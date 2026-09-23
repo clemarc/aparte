@@ -38,3 +38,26 @@
 - Rationale/evidence: first commit failed for both reasons; user authorizes local commits and forbids using release credentials. No global configuration changed.
 - Alternatives: inventing owner identity rejected; blocking coding on Git setup unnecessary.
 - Affects: local commit metadata, trivially replaceable before any separately authorized publication. Final review: no.
+
+## D006 — Recovery for attempted writes
+- Question: whether API return or Cmd-V dispatch proves insertion.
+- Adopted: record an attempted write and keep the one transient recovery result with “Insertion unconfirmed — check the target before copying.” No automatic retry or alternate mutation path. Even AX errors do not fall back.
+- Evidence: AX success is not app-level evidence; paste offers no acknowledgement. PRD prioritizes avoiding duplicates over silent retry.
+- Alternative: assuming success and discarding all recovery loses a recoverable result; automatic fallback can duplicate text.
+- Assumption: validated adapter happy paths still need visual evidence; the app cannot generally confirm. Affects coordinator/recovery; low change cost. Final review: yes.
+
+## D007 — Speech gate and Unicode
+- Provisional: 250 ms minimum, RMS >= 0.001 (-60 dBFS), Whisper no-speech 0.6 with low log probability, compression ratio >2.4 or four repeated 1–8-word phrases (at least 12 words) rejects the entire result.
+- Rationale: conservative energy floor preserves quiet speech; no per-word deletion/paraphrasing. Must calibrate against training-only quiet/noise clips and report held-out quality.
+- Alternative: aggressive energy gating risks quiet-speaker rejection; energy alone cannot identify speech.
+- Unicode: remove Unicode Cc control codes and map line/tab separators to spaces, retain Cf joiners needed for emoji. Unit evidence caught Foundation controlCharacters removing emoji joiners and the implementation was fixed.
+- Affects speech accuracy/insertion; easy thresholds to revisit, medium quality-validation cost. Final review: yes, high uncertainty until corpus validation.
+
+## D008 — Lazy clipboard proof on macOS 26.6
+- Question: how to enforce the PRD's refusal of lazy data without accidentally invoking its provider?
+- Adopted conservative interpretation: automatic snapshot accepts an empty clipboard or a matching change-count receipt for an eager write made by this adapter. Unknown nonempty clipboards go to Recovery before data access. Full multi-item representations are preserved for provably eager content.
+- Evidence: a separate real AppKit owner process supplied a lazy `NSPasteboardItemDataProvider`. The public `PasteboardGetItemFlavorFlags` returned 0 for its actual string flavor; fetching the data invoked the provider. Implicit system-translated flavors had promised flags but are not owner-supplied data. Both same-process and cross-process tests exposed this. Temporary diagnostics were removed.
+- Alternatives: treating flags=0 or a fast provider as proof of eagerness violates the explicit refusal requirement; private APIs are inappropriate. An unsafe override is not provided.
+- Conflict/uncertainty: public eager/lazy classification is insufficient on this host. Therefore general externally-owned rich/text/image clipboard happy-path acceptance remains BLOCKED by this OS/API limitation, even though safety tests pass. The app explicitly offers Copy instead. This restricts clipboard automatic insertion significantly; it is not full M2/M4 acceptance.
+- Affects: clipboard and Terminal/VS Code/Chrome/Slack automatic paste; low implementation change cost if a reliable public method becomes available, high validation importance. Final review: yes, highest impact.
+- Earlier M2 helper tests passed full snapshots before this stronger adversarial case exposed the limitation; that evidence is not being presented as full acceptance. Tests now distinguish known eager writes from unknown foreign provenance while retaining strict lazy refusal.

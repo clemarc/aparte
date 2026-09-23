@@ -34,3 +34,13 @@ PASS requires actual evidence; BLOCKED means missing external prerequisite; FAIL
 | Permission UI visual/revoke/restart behavior | BLOCKED | Native UI automation connection closed; owner privacy grants absent |
 | 10 live dictations each TextEdit/Terminal; no submission; warm latency | BLOCKED | Microphone/Accessibility/posting grants and live speaker needed |
 | Capture start p95 / physical device-route tests | BLOCKED | Actual microphone permission and hardware interaction needed |
+
+## M2 final evidence
+| Requirement | Status | Evidence |
+|---|---|---|
+| Safe mutation policy, no retry, target identities, transient Recovery implemented | PASS | Built native services; reducer/gesture/clipboard policy tests |
+| Real eager-owned rich/image/multi-item/empty restoration and concurrent-copy preservation | PASS | ClipboardIntegrationTests using private named boards; no general clipboard access |
+| Foreign lazy-provider refusal without materialization | PASS | Dedicated owner process test, zero provider requests; production refuses unknown provenance |
+| General foreign rich/text/image clipboard happy path | BLOCKED | D008: public metadata flags=0 for lazy provider on macOS 26.6; conservative Recovery restriction |
+| Actual AX selected text / 5-app compatibility / visual confirmation | BLOCKED | Missing app privacy grants and native UI tool connection |
+| Current automated suite | PASS | 27 tests, zero failures, artifacts/unit-tests.log |

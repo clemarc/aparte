@@ -30,8 +30,10 @@ import AparteSpeech
     private var startup: Task<Void, Never>?
     private var operation: Task<Void, Never>?
     private var preparation: Task<Void, Never>?
+    private var modelGeneration = UUID()
     private var deadline: Task<Void, Never>?
-    private var audioDraining = false
+    private var audioDrains = 0
+    private var audioDraining: Bool { audioDrains > 0 }
     private var startedAt: Date?
     private var watchdog: Timer?
     private var observers: [NSObjectProtocol] = []
@@ -60,7 +62,11 @@ import AparteSpeech
         memoryPressure = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
         memoryPressure?.setEventHandler { [weak self] in Task { @MainActor in self?.unloadIfIdle() } }; memoryPressure?.resume()
         recheck()
-        if installed(preferences.model) { prepare(preferences.model) }
+        preparation = Task {
+            try? await ModelStore(root: modelsRoot).cleanInterruptedStages()
+            preparation = nil
+            if installed(preferences.model) { prepare(preferences.model) } else { refresh() }
+        }
     }
     var sessionBusy: Bool { machine.id != nil || machine.engineBusy || audioDraining || startup != nil || operation != nil || preparation != nil }
     func installed(_ id: String) -> Bool { FileManager.default.fileExists(atPath: modelsRoot.appendingPathComponent(id).appendingPathComponent("tokenizer.json").path) }
@@ -83,21 +89,22 @@ import AparteSpeech
     func prepare(_ id: String) {
         guard !sessionBusy, !installing, let manifest = catalog?.models.first(where: { $0.id == id }) else { notice = "Finish the current operation first."; return }
         let previous = preferences.model
-        machine.preparing(); modelLoaded = false; modelStatus = "Preparing \(id)…"; refresh()
+        let generation = UUID(); modelGeneration = generation
+        machine.preparing(); modelLoaded = false; modelStatus = "Preparing \(id)…"
         preparation = Task {
             do {
                 try await speech.load(directory: modelsRoot.appendingPathComponent(id), manifest: manifest)
-                guard !Task.isCancelled else { throw AparteError.cancelled }
+                guard !Task.isCancelled, modelGeneration == generation else { throw AparteError.cancelled }
                 preferences.model = id; persist(); modelLoaded = true; modelStatus = "\(id.capitalized) prepared"; notice = "Hold your shortcut when Ready. Speak after Recording appears."
             } catch {
                 modelStatus = "Model load failed (\(id))."
-                if previous != id, let old = catalog?.models.first(where: { $0.id == previous }) {
-                    do { try await speech.load(directory: modelsRoot.appendingPathComponent(previous), manifest: old); modelLoaded = true; modelStatus = "Kept \(previous); requested switch failed." } catch { modelLoaded = false }
-                }
+                modelLoaded = await speech.activeModelID == previous
+                if modelLoaded { modelStatus = "Kept \(previous); requested switch failed." }
                 notice = (error as? AparteError)?.localizedDescription ?? "Model could not be prepared. Verify or reinstall it."
             }
             preparation = nil; refresh()
         }
+        refresh()
     }
     private func begin() {
         if bindingTest { notice = "Shortcut detected. Release it to finish the test. Other apps may still conflict."; onStatus?(); return }
@@ -123,11 +130,14 @@ import AparteSpeech
         guard let id = machine.id else { return }
         if machine.state == .startingCapture { cancel("Released before capture started; nothing recorded."); return }
         guard machine.release(id) else { return }
-        ticket?.cancel(); audioDraining = true; notice = "Transcribing locally…"; refresh()
+        ticket?.cancel(); audioDrains += 1; notice = "Transcribing locally…"; refresh()
         operation = Task {
             defer { deadline?.cancel(); deadline = nil; operation = nil; machine.unwind(); targetService.stopObserving(); refresh() }
             do {
-                let samples = try await audio.stop(discard: false); audioDraining = false; ticket = nil
+                let samples: [Float]
+                do { samples = try await audio.stop(discard: false); audioDrains -= 1 }
+                catch { audioDrains -= 1; throw error }
+                ticket = nil
                 guard machine.id == id, !Task.isCancelled else { return }
                 deadline = Task { try? await Task.sleep(for: .seconds(30)); guard !Task.isCancelled, self.machine.id == id else { return }; self.cancel(AparteError.timeout.localizedDescription) }
                 let result = try await speech.transcribe(samples, language: preferences.language)
@@ -136,7 +146,6 @@ import AparteSpeech
                 if result.noSpeech { notice = "No speech detected."; machine.finish(id); return }
                 await insert(result.text, id: id)
             } catch {
-                audioDraining = false
                 if machine.id == id { machine.cancel(); notice = (error as? AparteError)?.localizedDescription ?? "Transcription failed. Retry or prepare the model again." }
             }
         }
@@ -153,7 +162,7 @@ import AparteSpeech
         if target.method == "selectedText" {
             targetService.stopObserving() // Own mutation must not invalidate itself.
             switch targetService.insertSelectedText(text, into: target) {
-            case .attempted: notice = "Insertion attempted. Check the target."; machine.finish(id)
+            case .attempted: recover(text, id: id, uncertain: true)
             case .uncertain: recover(text, id: id, uncertain: true)
             case .unattempted: recover(text, id: id, uncertain: false)
             }
@@ -166,7 +175,7 @@ import AparteSpeech
             try clipboard.write(text, snapshot: snapshot)
             guard machine.id == id, !machine.invalidatedTarget, targetService.valid(target) else { clipboard.restore(); recover(text, id: id, uncertain: false); return }
             targetService.stopObserving()
-            if clipboard.dispatchPaste() { notice = "Paste attempted. Check the target."; machine.finish(id) }
+            if clipboard.dispatchPaste() { recover(text, id: id, uncertain: true) }
             else { recover(text, id: id, uncertain: false) }
         } catch { recover(text, id: id, uncertain: false) }
     }
@@ -183,8 +192,8 @@ import AparteSpeech
         ticket?.cancel(); startup?.cancel(); operation?.cancel(); deadline?.cancel(); deadline = nil
         machine.cancel(); targetService.stopObserving(); target = nil; clipboard.restore(); notice = reason
         if wasActive {
-            audioDraining = true
-            Task { _ = try? await audio.stop(discard: true); audioDraining = false; ticket = nil; refresh() }
+            audioDrains += 1
+            Task { _ = try? await audio.stop(discard: true); audioDrains -= 1; ticket = nil; refresh() }
         }
         refresh()
     }
@@ -199,7 +208,7 @@ import AparteSpeech
         }
         if let expiry = recoveryExpires, Date() >= expiry { discardRecovery(); notice = "Recovery expired." }
         if ticks % 20 == 0 {
-            if (machine.id != nil || modelLoaded) && !PermissionStatus().canDictate { cancel("Permission revoked. Recheck access in Settings.") }
+            if machine.id != nil && !PermissionStatus().canDictate { cancel("Permission revoked. Recheck access in Settings.") }
             permissionSummary = PermissionStatus().summary
         }
         if machine.state == .recording { onStatus?() }
@@ -226,12 +235,13 @@ extension Coordinator {
         guard !sessionBusy, !installing, let manifest = catalog?.models.first(where: { $0.id == id }) else { return }
         installing = true; installProgress = 0; modelStatus = source == nil ? "Downloading \(id)…" : "Verifying import…"
         let store = ModelStore(root: modelsRoot)
+        let generation = UUID(); modelGeneration = generation
         preparation = Task {
             do {
-                try await store.install(manifest, importing: source) { progress in Task { @MainActor in self.installProgress = progress } }
+                try await store.install(manifest, importing: source) { progress in Task { @MainActor in if self.modelGeneration == generation && self.installing { self.installProgress = progress } } }
                 modelStatus = "\(id.capitalized) installed. Prepare it before use."
             } catch { modelStatus = Task.isCancelled ? "Installation cancelled. Existing model preserved." : "Install failed. Check network, space or matching assets; retry or import." }
-            installing = false; preparation = nil; refresh()
+            modelGeneration = UUID(); installing = false; preparation = nil; refresh()
         }
     }
     func cancelInstall() { if installing { preparation?.cancel() } }

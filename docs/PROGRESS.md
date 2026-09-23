@@ -2,10 +2,11 @@
 
 Scope: PRD v2 M0–M4, sequential checkpoints. Started 2026-09-23.
 
-## Current checkpoint: M0
+## Current checkpoint: M2 hardening, then M3
 - Complete PRD read; repository initially contains only PRD, preserved.
 - Native environment: arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Chip/RAM collection in progress.
-- Local Git initialized; no remote. Public upstream source fetch in progress.
+- Local M0/M1 commits exist; no remote. Pinned source/models available in ignored artifacts.
+- Restart instruction received; resumed from actual state without deleting work. Latest additional lazy-provider test exposed same-process framework materialization and implicit translated flavors; resolving with cross-process fixture and declared-type filtering. Benchmark has not run yet; earlier launch attempts failed compilation during this work.
 
 ## Plan / next step
 1. M0: pin/review WhisperKit and model/tokenizer assets; Xcode app + testable modules, scripts, real fixture and cold offline engine validation; compile early.
@@ -35,3 +36,17 @@ Scope: PRD v2 M0–M4, sequential checkpoints. Started 2026-09-23.
 - Live TextEdit/Terminal 10-attempt gates and warm release-to-insertion latency BLOCKED by missing microphone/AX/post grants and absent consented speech. Production adapters remain unvalidated, not falsely enabled.
 - UI inspection attempted once using native computer-use API; failed `Sky Computer Use native pipe closed before response`. App launch verified by process only; visual/VoiceOver review BLOCKED.
 - Next: M2 test real named-pasteboard transactions, strengthen target/recovery paths, document compatibility protocol, then M3 lifecycle/corpus.
+
+## M2 checkpoint
+- Safe selected-text AX service and scoped target identities/selection metadata implemented; never reads surrounding text. AX observer plus user input events invalidate focus/caret edits; no reactivation.
+- Clipboard service now testable independently and exercised against actual named NSPasteboards. 20 tests pass (five production pasteboard tests included). Newer copies preserved; all eager formats retained; empty/multi-item/rich/image/oversized/promised cases covered. General clipboard untouched by tests.
+- One transient five-minute Recovery result retained for unconfirmed attempts; explicit Copy replaces clipboard; no retry path.
+- Compatibility protocol and candidate catalog documented. Actual cross-app compatibility stays BLOCKED by grants; tested helper policies are not target acceptance.
+- Additional hardening in progress: consult public Pasteboard flavor flags to reject lazy providers before materialization.
+- Next checkpoint: M3 model lifecycle verification, settings/rebind/login review, real comparative synthetic corpus benchmarks.
+
+## M2 final feasible checkpoint (after restart)
+- 27 tests pass, including a separate real lazy-provider owner process. See D008: public metadata cannot prove foreign AppKit data eagerness. Unknown nonempty clipboard now refuses without materializing or mutating it; eager-owned rich/multi-item restoration is verified.
+- General clipboard happy-path gate remains BLOCKED by OS/API proof limitation; all target happy paths remain BLOCKED by privacy grants. No falsely validated adapters.
+- Model atomic import/corruption/cancellation/symlink/space tests also pass as M3 groundwork.
+- Next/current: M3 Release base/small benchmark and actual model downloader/switch integration, then M4 full review and final evidence.

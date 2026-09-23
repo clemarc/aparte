@@ -18,3 +18,5 @@ public enum ClipboardPolicy {
         return !lower.contains("promise") && !lower.contains("promised") && !lower.contains("lazy")
     }
 }
+
+public enum EventIdentity { public static let marker: Int64 = 0x415041525445 }

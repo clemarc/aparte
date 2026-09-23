@@ -2,7 +2,8 @@
 source "$(dirname "$0")/common.sh"
 [[ $# == 2 && $1 == --suite ]] || { echo 'Usage: test-local.sh --suite unit|integration' >&2; exit 64; }
 case "$2" in
-unit) swift test --disable-automatic-resolution 2>&1 | tee artifacts/unit-tests.log ;;
+unit) xcrun swiftc Tests/Fixtures/LazyClipboardOwner.swift -o artifacts/lazy-clipboard-owner
+  swift test --disable-automatic-resolution 2>&1 | tee artifacts/unit-tests.log ;;
 integration)
   model=${APARTE_MODEL_DIR:-artifacts/models/base}
   fixture=${APARTE_FIXTURE:-artifacts/upstream/Tests/WhisperKitTests/Resources/jfk.wav}

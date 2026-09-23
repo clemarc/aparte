@@ -4,7 +4,7 @@ import Carbon
 import AparteCore
 
 @MainActor final class HotkeyService {
-    static let eventMarker: Int64 = 0x415041525445
+    static let eventMarker: Int64 = EventIdentity.marker
     private var tap: CFMachPort?
     private var source: CFRunLoopSource?
     private var matcher = GestureMatcher()
@@ -39,7 +39,7 @@ import AparteCore
     }
     private func handle(_ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
-            onDisabled?()
+            DispatchQueue.main.async { self.onDisabled?() }
             if let tap, AXIsProcessTrusted() { CGEvent.tapEnable(tap: tap, enable: true) }
             return Unmanaged.passUnretained(event)
         }
