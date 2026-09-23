@@ -1,1 +1,1 @@
-{"inactiveDeletion":true,"missingTokenizerRefused":true,"outboundURLRequests":0,"phase":"model-lifecycle","realSwitchBackAndForth":true,"verifiedImport":true,"workingEnginePreserved":true}
+{"coreMLLoadFailureRollback":true,"inactiveDeletion":true,"missingTokenizerRefused":true,"outboundURLRequests":0,"phase":"model-lifecycle","realInferenceCancellationAndRetry":true,"realSwitchBackAndForth":true,"verifiedImport":true,"workingEnginePreserved":true}

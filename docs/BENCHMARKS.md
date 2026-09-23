@@ -49,7 +49,7 @@ Initial M0 fresh-model base preparation was 5.874 s with a public upstream JFK f
 
 ## Offline and logging evidence
 
-Both full benchmark processes ran under `(deny network*)` and a URLProtocol request interceptor: **0 observed outbound URL requests**, stderr empty. The source audit confirms local-only tokenizer parsing (no Hub fallback) and disabled WhisperKit logs. The offline lifecycle check imported verified assets, rejected a missing tokenizer without a request, preserved the working engine, switched both directions and deleted an inactive model. See `docs/evidence/model-lifecycle.json`.
+Both full benchmark processes ran under `(deny network*)` and a URLProtocol request interceptor: **0 observed outbound URL requests**, stderr empty. The source audit confirms local-only tokenizer parsing (no Hub fallback) and disabled WhisperKit logs. The offline lifecycle check imported verified assets, rejected a missing tokenizer without a request, preserved the working engine, switched both directions, cancelled real inference then retried successfully, and deleted an inactive model. A deliberately invalid Core ML model with a derived test-only integrity manifest failed to load after unload; the previous working small engine was reloaded and transcribed successfully. See `docs/evidence/model-lifecycle.json`.
 
 Process network denial proves offline operation; the interceptor and inspected production call path provide separate evidence about attempted requests. This is scoped to the exercised paths, not a proof about arbitrary future dependency changes.
 

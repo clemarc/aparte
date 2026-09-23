@@ -102,7 +102,13 @@ private final class SnapshotRace: @unchecked Sendable {
     }
     private func owns() -> Bool {
         guard let pending else { return false }; let board = NSPasteboard(name: boardName)
-        return ClipboardPolicy.owns(expectedCount: pending.count, actualCount: board.changeCount, expectedMarker: pending.marker, actualMarker: board.string(forType: Self.markerType), expectedText: pending.text, actualText: board.string(forType: .string))
+        // Do not even request representations after another owner has replaced us:
+        // a foreign string may be a lazy provider with side effects.
+        guard board.changeCount == pending.count else { return false }
+        let marker = board.string(forType: Self.markerType)
+        guard marker == pending.marker, board.changeCount == pending.count else { return false }
+        let text = board.string(forType: .string)
+        return ClipboardPolicy.owns(expectedCount: pending.count, actualCount: board.changeCount, expectedMarker: pending.marker, actualMarker: marker, expectedText: pending.text, actualText: text)
     }
     public func restore() {
         restoration?.cancel(); restoration = nil

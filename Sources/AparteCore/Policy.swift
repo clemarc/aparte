@@ -61,7 +61,7 @@ public struct SessionMachine: Sendable {
     public private(set) var engineBusy = false
     public private(set) var invalidatedTarget = false
     public init() {}
-    public mutating func prepared(_ ready: Bool) { guard id == nil, !engineBusy else { return }; state = ready ? .ready : .needsSetup }
+    public mutating func prepared(_ ready: Bool, clearError: Bool = false) { guard id == nil, !engineBusy, state != .error || clearError || !ready else { return }; state = ready ? .ready : .needsSetup }
     public mutating func preparing() { guard id == nil, !engineBusy else { return }; state = .preparing }
     public mutating func begin() -> UUID? {
         guard (state == .ready || state == .recovery), !engineBusy else { return nil }
@@ -76,7 +76,7 @@ public struct SessionMachine: Sendable {
     }
     public mutating func invalidateTarget() { if id != nil { invalidatedTarget = true } }
     public mutating func decoded(_ token: UUID) -> Bool { guard id == token, state == .transcribing else { return false }; engineBusy = false; state = .inserting; return true }
-    public mutating func unwind() { engineBusy = false; if id == nil { state = .ready } }
+    public mutating func unwind() { engineBusy = false; if id == nil && state != .error { state = .ready } }
     public mutating func finish(_ token: UUID, recovery: Bool = false) { guard id == token else { return }; id = nil; state = recovery ? .recovery : .ready }
     public mutating func cancel() { id = nil; invalidatedTarget = true; state = engineBusy ? .transcribing : .ready }
     public mutating func fail() { id = nil; state = .error }

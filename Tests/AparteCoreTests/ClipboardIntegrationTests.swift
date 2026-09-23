@@ -54,6 +54,24 @@ import AppKit
 }
 
 extension ClipboardIntegrationTests {
+    func testNewLazyOwnerIsNotReadDuringRestoration() async throws {
+        let board = board(); defer { board.releaseGlobally() }
+        let service = ClipboardService(boardName: board.name)
+        service.copyExplicit("original")
+        try service.write("dictation", snapshot: await service.snapshot())
+        let process = Process(); let output = Pipe()
+        process.executableURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("artifacts/lazy-clipboard-owner")
+        process.arguments = [board.name.rawValue]; process.standardOutput = output
+        try process.run(); defer { if process.isRunning { process.terminate() } }
+        XCTAssertEqual(String(data: output.fileHandleForReading.availableData, encoding: .utf8), "READY\n")
+        let foreignCount = board.changeCount
+        service.restore()
+        XCTAssertEqual(board.changeCount, foreignCount)
+        process.terminate(); process.waitUntilExit()
+        let rest = output.fileHandleForReading.readDataToEndOfFile()
+        XCTAssertFalse(String(data: rest, encoding: .utf8)!.contains("REQUESTED"), "restoration must not read a newer lazy owner's data")
+    }
+
     func testActualLazyProviderRefusedWithoutMaterializing() async throws {
         let name = "dev.aparte.tests." + UUID().uuidString
         let board = NSPasteboard(name: .init(name)); defer { board.releaseGlobally() }

@@ -1,6 +1,6 @@
 # Acceptance ledger — M0–M4
 
-**M4 NOT ACCEPTED.** Feasible implementation and local checks are complete subject to the final checks listed in PROGRESS. Real-device/target gates are blocked, and D008 restricts clipboard automation. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
+**M4 NOT ACCEPTED.** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and evidence/verification.json. Real-device/target gates are blocked, and D008 restricts clipboard automation. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
 
 Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Target is arm64 macOS 14+. CLI preflight: microphone notDetermined; Accessibility/listening/posting false. No grants or security settings were changed. Native UI inspection failed (closed pipe; after restart, timeoutReached).
 
@@ -9,7 +9,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | ID / requirement | Status | Actual evidence |
 |---|---|---|
 | §1 complete PRD/environment before implementation | PASS | Full PRD read; native toolchain/chip/RAM recorded before app work |
-| §1 local Git, preservation, sequential milestones | PASS | Original PRD preserved; local M0/M1/M2/M3 commits; progress/decisions maintained after restart |
+| §1 local Git, preservation, sequential milestones | PASS | Original PRD preserved; local M0/M1/M2/M3/M4 commits; progress/decisions maintained after restart |
 | §1 no remote/CI/publication/credentials/M5 | PASS | No Git remote/workflow; ad-hoc local signature only; repository/history audit in final evidence |
 | §1.3 source, documentation, evidence bundle | PASS | README and all required docs, frozen fixtures, raw synthetic benchmark evidence |
 | §2 native menu bar, Swift/AppKit/SwiftUI, arm64 macOS14 | PASS | Xcode target/shared scheme; Debug and Release builds; arm64 binary and plist target 14.0 |
@@ -28,7 +28,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 
 | Requirement | Status | Actual evidence |
 |---|---|---|
-| §4 explicit states, IDs, no stale completion, busy serialization | PASS | SessionMachine tests; real engine actor holds lease across await; Coordinator IDs/operation guards |
+| §4 explicit states, IDs, no stale completion, busy serialization | PASS | SessionMachine tests including visible failure until explicit retry; real engine actor holds lease across await; Coordinator IDs/operation guards |
 | §4 release during startup; no late Recording | PASS | Reducer tests; cancellable capture ticket and serial lifecycle queue; physical timing BLOCKED |
 | §4 key repeat, either modifier release, matched key-up after cancel/rebind | PASS | Gesture tests, including Escape auto-repeat after cancel; event-tap delivery BLOCKED |
 | §4 unrelated input passes; own paste ignored | PASS | Matcher and marker tests/source; native global tap check BLOCKED |
@@ -62,7 +62,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Clipboard lazy/unknown refusal without provider invocation | PASS | Separate real owner process regression passes; no clipboard data requested on unknown provenance |
 | Clipboard externally-owned ordinary/rich/image happy paths | BLOCKED | D008: public flavor metadata fails to distinguish AppKit lazy providers; automatic paste restricted to empty or known eager-owned clipboard |
 | Clipboard full eager-owned multi-item/rich/image/empty restoration | PASS | Real named-pasteboard production service tests; all representations retained; user's clipboard untouched |
-| Clipboard concurrent new copy preserved / snapshot-to-write race | PASS | Real isolated-board tests + marker/content/changeCount checks |
+| Clipboard concurrent new copy preserved / snapshot-to-write race | PASS | Real isolated-board tests + marker/content/changeCount checks; newer foreign lazy owner is not read during restoration |
 | Clipboard one-second delay and slow/custom target consumption | BLOCKED | Restoration task implemented; exact target consumption/delayed paste requires real compatibility tests |
 | Clipboard cancel/orderly quit / crash boundaries | BLOCKED | Conditional restore code present; actual app quit-during-paste needs grants. Crash recovery explicitly not promised |
 | Recovery one result / 5min / Copy/View/Discard / expiry | PASS | Implemented observable memory-only result, timer, lock/new-session clearing, explicit-copy tests; visual panel/lock exercise BLOCKED |
@@ -82,7 +82,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | MODEL-02 hashes/config/tokenizers/revision/licences | PASS | Per-file manifest; local SHA-256; third-party source/licence provenance documented |
 | MODEL-03 explicit HTTPS/progress/cancel/space/atomic install | PASS | Production downloader success; atomic import/replace/corrupt/cancel/symlink/space unit checks; real cancelled download final report |
 | MODEL-04 offline import/delete/one-engine switch and rollback | PASS | Actual offline lifecycle evidence; missing-tokenizer switch preserves current working engine; two-way real switch and inactive deletion |
-| MODEL-04 load-failure rollback after unload | PASS | Production catch reloads prior engine; pre-unload validation failure exercised. A genuine Core ML load failure after successful hashes has not been induced |
+| MODEL-04 load-failure rollback after unload | PASS | Real Core ML rejected a deliberately invalid model.mil under a derived test-only matching manifest; the previous small engine reloaded and transcribed successfully (model-lifecycle.json) |
 | §8 no app-originated ASR network/cold offline/tokenizer fallback | PASS | Offline base/small full runs and lifecycle; 0 intercepted requests; strict local parser source audit |
 | §8 no persistent audio/transcript/snapshot/private fixtures | PASS | App write-path audit; only preferences/models persisted; committed corpus/evidence are synthetic; ignore/history audit |
 | §8 honest clipboard/destination/OS memory/privacy limitations | PASS | Onboarding, README, PRIVACY and D008; no “text never leaves” promise |
@@ -105,7 +105,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | App/window/field/caret/type/exit/secure/no-editable | BLOCKED | Implemented conservative guards; target matrix not executed |
 | Ambiguous AX/delayed paste/concurrent copy/rich/lazy/quit/crash | BLOCKED | Real clipboard ownership and strict lazy tests PASS; D008 and AX/target/quit tests blocked |
 | Stereo/rates/silence/quiet/59/60/unplug/change | BLOCKED | File conversion and synthetic audio tests PASS; live route/unplug/capture boundaries need device |
-| Interrupted/corrupt/space/offline-tokenizer/bad selection/switch/revoke | BLOCKED | Store/engine tests PASS; native permission revocation and Core ML post-verification load-failure UI remain unexercised |
+| Interrupted/corrupt/space/offline-tokenizer/bad selection/switch/revoke | BLOCKED | Store/engine tests PASS; actual permission revocation and visual model-failure UI remain unexercised; real post-verification Core ML rollback passed |
 | Local Release app | PASS | Native Release build, ad-hoc signature verified, stable install path and public small assets present |
 | Native visual/accessibility onboarding and indicators | BLOCKED | Computer-use connection closed/timeout; code-based accessible labels are not visual/VoiceOver evidence |
 | M0–M4 full acceptance | BLOCKED | Above device/runtime/target/clipboard proof gates; do not label M4 accepted |

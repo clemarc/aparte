@@ -98,6 +98,7 @@ import AparteSpeech
                 preferences.model = id; persist(); modelLoaded = true; modelStatus = "\(id.capitalized) prepared"; notice = "Hold your shortcut when Ready. Speak after Recording appears."
             } catch {
                 modelStatus = "Model load failed (\(id))."
+                machine.fail()
                 modelLoaded = await speech.activeModelID == previous
                 if modelLoaded { modelStatus = "Kept \(previous); requested switch failed." }
                 notice = (error as? AparteError)?.localizedDescription ?? "Model could not be prepared. Verify or reinstall it."
@@ -111,7 +112,7 @@ import AparteSpeech
         guard !sessionBusy else { notice = "Busy — this hold was ignored."; onStatus?(); return }
         guard modelLoaded, PermissionStatus().canDictate, !HotkeyService.secureInput else { notice = "Not ready. Recheck model, microphone and Accessibility in Settings."; recheck(); return }
         do { target = try targetService.capture() } catch { notice = "Secure or read-only context. Dictation refused."; onStatus?(); return }
-        machine.prepared(true)
+        machine.prepared(true, clearError: true)
         guard let id = machine.begin() else { return }
         discardRecovery(); startedAt = Date(); elapsed = 0
         notice = "Starting microphone…"; let newTicket = CaptureTicket(); ticket = newTicket
@@ -122,7 +123,7 @@ import AparteSpeech
                     guard let self, self.machine.started(id) else { return }
                     self.startedAt = Date(); self.notice = "Recording — release to transcribe, Escape to cancel."; self.refresh()
                 } }
-            } catch { if machine.id == id { machine.cancel(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start." } }
+            } catch { if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start." } }
             startup = nil; refresh()
         }
     }
@@ -139,14 +140,14 @@ import AparteSpeech
                 catch { audioDrains -= 1; throw error }
                 ticket = nil
                 guard machine.id == id, !Task.isCancelled else { return }
-                deadline = Task { try? await Task.sleep(for: .seconds(30)); guard !Task.isCancelled, self.machine.id == id else { return }; self.cancel(AparteError.timeout.localizedDescription) }
+                deadline = Task { try? await Task.sleep(for: .seconds(30)); guard !Task.isCancelled, self.machine.id == id else { return }; self.cancel(AparteError.timeout.localizedDescription); self.machine.fail(); self.refresh() }
                 let result = try await speech.transcribe(samples, language: preferences.language)
                 guard machine.decoded(id), !Task.isCancelled else { return }
                 deadline?.cancel(); deadline = nil
                 if result.noSpeech { notice = "No speech detected."; machine.finish(id); return }
                 await insert(result.text, id: id)
             } catch {
-                if machine.id == id { machine.cancel(); notice = (error as? AparteError)?.localizedDescription ?? "Transcription failed. Retry or prepare the model again." }
+                if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Transcription failed. Retry or prepare the model again." }
             }
         }
     }
@@ -208,8 +209,11 @@ import AparteSpeech
         }
         if let expiry = recoveryExpires, Date() >= expiry { discardRecovery(); notice = "Recovery expired." }
         if ticks % 20 == 0 {
-            if machine.id != nil && !PermissionStatus().canDictate { cancel("Permission revoked. Recheck access in Settings.") }
-            permissionSummary = PermissionStatus().summary
+            let permissions = PermissionStatus()
+            if machine.id != nil && !permissions.canDictate { cancel("Permission revoked. Recheck access in Settings.") }
+            let changed = permissionSummary != permissions.summary
+            permissionSummary = permissions.summary
+            if changed { refresh() }
         }
         if machine.state == .recording { onStatus?() }
     }

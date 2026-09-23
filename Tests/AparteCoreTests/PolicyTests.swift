@@ -22,6 +22,16 @@ final class PolicyTests: XCTestCase {
         var s = SessionMachine(); s.prepared(true); let id = s.begin()!; XCTAssertTrue(s.started(id)); XCTAssertTrue(s.release(id))
         s.cancel(); XCTAssertNil(s.begin()); XCTAssertFalse(s.decoded(id)); s.unwind(); XCTAssertNotNil(s.begin())
     }
+    func testFailureRemainsVisibleUntilExplicitRetry() {
+        var s = SessionMachine(); s.prepared(true); let id = s.begin()!
+        XCTAssertTrue(s.started(id)); XCTAssertTrue(s.release(id))
+        s.fail(); XCTAssertNil(s.begin()); XCTAssertFalse(s.decoded(id))
+        s.unwind(); s.prepared(true)
+        XCTAssertEqual(s.state, .error); XCTAssertNil(s.begin())
+        s.prepared(true, clearError: true); XCTAssertNotNil(s.begin())
+        s.fail(); s.unwind(); s.prepared(false)
+        XCTAssertEqual(s.state, .needsSetup, "missing capabilities must still take precedence")
+    }
     func testOwnedKeyupAndModifiers() {
         var m = GestureMatcher()
         XCTAssertEqual(m.key(49, down: true, flags: Shortcut.standard.modifiers, active: false), .down)

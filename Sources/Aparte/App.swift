@@ -25,7 +25,7 @@ import AVFoundation
     }
     private func updateStatus() {
         guard item != nil else { return }
-        let status = coordinator.state == .recording ? "Recording \(Int(coordinator.elapsed))s" : coordinator.state.rawValue
+        let status = coordinator.notice.hasPrefix("Busy —") ? "Busy" : (coordinator.state == .recording ? "Recording \(Int(coordinator.elapsed))s" : coordinator.state.rawValue)
         item.button?.title = "Aparté · \(status)"; item.button?.setAccessibilityLabel("Aparté: \(status). \(coordinator.notice)")
         item.button?.toolTip = coordinator.notice
         let visible = [.startingCapture, .recording, .transcribing, .inserting].contains(coordinator.state)
@@ -121,6 +121,7 @@ struct SettingsView: View {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(entry.displayName).bold()
                                 Text("\(ByteCountFormatter.string(fromByteCount: entry.installedBytes, countStyle: .file)) installed · \(ByteCountFormatter.string(fromByteCount: entry.temporaryBytes, countStyle: .file)) free space needed for installation. First preparation may take several seconds or longer.").font(.caption)
+                                Text("Measured preparation: about \(entry.id == "base" ? "6" : "18") seconds on an M5 Pro with 48 GB RAM. Your Mac and cache state may differ.").font(.caption).foregroundStyle(.secondary)
                                 HStack { Button("Download") { model.installModel(entry.id) }; Button("Import…") { model.importModel(entry.id) }; Button("Prepare / Use") { model.prepare(entry.id) }.disabled(!model.installed(entry.id)); Button("Delete", role: .destructive) { model.deleteModel(entry.id) }.disabled(!model.installed(entry.id)) }.disabled(model.sessionBusy || model.installing)
                             }
                         }

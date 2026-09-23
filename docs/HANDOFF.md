@@ -8,7 +8,7 @@
 - Local ad-hoc Release app at `~/Applications/Aparte.app` and `artifacts/DerivedData/Build/Products/Release/Aparte.app`; signature verified. No Developer ID, notarisation, DMG or public release.
 - Verified public multilingual small model installed under `~/Library/Application Support/Aparte/Models/small/` for offline use. Base/small evaluation assets remain ignored in `artifacts/models/`.
 - Native capture, WhisperKit inference, guarded target/AX/clipboard paths, transient recovery, configurable hold shortcut/language/model management and truthful launch-at-login controls.
-- 27 passing tests including actual named-pasteboard and separate lazy-owner process checks; real offline engine/corpus, model installer, cancellation and model-switch evidence.
+- 29 passing tests including actual named-pasteboard and separate lazy-owner process checks; real offline engine/corpus, model installer, cancellation and model-switch evidence.
 - Small passed the fixed synthetic WER, technical-term and no-speech gates. Base failed technical terms, so small is the default. Exact results/raw data and limitations are in BENCHMARKS.
 
 M0 feasible gates passed. M1–M4 implementation continued despite missing permission/desktop prerequisites, as requested. Missing real-device evidence is not converted into acceptance. The final clean-checkout verification result is recorded in `docs/evidence/verification.json` and PROGRESS.
@@ -19,7 +19,7 @@ Automatic adapter catalog is empty until each exact app/OS version passes the re
 
 D008: macOS 26.6 returns ordinary public flavor metadata for a foreign lazy AppKit provider. The strict test proved fetching it invokes the provider. Unknown nonempty clipboards therefore cause Recovery without reading their data. Automatic paste is limited to empty or proven eager-owned clipboards. This limits common clipboard workflows and blocks the general rich/text/image clipboard happy-path gate. There is no unsafe override.
 
-No live recording was collected. Microphone/Accessibility/posting, real global shortcut delivery, actual insertion correctness, visible indicators, VoiceOver, physical device changes, lock/sleep, launch-at-login cycle and macOS14 runtime have not been accepted. Native UI tooling failed (closed connection, then timeout). Installed app process launch and code builds are evidence of those narrow checks only.
+No live recording was collected. Quit and reopen any previously running instance to use the final rebuilt bundle. Microphone/Accessibility/posting, real global shortcut delivery, actual insertion correctness, visible indicators, VoiceOver, physical device changes, lock/sleep, launch-at-login cycle and macOS14 runtime have not been accepted. Native UI tooling failed (closed connection, then timeout). Installed app process launch and code builds are evidence of those narrow checks only.
 
 File decode timings are not release-to-insertion latency. Synthetic speech quality is not natural microphone quality. Ordinary clipboard races and custom terminal paste handlers cannot be made atomic by this app. No Return is generated. Check an “Insertion unconfirmed” target before copying a recovery result again.
 
