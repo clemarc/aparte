@@ -17,7 +17,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | §2 hold-only/default chord/language scope/no deferred features | PASS | Production coordinator, configurable Control–Option–Space, Auto/en/fr; source inspection |
 | §2 stable name/bundle/install path | PASS | Aparte.app, display Aparté, dev.aparte.Aparte; local ~/Applications install/signature verified |
 | §3 pinned OSS WhisperKit only | PASS | Exact revision/lockfiles; WhisperKit/ArgmaxCore only app engine, no Pro SDK |
-| §3 testable modules and reproducible entry points | PASS | build/test/benchmark scripts; generated project committed; actual unit/integration/Release runs |
+| §3 testable modules and reproducible entry points | PASS | build/test/benchmark scripts; generated project committed; clean final-source Debug build and 29 tests, actual small integration and Release runs (evidence/verification.json) |
 | §3 scripts fail rather than skip | PASS | Missing prereq exits 2; actual compile/test failures and base benchmark gate returned nonzero during development |
 | §3 local ad-hoc signing | PASS | codesign verify strict/deep; Signature=adhoc, no TeamIdentifier |
 | M0 real production engine spike | PASS | Public 11 s JFK fixture actual transcription, M0 timings recorded |

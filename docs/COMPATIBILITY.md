@@ -12,7 +12,7 @@ Automatic adapters are deliberately disabled until the real target/version proto
 | Slack 4.52.155 draft composer | Clipboard Cmd-V, no submission | BLOCKED: permissions and target draft/login validation required |
 | macOS 14 | All | BLOCKED: host is macOS 26.6 |
 
-Native UI inspection attempt failed with `Sky Computer Use native pipe closed before response`; this does not establish a UI or app defect. Process launch succeeded. Versions are recorded in the final environment evidence after inspection.
+Native UI inspection failed with `Sky Computer Use native pipe closed before response`; after restart it failed with `timeoutReached`. This does not establish a UI or app defect. Process launch succeeded. Versions are recorded in the final environment evidence after inspection.
 
 ## Protocol to enable an adapter
 

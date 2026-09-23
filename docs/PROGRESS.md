@@ -6,7 +6,7 @@ Implementation through feasible M0–M4 scope is complete; validation pending. *
 
 Final source checks: 29 tests pass; native Release build passes and is installed at `~/Applications/Aparte.app` with a verified local ad-hoc signature. Public small assets are verified and installed in the managed model directory. No permissions were granted, live audio collected, or security settings changed. An earlier installed candidate launched as a process; desktop visual access failed. Reopen the app to load the final rebuilt bundle.
 
-Current next step: finish the final-source clean archive Debug/unit reproduction and integration smoke check, record evidence/verification.json, and make the evidence checkpoint commit. No implementation approval is pending. After that, stop with the M4 handoff; do not repeat unchanged external blockers or begin M5.
+Current next step: human/external validation in HANDOFF only. Final-source clean archive Debug/unit reproduction and real small integration both passed; evidence/verification.json records source c7fe4bd and installed binary digest. All feasible implementation and verification is complete. Stop at this M4 handoff; do not repeat unchanged external blockers or begin M5.
 
 ## Completed checkpoints
 
@@ -19,7 +19,7 @@ Current next step: finish the final-source clean archive Debug/unit reproduction
 ## Verification and evidence
 
 - Commands: `./scripts/build-local.sh --configuration Debug|Release`; `./scripts/test-local.sh --suite unit|integration`; `./scripts/benchmark-local.sh --manifest Tests/Fixtures/manifest.json`.
-- Clean archive of 18c64e1 resolved exact dependencies, built Debug and passed 27 then-existing tests without model assets. Final-source clean reproduction is the remaining verification above.
+- Clean archive of 18c64e1 resolved exact dependencies, built Debug and passed 27 then-existing tests without model assets. Final-source archive c7fe4bd likewise resolved, built Debug and passed all 29 tests with no model assets; actual small integration separately passed (3 s fixture, 0.332 s decode, zero observed URL requests).
 - Missing-model/fixture integration and benchmark checks both return 2 with explicit BLOCKED messages. Restricted sandbox hardware inspection now also returns 2 with the diagnostic location, instead of silently exiting.
 - Real fixture/model/benchmark/lifecycle/cancel/idle results: `docs/evidence/`. Large local logs, generated audio and weights remain ignored under `artifacts/`.
 - Source/history audit found no tracked weights/audio/build artifacts, private absolute paths, credential-pattern matches, remotes or hosted workflows. This is a scoped pattern audit, not proof against all possible secret formats.

@@ -1,0 +1,87 @@
+{
+  "verifiedAtUTC": "2026-09-23T18:57:26.278212+00:00",
+  "implementationCommit": "c7fe4bd8d877ca1903d7378b496d358f35d118bf",
+  "environment": {
+    "chip": "Apple M5 Pro",
+    "ramBytes": 51539607552,
+    "os": "macOS 26.6 (25G72)",
+    "xcode": "27.0 (27A266a)",
+    "swift": "6.4 (swiftlang-6.4.0.34.1)",
+    "sdk": "27.0",
+    "architecture": "arm64",
+    "deploymentTarget": "14.0"
+  },
+  "cleanArchive": {
+    "sourceCommit": "c7fe4bd8d877ca1903d7378b496d358f35d118bf",
+    "method": "git archive HEAD into empty ignored directory; no model assets; public locked dependencies resolved from cache/network",
+    "dependencyResolution": "PASS",
+    "DebugBuild": "PASS",
+    "unitTests": {
+      "status": "PASS",
+      "executed": 29,
+      "failures": 0,
+      "seconds": 0.452
+    },
+    "commands": [
+      "swift package resolve",
+      "./scripts/build-local.sh --configuration Debug",
+      "./scripts/test-local.sh --suite unit"
+    ]
+  },
+  "Release": {
+    "build": "PASS",
+    "unitTests": {
+      "executed": 29,
+      "failures": 0
+    },
+    "installedAt": "~/Applications/Aparte.app",
+    "strictDeepSignatureVerification": "PASS",
+    "signature": "adhoc",
+    "teamIdentifier": null,
+    "binarySHA256": "ec42d1d26c7c9f750c8d7af8be3bd3618193b530fbfce98ebb699cee95c9195d",
+    "processLaunch": "Earlier installed M4 candidate process observed; reopen to load final rebuilt bundle. Visual inspection blocked."
+  },
+  "integration": {
+    "command": "./scripts/test-local.sh --suite integration",
+    "status": "PASS",
+    "result": {
+      "audioSeconds": 3,
+      "decodeSeconds": 0.332409125,
+      "model": "small",
+      "noSpeech": false,
+      "outboundURLRequests": 0,
+      "prepareSeconds": 17.353801012039185,
+      "text": "Please open the window and close the door."
+    }
+  },
+  "missingPrerequisites": {
+    "integrationExitCode": 2,
+    "benchmarkExitCode": 2,
+    "hardwareInspectionDeniedExitCode": 2,
+    "scope": "Actual negative command checks; useful BLOCKED diagnostics, never successful skips."
+  },
+  "offlineLifecycle": {
+    "coreMLLoadFailureRollback": true,
+    "inactiveDeletion": true,
+    "missingTokenizerRefused": true,
+    "outboundURLRequests": 0,
+    "phase": "model-lifecycle",
+    "realInferenceCancellationAndRetry": true,
+    "realSwitchBackAndForth": true,
+    "verifiedImport": true,
+    "workingEnginePreserved": true
+  },
+  "sourceAudit": {
+    "historyThrough": "c7fe4bd8d877ca1903d7378b496d358f35d118bf",
+    "historyObjectsInspected": 184,
+    "trackedFiles": 65,
+    "absolutePrivatePathMatches": [],
+    "credentialPatternMatches": [],
+    "blobsOver2MiB": [],
+    "audioOrWeightFiles": [],
+    "remotes": [],
+    "hostedWorkflowFiles": [],
+    "scope": "Tracked/history pattern audit; not a guarantee against every secret format. Final evidence commit only adds sanitized documentation."
+  },
+  "acceptance": "Implementation complete through feasible M0-M4 scope; validation pending. M4 NOT accepted. See ACCEPTANCE and HANDOFF."
+}
