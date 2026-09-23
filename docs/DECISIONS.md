@@ -69,3 +69,14 @@
 - Alternatives: base is faster but fails the explicit 80% terms gate. Turbo adds download/resource/validation cost without need for an additional quality-passing candidate; left out as optional.
 - Assumptions/limitations: corpus uses original CC0 reference text and four installed synthetic voices (two/language); ten ordinary held-out clips plus quiet/noise held-out subsets; thresholds were not tuned on held-out output. Audio generated locally, not redistributed. Natural microphone speech and end-to-end latency remain unvalidated. Final model-selection generalization is provisional until live tests.
 - Affects: default preferences, README/benchmarks; very low switching cost, moderate revalidation cost. Final review: yes.
+
+## D010 — Layout-independent physical shortcut and local identity
+- Adopted: shortcuts persist physical macOS key codes and modifiers; settings label US physical positions and explicitly disclose this. The binding test verifies event delivery without recording once Accessibility/posting are available; microphone grant is not required for the test.
+- Question: represent configurable chords without promising universal layout/conflict behavior?
+- Rationale: physical chord stability is simple and matches CGEvent matching. Reserved/unsupported keys are rejected; matching original key-up remains owned after changes/cancellation.
+- Alternatives: character-based matching changes with layout/Option composition; a layout-aware label can be added without changing stored chords.
+- Uncertainty: non-US layout and per-app conflict UX requires physical validation. Affects hotkeys/settings; low cost to improve labels, medium to change storage semantics. Status adopted. Final review: yes, lower impact.
+
+## D007 update — M4 review
+- Small passed the frozen quiet/no-speech corpus with unchanged thresholds. Natural room-noise/microphone robustness is still unvalidated.
+- Sanitization additionally removes Unicode format controls (e.g. bidi overrides) except ZWJ/ZWNJ, preserving emoji/legitimate joiners. A regression test covers this; no visible words are rewritten.

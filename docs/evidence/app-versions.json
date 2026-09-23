@@ -1,0 +1,32 @@
+{
+  "TextEdit": {
+    "version": "1.20",
+    "build": "415",
+    "bundleID": "com.apple.TextEdit",
+    "runtimeCompatibility": "BLOCKED - privacy grants / desktop interaction"
+  },
+  "Terminal": {
+    "version": "2.15",
+    "build": "470.2",
+    "bundleID": "com.apple.Terminal",
+    "runtimeCompatibility": "BLOCKED - privacy grants / desktop interaction"
+  },
+  "VS Code": {
+    "version": "1.138.0",
+    "build": "1.138.0",
+    "bundleID": "com.microsoft.VSCode",
+    "runtimeCompatibility": "BLOCKED - privacy grants / desktop interaction"
+  },
+  "Chrome": {
+    "version": "153.0.8010.53",
+    "build": "8010.53",
+    "bundleID": "com.google.Chrome",
+    "runtimeCompatibility": "BLOCKED - privacy grants / desktop interaction"
+  },
+  "Slack": {
+    "version": "4.52.155",
+    "build": "452000155",
+    "bundleID": "com.tinyspeck.slackmacgap",
+    "runtimeCompatibility": "BLOCKED - privacy grants / desktop interaction"
+  }
+}

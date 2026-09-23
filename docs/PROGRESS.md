@@ -57,3 +57,12 @@ Scope: PRD v2 M0–M4, sequential checkpoints. Started 2026-09-23.
 - Fixed 55-clip synthetic corpus and 30 warm cases evaluated on real Release engine; raw evidence committed. Small passes WER/technical/no-speech gates; base fails terms 50%. Chose small default (D009), kept saved selections.
 - Both models completed 100 sessions, retained growth below 1%, no crash, 59/60 s file boundaries passed. Live/Ready/insertion timing remains BLOCKED.
 - Next: M4 final defect/adversarial review, unit/integration/build scripts, local Release install and complete handoff/evidence. Do not begin M5.
+
+## M4 active review
+- Final regression unit run: 27 tests, zero failures. Native Release built and strict ad-hoc signature verified; installed at ~/Applications/Aparte.app. Verified public small model imported into managed Application Support storage. App launched; no privacy grants changed.
+- Source review fixed Escape autorepeat ownership after cancellation, overlapping audio-drain tracking, rejected HTTP downgrade redirects, and clarified login status/shortcut labels. Format controls removed while preserving emoji joiners.
+- Real cancelled HTTPS installation passed: partial directory removed and previous verified installation preserved.
+- Real offline inference cancellation/retry passed. Additional real Core ML post-integrity loader-failure rollback exercise running.
+- Installed Release five-minute idle-resource sample running; this does NOT accept Ready idle CPU because Ready is blocked by grants.
+- Native UI inspection after restart still failed (timeoutReached); visual/VoiceOver remains BLOCKED, no further unchanged retries.
+- Remaining productive tasks: finish these checks, clean source-build reproduction, source/history audit, finalize acceptance/handoff and final local commit. No M5.

@@ -133,12 +133,12 @@ struct SettingsView: View {
                         Picker("Language", selection: $model.preferences.language) { Text("Auto").tag("auto"); Text("English").tag("en"); Text("French").tag("fr") }.onChange(of: model.preferences.language) { model.persist() }.disabled(model.sessionBusy)
                         HStack { Text("Shortcut: \(shortcutLabel)"); Button(recordingBinding ? "Press a chord…" : "Change…") { captureBinding() }; Button("Reset") { model.preferences.shortcut = .standard; model.persist() } }.disabled(model.sessionBusy)
                         Toggle("Test shortcut (does not record)", isOn: $model.bindingTest)
-                        Text("Use Control, Option or Command plus a key. Fn/Globe, bare letters, modifier-only and reserved bindings are unsupported. A successful test cannot rule out every app conflict.").font(.caption)
+                        Text("Use Control, Option or Command plus a key. Fn/Globe, bare letters, modifier-only and reserved bindings are unsupported. Key names use US physical positions. A successful test cannot rule out every app conflict.").font(.caption)
                         Toggle("Launch at login", isOn: Binding(get: { loginStatus == .enabled }, set: { enabled in
                             do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }; loginError = "" } catch { loginError = "Registration failed; install in ~/Applications/Aparte.app and retry." }
                             loginStatus = SMAppService.mainApp.status
                         }))
-                        Text("Login registration: \(String(describing: loginStatus)) \(loginError)").font(.caption)
+                        Text("Login registration: \(loginDescription) \(loginError)").font(.caption)
                         if loginStatus == .requiresApproval { Button("Open Login Items") { SMAppService.openSystemSettingsLoginItems() } }
                     }.padding(6)
                 }
@@ -147,10 +147,20 @@ struct SettingsView: View {
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status }.onDisappear { stopBindingCapture() }
     }
+    private var loginDescription: String {
+        switch loginStatus {
+        case .notRegistered: return "Off"
+        case .enabled: return "On"
+        case .requiresApproval: return "Awaiting approval in Login Items"
+        case .notFound: return "App not found; install at the stable path"
+        @unknown default: return "Unknown; recheck Login Items"
+        }
+    }
     private var shortcutLabel: String {
         let s = model.preferences.shortcut
         let modifiers = [(Shortcut.control,"⌃"),(Shortcut.option,"⌥"),(Shortcut.shift,"⇧"),(Shortcut.command,"⌘")].filter { s.modifiers & $0.0 != 0 }.map(\.1).joined()
-        return modifiers + (s.key == 49 ? "Space" : "Key \(s.key)")
+        let names: [UInt16: String] = [0:"A",1:"S",2:"D",3:"F",4:"H",5:"G",6:"Z",7:"X",8:"C",9:"V",10:"§",11:"B",12:"Q",13:"W",14:"E",15:"R",16:"Y",17:"T",18:"1",19:"2",20:"3",21:"4",22:"6",23:"5",24:"=",25:"9",26:"7",27:"−",28:"8",29:"0",30:"]",31:"O",32:"U",33:"[",34:"I",35:"P",37:"L",38:"J",39:"’",40:"K",41:";",42:"\\",43:",",44:"/",45:"N",46:"M",47:".",49:"Space",50:"`"]
+        return modifiers + (names[s.key] ?? "Unknown")
     }
     private func captureBinding() {
         guard !recordingBinding else { stopBindingCapture(); return }; recordingBinding = true

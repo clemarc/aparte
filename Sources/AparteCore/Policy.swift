@@ -25,7 +25,7 @@ public enum TranscriptPolicy {
         let separators = CharacterSet(charactersIn: "\t\n\r\u{0085}\u{2028}\u{2029}")
         let cleaned = text.unicodeScalars.compactMap { scalar -> String? in
             if separators.contains(scalar) { return " " }
-            if scalar.properties.generalCategory == .control { return nil }
+            if scalar.properties.generalCategory == .control || (scalar.properties.generalCategory == .format && scalar.value != 0x200C && scalar.value != 0x200D) { return nil }
             return String(scalar)
         }.joined()
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -112,6 +112,7 @@ public struct GestureMatcher: Sendable {
     public mutating func key(_ key: UInt16, down: Bool, flags: UInt64, repeated: Bool = false, active: Bool, ownEvent: Bool = false) -> Action {
         if ownEvent { return .pass }
         if key == 53 {
+            if down && escapeOwned { return .consume }
             if !down && escapeOwned { escapeOwned = false; return .consume }
             if down && active { escapeOwned = true; return .escape }
         }

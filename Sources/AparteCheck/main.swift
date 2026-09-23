@@ -9,7 +9,7 @@ import AVFoundation
         do {
             let args = Array(CommandLine.arguments.dropFirst())
             if args.first == "benchmark" { try await benchmark(args: args); return }
-            if args.first == "install" { try await modelCommand(args: args); return }
+            if args.first == "install" || args.first == "cancel-install" { try await modelCommand(args: args); return }
             URLProtocol.registerClass(NetworkAudit.self)
             if args.first == "model-lifecycle" { try await modelCommand(args: args); return }
             if args.first == "permissions" {

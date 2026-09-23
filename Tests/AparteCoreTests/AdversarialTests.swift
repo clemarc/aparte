@@ -13,6 +13,7 @@ final class AdversarialTests: XCTestCase {
     func testEscapeMatchedAfterCancellation() {
         var gesture = GestureMatcher()
         XCTAssertEqual(gesture.key(53, down: true, flags: 0, active: true), .escape)
+        XCTAssertEqual(gesture.key(53, down: true, flags: 0, repeated: true, active: false), .consume)
         XCTAssertEqual(gesture.key(53, down: false, flags: 0, active: false), .consume)
         XCTAssertEqual(gesture.key(53, down: true, flags: 0, active: false), .pass)
     }
@@ -52,5 +53,6 @@ final class AdversarialTests: XCTestCase {
         let result = TranscriptPolicy.sanitize(text)
         XCTAssertFalse(result.unicodeScalars.contains { $0.properties.generalCategory == .control })
         XCTAssertEqual(result, "echo hello rm -rf /[31m")
+        XCTAssertEqual(TranscriptPolicy.sanitize("safe\u{202e}text\u{200d}"), "safetext\u{200d}")
     }
 }

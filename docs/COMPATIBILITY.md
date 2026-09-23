@@ -4,12 +4,12 @@ Automatic adapters are deliberately disabled until the real target/version proto
 
 | Target | Candidate method | Runtime result |
 |---|---|---|
-| TextEdit | Settable AXSelectedText only | BLOCKED: Accessibility and posting grants absent |
-| Apple Terminal | Single-line clipboard Cmd-V | BLOCKED: same grants and live speaker required |
-| Claude Code in Terminal | Same terminal adapter, inert prompt only | BLOCKED: installation/session not verified; never launch executable commands from fixtures |
-| VS Code | Clipboard Cmd-V | BLOCKED: Accessibility/posting grants absent |
-| Chrome textarea/contenteditable | Clipboard Cmd-V | BLOCKED: Accessibility/posting grants absent |
-| Slack draft composer | Clipboard Cmd-V, no submission | BLOCKED: permissions and target draft/login validation required |
+| TextEdit 1.20 (415) | Settable AXSelectedText only | BLOCKED: Accessibility and posting grants absent |
+| Apple Terminal 2.15 (470.2) | Single-line clipboard Cmd-V | BLOCKED: same grants and live speaker required |
+| Claude Code 2.1.267 in Terminal | Same terminal adapter, inert prompt only | BLOCKED: CLI installed; inert input session not verified; never launch executable commands from fixtures |
+| VS Code 1.138.0 | Clipboard Cmd-V | BLOCKED: Accessibility/posting grants absent |
+| Chrome 153.0.8010.53 textarea/contenteditable | Clipboard Cmd-V | BLOCKED: Accessibility/posting grants absent |
+| Slack 4.52.155 draft composer | Clipboard Cmd-V, no submission | BLOCKED: permissions and target draft/login validation required |
 | macOS 14 | All | BLOCKED: host is macOS 26.6 |
 
 Native UI inspection attempt failed with `Sky Computer Use native pipe closed before response`; this does not establish a UI or app defect. Process launch succeeded. Versions are recorded in the final environment evidence after inspection.

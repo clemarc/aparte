@@ -1,0 +1,7 @@
+{
+  "durationSeconds": 300.00497441699997,
+  "averageCPUPercentOneCore": 0.05333244900719674,
+  "initialResidentBytes": 727367680,
+  "finalResidentBytes": 727400448,
+  "context": "Installed Release process; actual Ready not verified because permissions/desktop interaction are blocked. Not a PASS for the Ready resource gate."
+}

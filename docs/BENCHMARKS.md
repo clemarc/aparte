@@ -52,3 +52,7 @@ Initial M0 fresh-model base preparation was 5.874 s with a public upstream JFK f
 Both full benchmark processes ran under `(deny network*)` and a URLProtocol request interceptor: **0 observed outbound URL requests**, stderr empty. The source audit confirms local-only tokenizer parsing (no Hub fallback) and disabled WhisperKit logs. The offline lifecycle check imported verified assets, rejected a missing tokenizer without a request, preserved the working engine, switched both directions and deleted an inactive model. See `docs/evidence/model-lifecycle.json`.
 
 Process network denial proves offline operation; the interceptor and inspected production call path provide separate evidence about attempted requests. This is scoped to the exercised paths, not a proof about arbitrary future dependency changes.
+
+## Installed Release idle observation
+
+The installed Release process ran through a five-minute read-only sample: 300.005 s, average 0.0533% of one core from cumulative process CPU time, resident 727,367,680→727,400,448 bytes. Raw samples are `docs/evidence/idle-release.csv`. Actual Ready could not be established/observed with the available privacy grants and desktop tool, so this does **not** accept the Ready resource gate. No microphone recording was initiated.

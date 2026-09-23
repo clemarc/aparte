@@ -73,7 +73,7 @@ import AparteSpeech
     func persist() { UserDefaults.standard.set(try? JSONEncoder().encode(preferences), forKey: "preferences.v1"); hotkey.binding = preferences.shortcut }
     func recheck() {
         let permissions = PermissionStatus(); permissionSummary = permissions.summary
-        if permissions.canDictate { tapFailed = !hotkey.start() }
+        if permissions.accessibility && permissions.posting { tapFailed = !hotkey.start() }
         else if machine.id != nil { cancel("Permissions changed. Open Settings and recheck.") }
         refresh()
     }
