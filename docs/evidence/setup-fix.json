@@ -1,0 +1,40 @@
+{
+  "verifiedAtUTC": "2026-09-23T19:21:11.343318+00:00",
+  "implementationCommit": "aa0f567ce1ce8c654af61b7681ddd34214c5263e",
+  "appVersion": "0.4.1",
+  "build": "2",
+  "installedAt": "~/Applications/Aparte.app",
+  "binarySHA256": "70d661df4823e6f1f31161a8cc301f9107c83c1efdd507913d5e780820ad625a",
+  "checks": {
+    "DebugBuild": "PASS (early compile; final additions compiled in Release)",
+    "ReleaseBuild": "PASS",
+    "strictAdHocSignature": "PASS (install-local.sh)",
+    "unitTests": {
+      "executed": 33,
+      "failures": 0,
+      "status": "PASS"
+    },
+    "realWhisperKitFixtureIntegration": {
+      "audioSeconds": 3,
+      "decodeSeconds": 0.294260125,
+      "model": "small",
+      "noSpeech": false,
+      "outboundURLRequests": 0,
+      "prepareSeconds": 17.02793002128601,
+      "text": "Please open the window and close the door."
+    },
+    "gitDiffCheck": "PASS"
+  },
+  "newRegressionCoverage": [
+    "Microphone diagnostics without Accessibility do not imply global readiness",
+    "Missing model and actual tap reported separately",
+    "Rebinding allows chord through but retains ownership of existing key-up",
+    "UTF-16 test-field selection, revision, focus and range validation"
+  ],
+  "liveValidation": {
+    "status": "BLOCKED",
+    "reason": "Native app inspection failed: Sky Computer Use native pipe closed before response. User reports Microphone/Accessibility granted; running app capability state and real clicks/live audio not observed. No live recording collected.",
+    "next": "Quit/reopen installed 0.4.1, Recheck, run Start/Stop test then focus text box and hold shortcut. In-app delivery is labelled separately."
+  },
+  "scope": "Real production capture/WhisperKit code shared by diagnostics; only policy/file checks executed here. No external compatibility adapter enabled, no permission bypass, no M5."
+}
