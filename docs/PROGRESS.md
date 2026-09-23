@@ -27,3 +27,11 @@ Scope: PRD v2 M0–M4, sequential checkpoints. Started 2026-09-23.
 - Permission preflight: microphone notDetermined (0), AX false, listening false, posting false. Do not retry unchanged privacy blocker or grant on behalf of owner.
 - Model pins downloaded and hashed, manifest committed; no weights in Git.
 - Next: M1 native services/coordinator and minimal permission UI. Continue immediately; missing real microphone/insertion grants stay BLOCKED.
+
+## M1 checkpoint — implementation complete; device gates blocked
+- Native AVAudioEngine capture (preallocated bounded PCM), proper converter, live-buffer indicator, serialized state IDs, hold matcher, modifier wait, Escape, route/sleep/lock cancellation and inference deadline implemented.
+- Minimal onboarding/settings UI remains usable without grants; no automatic prompts. Recovery and model controls share groundwork needed by following milestones.
+- Native Debug build passes; 15 unit tests pass including stale completion/100 rapid sessions, modifier order, Escape ownership, sanitization and clipboard ownership rules.
+- Live TextEdit/Terminal 10-attempt gates and warm release-to-insertion latency BLOCKED by missing microphone/AX/post grants and absent consented speech. Production adapters remain unvalidated, not falsely enabled.
+- UI inspection attempted once using native computer-use API; failed `Sky Computer Use native pipe closed before response`. App launch verified by process only; visual/VoiceOver review BLOCKED.
+- Next: M2 test real named-pasteboard transactions, strengthen target/recovery paths, document compatibility protocol, then M3 lifecycle/corpus.

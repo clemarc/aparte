@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "validated": [],
+  "candidates": [
+    {"bundleID":"com.apple.TextEdit","method":"selectedText","roles":["AXTextArea","AXTextField"]},
+    {"bundleID":"com.apple.Terminal","method":"clipboard","roles":["AXTextArea"]},
+    {"bundleID":"com.microsoft.VSCode","method":"clipboard","roles":["AXTextArea","AXTextField"]},
+    {"bundleID":"com.google.Chrome","method":"clipboard","roles":["AXTextArea","AXTextField"]},
+    {"bundleID":"com.tinyspeck.slackmacgap","method":"clipboard","roles":["AXTextArea","AXTextField"]}
+  ],
+  "note":"Candidates are implemented, not validated. Add version/OS-scoped validation only after the real protocol in docs/COMPATIBILITY.md passes. No mock enables a production adapter."
+}

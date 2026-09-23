@@ -31,3 +31,10 @@
 - Alternatives: mutable runtime discovery rejected; turbo deferred until base/small comparative evidence warrants more memory/download scope.
 - Assumption: shared base tokenizer fits multilingual small vocabulary, to validate during M3 real inference. Download transfer interrupted once; bounded retry succeeded, partial files never promoted.
 - Affects: models/downloader, disk, licensing notices; low-to-medium migration cost. Status adopted. Final review: yes.
+
+## D005 — Local checkpoint identity
+- Adopted: per-command Git author `Aparte Local Build Agent <aparte-agent@localhost.invalid>`, signing disabled per local commit only.
+- Question: machine has no Git author and requires an unavailable SSH signing key by default.
+- Rationale/evidence: first commit failed for both reasons; user authorizes local commits and forbids using release credentials. No global configuration changed.
+- Alternatives: inventing owner identity rejected; blocking coding on Git setup unnecessary.
+- Affects: local commit metadata, trivially replaceable before any separately authorized publication. Final review: no.

@@ -24,3 +24,13 @@ PASS requires actual evidence; BLOCKED means missing external prerequisite; FAIL
 | Real WhisperKit fixture | PASS | artifacts/integration.log; public JFK 11 s, decode 0.860 s |
 | Cold offline load | PASS | Process network-denied run, artifacts/offline-cold.json; source audit local tokenizer loader |
 | Live OS permissions | BLOCKED | CLI preflight microphone=0, AX/listen/post=false; owner UI action needed |
+
+## M1 evidence update
+| Requirement | Status | Evidence |
+|---|---|---|
+| Native capture/coordinator/hotkey build | PASS | artifacts/build-Debug.log, native app links AVFoundation/ApplicationServices |
+| Deterministic startup/release/cancel/stale/busy/gesture policies | PASS | 15 unit tests; actual audio tap timing is a separate blocked check |
+| Minimal denied/unrequested permission path | PASS | Public preflight APIs report ungranted; settings compile; no automatic requests |
+| Permission UI visual/revoke/restart behavior | BLOCKED | Native UI automation connection closed; owner privacy grants absent |
+| 10 live dictations each TextEdit/Terminal; no submission; warm latency | BLOCKED | Microphone/Accessibility/posting grants and live speaker needed |
+| Capture start p95 / physical device-route tests | BLOCKED | Actual microphone permission and hardware interaction needed |
