@@ -1,0 +1,25 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {
+59C1E65A6E1D5B2435D451D1 = { isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sources/Aparte/App.swift"; sourceTree = SOURCE_ROOT; };
+56DFB2D7794443BD8A3FE17A = { isa = PBXBuildFile; fileRef = 59C1E65A6E1D5B2435D451D1; };
+21DE396CBA5730EF062A4144 = { isa = PBXFileReference; lastKnownFileType = text.json; path = "Resources/Models.json"; sourceTree = SOURCE_ROOT; };
+A5C1D8F7DFD26572853FC687 = { isa = PBXBuildFile; fileRef = 21DE396CBA5730EF062A4144; };
+7D1043473D55BFA90E8530D3 = { isa = PBXFileReference; explicitFileType = wrapper.application; path = Aparte.app; sourceTree = BUILT_PRODUCTS_DIR; };
+64292B1C2B2E13EAD8788FC8 = { isa = PBXGroup; children = (59C1E65A6E1D5B2435D451D1,21DE396CBA5730EF062A4144,7D1043473D55BFA90E8530D3,); sourceTree = "<group>"; };
+582681C2EAE02B3F3D399C0C = { isa = XCLocalSwiftPackageReference; relativePath = .; };
+902309FBB3EC209A1BF37B85 = { isa = XCSwiftPackageProductDependency; productName = AparteCore; };
+76BDF76935AF4FB406E485A9 = { isa = PBXBuildFile; productRef = 902309FBB3EC209A1BF37B85; };
+C8A1415AE80769D021E9DF8D = { isa = XCSwiftPackageProductDependency; productName = AparteSpeech; };
+44E962870BB681634CF649D1 = { isa = PBXBuildFile; productRef = C8A1415AE80769D021E9DF8D; };
+BCE16DD0260827ECF338C787 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (56DFB2D7794443BD8A3FE17A,); runOnlyForDeploymentPostprocessing = 0; };
+7561BFB015D8F536760CB671 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (76BDF76935AF4FB406E485A9,44E962870BB681634CF649D1,); runOnlyForDeploymentPostprocessing = 0; };
+0189424A5A60FED329FA868E = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A5C1D8F7DFD26572853FC687,); runOnlyForDeploymentPostprocessing = 0; };
+89E1FD6268CC0F221A2BE178 = { isa = XCBuildConfiguration; buildSettings = { MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; ARCHS = arm64; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone";  }; name = Debug; };
+E6DE6C99132752C914FEF632 = { isa = XCBuildConfiguration; buildSettings = { MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; ARCHS = arm64; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-O";  }; name = Release; };
+862894B703A6DEDF96A9DD6C = { isa = XCConfigurationList; buildConfigurations = (89E1FD6268CC0F221A2BE178,E6DE6C99132752C914FEF632,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+7082CC0B6FC1282FCEABD07A = { isa = XCBuildConfiguration; buildSettings = { MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; ARCHS = arm64; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; PRODUCT_NAME = Aparte; PRODUCT_BUNDLE_IDENTIFIER = dev.aparte.Aparte; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; ENABLE_HARDENED_RUNTIME = NO; ENABLE_APP_SANDBOX = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";  }; name = Debug; };
+639A7CA24D39909E713B47F7 = { isa = XCBuildConfiguration; buildSettings = { MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; ARCHS = arm64; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; SWIFT_OPTIMIZATION_LEVEL = "-O"; PRODUCT_NAME = Aparte; PRODUCT_BUNDLE_IDENTIFIER = dev.aparte.Aparte; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; ENABLE_HARDENED_RUNTIME = NO; ENABLE_APP_SANDBOX = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";  }; name = Release; };
+C57128001CE614BF8549D6BB = { isa = XCConfigurationList; buildConfigurations = (7082CC0B6FC1282FCEABD07A,639A7CA24D39909E713B47F7,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+0E8A3AD980EC179856012B7E = { isa = PBXNativeTarget; buildConfigurationList = C57128001CE614BF8549D6BB; buildPhases = (BCE16DD0260827ECF338C787,7561BFB015D8F536760CB671,0189424A5A60FED329FA868E,); buildRules = (); dependencies = (); name = Aparte; productName = Aparte; productReference = 7D1043473D55BFA90E8530D3; productType = "com.apple.product-type.application"; packageProductDependencies = (902309FBB3EC209A1BF37B85,C8A1415AE80769D021E9DF8D,); };
+98F54143AB4E86B28C3AFEE0 = { isa = PBXProject; attributes = { LastUpgradeCheck = 2700; }; buildConfigurationList = 862894B703A6DEDF96A9DD6C; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; knownRegions = (en,Base,); mainGroup = 64292B1C2B2E13EAD8788FC8; projectDirPath = ""; projectRoot = ""; targets = (0E8A3AD980EC179856012B7E,); packageReferences = (582681C2EAE02B3F3D399C0C,); };
+}; rootObject = 98F54143AB4E86B28C3AFEE0; }
