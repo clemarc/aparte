@@ -8,6 +8,10 @@ import AVFoundation
     static func main() async {
         do {
             let args = Array(CommandLine.arguments.dropFirst())
+            if args.first == "benchmark" { try await benchmark(args: args); return }
+            if args.first == "install" { try await modelCommand(args: args); return }
+            URLProtocol.registerClass(NetworkAudit.self)
+            if args.first == "model-lifecycle" { try await modelCommand(args: args); return }
             if args.first == "permissions" {
                 print("microphone=\(AVCaptureDevice.authorizationStatus(for: .audio).rawValue) accessibility=\(AXIsProcessTrusted()) listen=\(CGPreflightListenEventAccess()) post=\(CGPreflightPostEventAccess())")
                 return
@@ -24,7 +28,7 @@ import AVFoundation
             let audio = try AudioConversion.readFixture(URL(fileURLWithPath: args[3]))
             let result = try await engine.transcribe(audio, language: args.count > 5 ? args[5] : "auto")
             // Only this explicit fixture tool emits synthetic/public fixture output, never production logs.
-            let payload: [String: Any] = ["model": modelID, "prepareSeconds": prepared, "audioSeconds": Double(audio.count)/16000, "decodeSeconds": result.seconds, "text": result.text, "noSpeech": result.noSpeech]
+            let payload: [String: Any] = ["model": modelID, "prepareSeconds": prepared, "audioSeconds": Double(audio.count)/16000, "decodeSeconds": result.seconds, "text": result.text, "noSpeech": result.noSpeech, "outboundURLRequests": NetworkAudit.count]
             print(String(data: try JSONSerialization.data(withJSONObject: payload, options: [.sortedKeys]), encoding: .utf8)!)
         } catch {
             fputs("FAILED: \((error as? AparteError)?.rawValue ?? "fixture-or-model-error")\n", stderr); exit(1)

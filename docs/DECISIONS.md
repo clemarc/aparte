@@ -61,3 +61,11 @@
 - Conflict/uncertainty: public eager/lazy classification is insufficient on this host. Therefore general externally-owned rich/text/image clipboard happy-path acceptance remains BLOCKED by this OS/API limitation, even though safety tests pass. The app explicitly offers Copy instead. This restricts clipboard automatic insertion significantly; it is not full M2/M4 acceptance.
 - Affects: clipboard and Terminal/VS Code/Chrome/Slack automatic paste; low implementation change cost if a reliable public method becomes available, high validation importance. Final review: yes, highest impact.
 - Earlier M2 helper tests passed full snapshots before this stronger adversarial case exposed the limitation; that evidence is not being presented as full acceptance. Tests now distinguish known eager writes from unknown foreign provenance while retaining strict lazy refusal.
+
+## D009 — M3 model default and fixed quality corpus
+- Question: fastest supported model meeting the unchanged quality gates on this reference Mac?
+- Adopted: multilingual small is the new-install default. Existing saved base selections remain respected. Base remains available but its technical-term quality gate failed.
+- Evidence: same frozen 55 synthetic clips, Auto language, Release adapter. Base EN/FR WER 2.35%/10.81%, terms 50% (FAIL). Small EN/FR WER 0.64%/4.87%, terms 83.33% (PASS). Both reject 10/10 no-speech clips. Small quiet WER 0%; 30 warm decode p50/p95 0.401/0.821 s; 100-session resident growth 0.035%, peak ~803 MiB. These are decode-only results, not insertion latency.
+- Alternatives: base is faster but fails the explicit 80% terms gate. Turbo adds download/resource/validation cost without need for an additional quality-passing candidate; left out as optional.
+- Assumptions/limitations: corpus uses original CC0 reference text and four installed synthetic voices (two/language); ten ordinary held-out clips plus quiet/noise held-out subsets; thresholds were not tuned on held-out output. Audio generated locally, not redistributed. Natural microphone speech and end-to-end latency remain unvalidated. Final model-selection generalization is provisional until live tests.
+- Affects: default preferences, README/benchmarks; very low switching cost, moderate revalidation cost. Final review: yes.

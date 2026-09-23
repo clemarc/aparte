@@ -50,3 +50,10 @@ Scope: PRD v2 M0–M4, sequential checkpoints. Started 2026-09-23.
 - General clipboard happy-path gate remains BLOCKED by OS/API proof limitation; all target happy paths remain BLOCKED by privacy grants. No falsely validated adapters.
 - Model atomic import/corruption/cancellation/symlink/space tests also pass as M3 groundwork.
 - Next/current: M3 Release base/small benchmark and actual model downloader/switch integration, then M4 full review and final evidence.
+
+## M3 checkpoint — feasible implementation/measurements complete
+- Settings cover rebind/test, Auto/en/fr, catalog download/import/delete, atomic install/cancel, engine switch with rollback and persisted schema, SMAppService actual status (off unless user registers).
+- Production HTTPS downloader completed verified base install; real offline lifecycle check passed missing-tokenizer refusal/working engine preservation, import, switches in both directions, inactive delete; zero URL attempts.
+- Fixed 55-clip synthetic corpus and 30 warm cases evaluated on real Release engine; raw evidence committed. Small passes WER/technical/no-speech gates; base fails terms 50%. Chose small default (D009), kept saved selections.
+- Both models completed 100 sessions, retained growth below 1%, no crash, 59/60 s file boundaries passed. Live/Ready/insertion timing remains BLOCKED.
+- Next: M4 final defect/adversarial review, unit/integration/build scripts, local Release install and complete handoff/evidence. Do not begin M5.

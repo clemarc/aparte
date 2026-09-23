@@ -8,7 +8,7 @@ private final class LocalTokenizer: WhisperTokenizer {
     let specialTokens: SpecialTokens
     let allLanguageTokens: Set<Int>
     init(folder: URL) async throws {
-        let local = try await AutoTokenizerWrapper.from(modelFolder: folder)
+        let local = try await AutoTokenizerWrapper.from(modelFolder: folder, hubApi: HubApiWrapper(downloadBase: folder, hfToken: "", endpoint: "https://huggingface.co"))
         underlying = local
         func token(_ s: String) throws -> Int { guard let id = local.convertTokenToId(s) else { throw AparteError.invalidAsset }; return id }
         specialTokens = try SpecialTokens(endToken: token("<|endoftext|>"), englishToken: token("<|en|>"), noSpeechToken: token("<|nospeech|>"), noTimestampsToken: token("<|notimestamps|>"), specialTokenBegin: token("<|endoftext|>"), startOfPreviousToken: token("<|startofprev|>"), startOfTranscriptToken: token("<|startoftranscript|>"), timeTokenBegin: token("<|0.00|>"), transcribeToken: token("<|transcribe|>"), translateToken: token("<|translate|>"), whitespaceToken: local.encode(text: " ").first ?? 220)
@@ -40,19 +40,35 @@ public struct SpeechResult: Sendable {
 public actor Transcriber {
     private var engine: LocalWhisperKit?
     private var busy = false
+    private var selected: (URL, ModelManifest)?
+    public var activeModelID: String? { selected?.1.id }
     public init() {}
     public func load(directory: URL, manifest: ModelManifest) async throws {
         guard !busy else { throw AparteError.busy }; busy = true; defer { busy = false }
-        if let engine { await engine.unloadModels() }; engine = nil
+        // Verify before unloading the working model; corrupt switches leave it usable.
         try manifest.verify(directory: directory)
+        let previous = selected
+        if let engine { await engine.unloadModels() }; engine = nil; selected = nil
+        do {
+            engine = try await makeEngine(directory: directory)
+            try Task.checkCancellation(); selected = (directory, manifest)
+        } catch {
+            if let engine { await engine.unloadModels() }; engine = nil
+            if let (oldDirectory, oldManifest) = previous, !Task.isCancelled {
+                engine = try? await makeEngine(directory: oldDirectory)
+                if engine != nil { selected = (oldDirectory, oldManifest) }
+            }
+            throw error
+        }
+    }
+    private func makeEngine(directory: URL) async throws -> LocalWhisperKit {
         Logging.updateLogLevel(.none); Logging.updateCallback(nil)
         let configuration = WhisperKitConfig(modelFolder: directory.path, tokenizerFolder: directory, verbose: false, logLevel: .none, prewarm: true, load: true, download: false)
-        let loaded = try await LocalWhisperKit(configuration)
-        try Task.checkCancellation(); engine = loaded
+        return try await LocalWhisperKit(configuration)
     }
     public func unload() async throws {
         guard !busy else { throw AparteError.busy }; busy = true; defer { busy = false }
-        if let engine { await engine.unloadModels() }; engine = nil
+        if let engine { await engine.unloadModels() }; engine = nil; selected = nil
     }
     public func transcribe(_ samples: [Float], language: String = "auto") async throws -> SpeechResult {
         guard !busy else { throw AparteError.busy }; guard let engine else { throw AparteError.unavailableModel }

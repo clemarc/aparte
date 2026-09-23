@@ -134,13 +134,13 @@ public struct Preferences: Codable, Sendable {
     public var schema = 1
     public var shortcut = Shortcut.standard
     public var language = "auto"
-    public var model = "base"
+    public var model = "small"
     public init() {}
     public static func decode(_ data: Data?) -> Preferences {
         guard let data, var p = try? JSONDecoder().decode(Self.self, from: data), p.schema == 1 else { return .init() }
         if !p.shortcut.isValid { p.shortcut = .standard }
         if !["auto", "en", "fr"].contains(p.language) { p.language = "auto" }
-        if !["base", "small"].contains(p.model) { p.model = "base" }
+        if !["base", "small"].contains(p.model) { p.model = "small" }
         return p
     }
 }

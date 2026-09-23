@@ -1,0 +1,43 @@
+{
+  "enWER": 0.006396588486140725,
+  "encalibrationWER": 0.008849557522123894,
+  "enheldoutWER": 0.0,
+  "frWER": 0.048728813559322036,
+  "frcalibrationWER": 0.02857142857142857,
+  "frheldoutWER": 0.10655737704918032,
+  "quietWER": 0.0,
+  "technicalTermsPreserved": 0.8333333333333334,
+  "noSpeechRejections": 10,
+  "warmDecode3": {
+    "n": 10,
+    "p50": 0.223893875,
+    "p95": 0.28725075
+  },
+  "warmDecode8": {
+    "n": 10,
+    "p50": 0.400661083,
+    "p95": 0.533002791
+  },
+  "warmDecode15": {
+    "n": 10,
+    "p50": 0.611705708,
+    "p95": 0.892863042
+  },
+  "warmDecodeall": {
+    "n": 30,
+    "p50": 0.400661083,
+    "p95": 0.820904292
+  },
+  "memoryFirstLastBytes": [
+    742899712,
+    743161856
+  ],
+  "memoryGrowth": 0.0003528659329996575,
+  "summary": {
+    "outboundURLRequests": 0,
+    "peakResidentBytes": 841826304,
+    "phase": "summary"
+  },
+  "note": "Decode-only file measurements, not release-to-insertion; no permission-based gates are passed by this report.",
+  "qualityGates": "PASS"
+}
