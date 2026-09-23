@@ -8,6 +8,10 @@ import AparteCore
     private var tap: CFMachPort?
     private var source: CFRunLoopSource?
     private var matcher = GestureMatcher()
+    private var localMonitor: Any?
+    var capturingBinding = false
+    var allowsLocalTest: (() -> Bool)?
+    private(set) var lastDelivery = "Global shortcut"
     var active = false
     var onDown: (() -> Void)?
     var onUp: (() -> Void)?
@@ -15,10 +19,21 @@ import AparteCore
     var onInteraction: (() -> Void)?
     var onDisabled: (() -> Void)?
     var binding: Shortcut { get { matcher.binding } set { matcher.binding = newValue } }
-    var isRunning: Bool { tap != nil }
+    var isRunning: Bool { tap.map { CFMachPortIsValid($0) && CGEvent.tapIsEnabled(tap: $0) } ?? false }
+    func installLocalTestHandler() {
+        guard localMonitor == nil else { return }
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self, !self.isRunning, !self.capturingBinding,
+                  self.allowsLocalTest?() == true || self.matcher.ownsGesture,
+                  let cg = event.cgEvent else { return event }
+            return self.handle(cg.type, cg, delivery: "In-app shortcut only") == nil ? nil : event
+        }
+    }
     func start() -> Bool {
         if let tap { CGEvent.tapEnable(tap: tap, enable: true); return true }
-        guard AXIsProcessTrusted(), CGPreflightPostEventAccess() else { return false }
+        // Posting is a separate capability, checked before an actual clipboard paste.
+        // Test the real suppressing tap instead of using its unrelated preflight gate.
+        guard AXIsProcessTrusted() else { return false }
         let events: [CGEventType] = [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .rightMouseDown, .otherMouseDown, .scrollWheel]
         let mask = events.reduce(CGEventMask(0)) { $0 | (1 << $1.rawValue) }
         let callback: CGEventTapCallBack = { _, type, event, context in
@@ -37,7 +52,8 @@ import AparteCore
         if let source { CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes) }
         tap = nil; source = nil
     }
-    private func handle(_ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
+    func shutdown() { stop(); if let localMonitor { NSEvent.removeMonitor(localMonitor) }; localMonitor = nil }
+    private func handle(_ type: CGEventType, _ event: CGEvent, delivery: String = "Global shortcut") -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             DispatchQueue.main.async { self.onDisabled?() }
             if let tap, AXIsProcessTrusted() { CGEvent.tapEnable(tap: tap, enable: true) }
@@ -47,13 +63,13 @@ import AparteCore
         let action: GestureMatcher.Action
         switch type {
         case .keyDown, .keyUp:
-            action = matcher.key(UInt16(event.getIntegerValueField(.keyboardEventKeycode)), down: type == .keyDown, flags: event.flags.rawValue, repeated: event.getIntegerValueField(.keyboardEventAutorepeat) != 0, active: active)
+            action = matcher.key(UInt16(event.getIntegerValueField(.keyboardEventKeycode)), down: type == .keyDown, flags: event.flags.rawValue, repeated: event.getIntegerValueField(.keyboardEventAutorepeat) != 0, active: active, allowNewBinding: !capturingBinding)
         case .flagsChanged: action = matcher.flags(event.flags.rawValue)
         default: if active { onInteraction?() }; return Unmanaged.passUnretained(event)
         }
         // Dispatch coordinator work after this short callback has returned.
         switch action {
-        case .down: DispatchQueue.main.async { self.onDown?() }; return nil
+        case .down: lastDelivery = delivery; DispatchQueue.main.async { self.onDown?() }; return nil
         case .up: DispatchQueue.main.async { self.onUp?() }; return type == .flagsChanged ? Unmanaged.passUnretained(event) : nil
         case .escape: DispatchQueue.main.async { self.onCancel?() }; return nil
         case .consume: return nil

@@ -37,10 +37,20 @@ Use the stable `~/Applications/Aparte.app` path. The script refuses an unrelated
 1. Open Aparté’s menu bar item → Settings & Setup. The app normally has no Dock icon.
 2. Explicitly Download the selected model, or Import a directory that matches `Resources/Models.json` including tokenizer files. Downloads are HTTPS, staged, hash-verified and atomically installed. Cancellation or failure preserves the previous installation. Prepare / Use loads the model before dictation.
 3. Small is the quality-passing default on the tested synthetic corpus. Base remains selectable. Managed assets live in `~/Library/Application Support/Aparte/Models/`; Core ML may keep additional compilation caches outside this directory.
-4. Enable Microphone when ready. Open Accessibility Settings and grant Aparté. Recheck. Input Monitoring is suggested only after an observed tap failure; it is not an unconditional third prompt. Denied/restricted permissions keep system-wide dictation out of Ready. No live recording was performed by the build agent.
+4. Enable Microphone when ready. Open Accessibility Settings and grant Aparté. Recheck. Input Monitoring is suggested only after an observed tap failure; it is not an unconditional third prompt. The status card names every missing step. Recheck restarts the listener and prepares an installed selected model; reopening after a grant/rebuild may still be needed. Clipboard event posting is checked only for paste; it does not block the microphone test or shortcut recorder. No live recording was performed by the build agent.
 5. Choose Auto, English or French. The shortcut defaults to Control–Option–Space. Change it with a modifier-plus-key chord; use Test shortcut without recording. Other apps can still conflict. Launch at login is off initially and uses the actual SMAppService registration status.
 6. With grants and a prepared model, hold the shortcut, wait for Recording, speak, and release. Escape cancels; 60 seconds cancels and discards. Busy holds are ignored. A new recording clears the previous recovery result.
 7. Until an exact app/OS adapter has passed the compatibility protocol, open Recovery to View/Copy/Discard the result. Copy intentionally replaces the clipboard. Results expire after five minutes or on lock/quit/discard/new recording. For an unconfirmed insertion, inspect the target before copying again.
+
+## Test Setup (0.4.1)
+
+Quit/reopen the installed app after updating. In **Settings & Setup → Test dictation**:
+
+- **Microphone → transcription:** click Start recording, wait for Recording, speak, then Stop & transcribe. The text appears below. Only a prepared model and Microphone access are required.
+- **Shortcut → transcription → text box:** click the box, hold your shortcut, speak after Recording, and release. Keep focus in the box until insertion. Select text first to test replacement. The result reports whether the global tap or in-app shortcut handler received the chord; an in-app pass does not validate another application.
+- **Preferences → Change:** the recorder takes focus and previews modifiers and the chord. Escape cancels; unsupported/reserved chords are shown without replacing the previous binding. Detection-only mode deliberately does not record; switch it off before the text-box test.
+
+Test audio is never saved. Test results/editor clear on Setup close, explicit clear, lock/quit or five-minute expiry. General dictation remains hold-to-talk. If Needs setup persists, the status card now identifies the missing model, microphone, Accessibility or actual shortcut listener instead of a generic message.
 
 ## Privacy and limitations
 

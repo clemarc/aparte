@@ -2,13 +2,19 @@
 
 **Implementation complete through the feasible M0–M4 scope; validation pending. M4 is not accepted.** The candidate deliberately restricts automatic clipboard insertion where safe eager-data snapshotting cannot be proved (D008). No M5 work was started.
 
+## 0.4.1 setup-testing update
+
+The owner reported grants were already enabled but setup remained blocked, and shortcut capture was not displaying the chord. The updated app shows exact readiness blockers, recreates the listener on Recheck, and prepares an installed selected model. A native recorder previews modifiers and chords without competing with the global binding. Start/Stop microphone testing and an app-owned end-to-end text box both use the production audio/WhisperKit path. In-app versus global shortcut delivery is labelled. See D011–D012 and README's Test Setup section.
+
+Quit/reopen the installed 0.4.1, Recheck, then run microphone and text-box tests. Owner-reported grants are acknowledged; do not blindly request them again. If still blocked, the status card and permission summary identify what this running build actually sees. Physical UI/live testing remains unverified because the desktop tool connection failed closed. External adapter acceptance is unchanged.
+
 ## Delivered
 
 - Native arm64 macOS14+ source, Xcode project/shared scheme, testable modules and exact Swift dependency/model pins.
 - Local ad-hoc Release app at `~/Applications/Aparte.app` and `artifacts/DerivedData/Build/Products/Release/Aparte.app`; signature verified. No Developer ID, notarisation, DMG or public release.
 - Verified public multilingual small model installed under `~/Library/Application Support/Aparte/Models/small/` for offline use. Base/small evaluation assets remain ignored in `artifacts/models/`.
 - Native capture, WhisperKit inference, guarded target/AX/clipboard paths, transient recovery, configurable hold shortcut/language/model management and truthful launch-at-login controls.
-- 29 passing tests including actual named-pasteboard and separate lazy-owner process checks; real offline engine/corpus, model installer, cancellation and model-switch evidence.
+- 33 passing tests including actual named-pasteboard and separate lazy-owner process checks; real offline engine/corpus, model installer, cancellation and model-switch evidence.
 - Small passed the fixed synthetic WER, technical-term and no-speech gates. Base failed technical terms, so small is the default. Exact results/raw data and limitations are in BENCHMARKS.
 
 M0 feasible gates passed. M1–M4 implementation continued despite missing permission/desktop prerequisites, as requested. Missing real-device evidence is not converted into acceptance. The final clean-checkout verification result is recorded in `docs/evidence/verification.json` and PROGRESS.
@@ -35,7 +41,7 @@ File decode timings are not release-to-insertion latency. Synthetic speech quali
 
 ## Consolidated remaining human / external actions
 
-- [ ] Open the stable app and review Settings & Setup. Grant Microphone and Accessibility through macOS; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
+- [ ] Reopen the stable 0.4.1 app and review Settings & Setup → Recheck and both tests. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
 - [ ] Provide a consented local microphone session: ten short English/French/quiet dictations, no retained recordings. Measure shortcut-to-live-capture p95 and release-to-dispatch/visible-text timings; test default input, startup release, 59/60-second boundary, device unplug/change, missed key-up, permissions revoked, Escape, busy holds, sleep/lock/logout and stale completion.
 - [ ] Run the ten-attempt matrix for TextEdit, Terminal/Claude Code, VS Code, Chrome textarea/contenteditable and Slack drafts as described in COMPATIBILITY. Use disposable/inert text, no submission. Validate exact insertion once, selection, Unicode, rich context, focus/caret invalidation, secure/read-only refusal, ambiguous writes, delayed consumers, concurrent clipboard copies and orderly quit. Add validated catalog entries only after evidence passes.
 - [ ] Resolve D008's public-API clipboard limitation or explicitly retain the Recovery-only restriction. This is an OS/API limitation, not a missing macOS privacy grant; granting more permissions alone does not fix it.

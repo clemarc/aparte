@@ -72,7 +72,7 @@
 - Affects: default preferences, README/benchmarks; very low switching cost, moderate revalidation cost. Final review: yes.
 
 ## D010 — Layout-independent physical shortcut and local identity
-- Adopted: shortcuts persist physical macOS key codes and modifiers; settings label US physical positions and explicitly disclose this. The binding test verifies event delivery without recording once Accessibility/posting are available; microphone grant is not required for the test.
+- Adopted: shortcuts persist physical macOS key codes and modifiers; settings label US physical positions and explicitly disclose this. The binding test verifies event delivery without recording; microphone grant is not required. D011–D012 extend it with explicitly labelled local delivery when global capability is unavailable.
 - Question: represent configurable chords without promising universal layout/conflict behavior?
 - Rationale: physical chord stability is simple and matches CGEvent matching. Reserved/unsupported keys are rejected; matching original key-up remains owned after changes/cancellation.
 - Alternatives: character-based matching changes with layout/Option composition; a layout-aware label can be added without changing stored chords.
@@ -81,3 +81,18 @@
 ## D007 update — M4 review
 - Small passed the frozen quiet/no-speech corpus with unchanged thresholds. Natural room-noise/microphone robustness is still unvalidated.
 - Sanitization additionally removes Unicode format controls (e.g. bidi overrides) except ZWJ/ZWNJ, preserving emoji/legitimate joiners. A regression test covers this; no visible words are rewritten.
+
+## D011 — Capability-specific setup readiness (0.4.1)
+- Question: why should an event-posting preflight prevent microphone diagnostics, shortcut rebinding or creation of a listening/suppressing tap?
+- Adopted: model + microphone suffice for explicit in-app audio tests. Global dictation requires microphone, prepared model, Accessibility and a successfully enabled real event tap. Event posting remains checked before the separate clipboard paste operation; selected-text AX and app-owned insertion do not post keyboard events. Recheck reconstructs an idle tap and prepares an installed selected model; app activation/capability changes recheck automatically. Show every missing prerequisite.
+- Evidence: user reports Microphone/Accessibility granted but stuck Needs setup. Source had posting preflight as an unconditional gate before even trying the event tap. The recorder also competed with that tap for the current binding. This explains possible failure paths; the precise running-app permission state could not be observed because native inspection failed closed.
+- Alternatives: treating all three permissions as mandatory or prompting repeatedly rejected; marking global readiness from a successful local test rejected. No permissions/security settings are changed by code or agent.
+- Uncertainty: ad-hoc rebuilds may change TCC identity and require owner re-grant/restart. Real user verification remains required. Affects permissions/coordinator/hotkeys; low implementation change cost, meaningful platform validation cost. Status adopted. Final review: yes.
+
+## D012 — Explicit setup diagnostics and owned test editor
+- Question: how to let the user isolate microphone/ASR and shortcut/insertion failures without relying on an unvalidated external target?
+- Adopted: user-requested Start/Stop microphone test shares the bounded production capture, cancellation/deadline, speech gate and real WhisperKit engine. A native app-owned editable test box uses the same hold gesture/capture/ASR then exact selected-range insertion, guarded by focus, selection and edit revision. Local shortcut delivery is explicitly labelled when no global tap exists. The test does not enable any external compatibility adapter.
+- Alternatives: prerecorded/mock results would not validate the microphone; bypassing external adapter gates would misrepresent compatibility. Separate audio/inference implementations would duplicate lifecycle risks. Test-only button recording is the user's explicit extension to hold-only production dictation, not a general toggle-to-talk mode.
+- Privacy: no recordings saved; the diagnostic transcript shares the one Recovery slot. Test editor/result clear on Setup close, lock, quit, explicit clear or five-minute expiry. Closing/cancelling invalidates late completions. Undo is disabled for the test editor. No diagnostic transcript enters logs or evidence.
+- Shortcut recorder now owns first responder, handles modifiers and Command equivalents, previews entered keys and suppresses new global gestures only while rebinding; original owned key-up still consumed. This removes dependence on an unverified global permission for rebinding.
+- Uncertainty: native UI/live microphone verification blocked by tool transport failure; policy regressions and real file inference are distinct evidence. Affects Setup UI/coordinator/local event handler; moderate change cost. Status adopted. Final review: yes, test scope and retention.

@@ -2,7 +2,7 @@
 
 **M4 NOT ACCEPTED.** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and evidence/verification.json. Real-device/target gates are blocked, and D008 restricts clipboard automation. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
 
-Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Target is arm64 macOS 14+. CLI preflight: microphone notDetermined; Accessibility/listening/posting false. No grants or security settings were changed. Native UI inspection failed (closed pipe; after restart, timeoutReached).
+Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Target is arm64 macOS 14+. Initial-build CLI preflight: microphone notDetermined; Accessibility/listening/posting false. During 0.4.1 testing the owner reports Microphone and Accessibility granted; the running app state remains unobserved because native inspection fails. Original absent-grant rows below describe the initial evidence, not a new claim that the owner has not granted access. No grants or security settings were changed. Native UI inspection failed (closed pipe; after restart, timeoutReached).
 
 ## Foundation and scope
 
@@ -109,3 +109,18 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Local Release app | PASS | Native Release build, ad-hoc signature verified, stable install path and public small assets present |
 | Native visual/accessibility onboarding and indicators | BLOCKED | Computer-use connection closed/timeout; code-based accessible labels are not visual/VoiceOver evidence |
 | M0–M4 full acceptance | BLOCKED | Above device/runtime/target/clipboard proof gates; do not label M4 accepted |
+
+## 0.4.1 owner-testing follow-up
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Readiness/recheck explains exact missing step and retries actual tap/model | PASS | Capability-specific production checks; four new policy regressions included in 33 passing tests. Posting checked only on paste; no permission bypass |
+| Fix owner's specific stuck setup instance | BLOCKED | Code failure paths fixed; owner reports grants but native inspection of running process failed closed. Requires reopen/recheck in installed 0.4.1 |
+| Shortcut recorder previews modifiers/chord and avoids global consumption | PASS | Native first responder with pre-menu local capture; global matcher bypass only for new gestures while rebinding; key-up preservation regression passes; Debug/Release compile |
+| Actual shortcut entry/key delivery on owner's desktop | BLOCKED | Native tool transport failed; physical retest required |
+| Start/Stop real microphone test and visible local transcript | PASS | Shared production capture/inference path, 60s cancel/30s deadline and stale-ID guards; explicit controls compiled; no mock output |
+| End-to-end owned text box with focus/selection protection | PASS | Production native NSTextView selected-range insertion; revision/UTF-16/focus policy regressions pass. In-app route labelled separately from global tap |
+| Live microphone and visual UI behavior of new tests | BLOCKED | No recording collected by agent; owner must use the new controls. File inference/unit success is not live evidence |
+| Temporary test results clear on close/lock/quit/expiry | PASS | Shared Recovery slot plus explicitly transient test editor; cancellation and cleanup paths source-reviewed. Actual window/lock exercise remains BLOCKED |
+
+Evidence for this patch is `docs/evidence/setup-fix.json`; the earlier verification.json remains the previous source checkpoint. M4 acceptance remains pending, and no external adapter was enabled by these diagnostics.

@@ -2,6 +2,12 @@
 
 ## Current status
 
+**0.4.1 setup follow-up complete; live validation pending.** Installed at the stable local path. Fixed unconditional event-posting gate before tap startup, added actual tap status + actionable readiness blockers and automatic rechecks, replaced shortcut capture with a native focused recorder/preview, and added real Start/Stop microphone and guarded shortcut/text-box tests. All share production audio/WhisperKit and lifecycle limits. D011–D012 record scope/capability/privacy decisions. Debug and Release builds passed, all 33 tests passed, real small fixture integration passed with 0 observed outbound requests. Signature checked during install. Desktop inspection still fails closed; no live recording was collected. Updated test evidence: `docs/evidence/setup-fix.json`.
+
+**Next step:** owner quits/reopens 0.4.1, presses Recheck, then tests microphone and the owned text box (with detection-only mode off). Readiness now states exactly what this running app sees; owner reports grants already enabled, so do not assume permissions are still absent. No additional implementation or approval is pending. Live desktop behavior and external target gates remain unaccepted.
+
+## Previous M4 checkpoint (historical evidence)
+
 Implementation through feasible M0–M4 scope is complete; validation pending. **M4 is not accepted.** No M5 work was started. See ACCEPTANCE for scoped PASS/FAIL/BLOCKED results and HANDOFF for the single human-action checklist and ordered decision review.
 
 Final source checks: 29 tests pass; native Release build passes and is installed at `~/Applications/Aparte.app` with a verified local ad-hoc signature. Public small assets are verified and installed in the managed model directory. No permissions were granted, live audio collected, or security settings changed. An earlier installed candidate launched as a process; desktop visual access failed. Reopen the app to load the final rebuilt bundle.

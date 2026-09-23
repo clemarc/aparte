@@ -18,6 +18,19 @@ import AparteSpeech
     @Published var installing = false
     @Published var tapFailed = false
     @Published var bindingTest = false
+    @Published var recordingBinding = false { didSet { hotkey.capturingBinding = recordingBinding } }
+    @Published private(set) var readinessSummary = "Checking setup…"
+    @Published private(set) var shortcutStatus = "Not checked"
+    @Published private(set) var testStatus = "Choose a test below. Audio and results stay in memory."
+    @Published private(set) var lastResultWasTest = false
+    weak var testEditor: SetupTextView?
+    private enum Destination { case external, microphoneTest, setupField }
+    private var destination: Destination?
+    private var testReceipt: TestInsertionReceipt?
+    private var sessionDelivery = ""
+    private var testExpires: Date?
+    var microphoneTestActive: Bool { destination == .microphoneTest && [.startingCapture, .recording].contains(state) }
+    var canStartMicrophoneTest: Bool { modelLoaded && PermissionStatus().microphone == .authorized && !sessionBusy }
     private var recoveryExpires: Date?
     private var machine = SessionMachine()
     let hotkey = HotkeyService()
@@ -46,22 +59,25 @@ import AparteSpeech
         catalog = Bundle.main.url(forResource: "Models", withExtension: "json").flatMap { try? ModelCatalog.load($0) }
         hotkey.binding = preferences.shortcut
         hotkey.onDown = { [weak self] in self?.begin() }
-        hotkey.onUp = { [weak self] in self?.release() }
+        hotkey.onUp = { [weak self] in if self?.destination != .microphoneTest { self?.release() } }
         hotkey.onCancel = { [weak self] in self?.cancel("Cancelled") }
         hotkey.onInteraction = { [weak self] in self?.machine.invalidateTarget() }
         hotkey.onDisabled = { [weak self] in self?.cancel("Shortcut tap interrupted. Recheck permissions.") }
         targetService.onInvalidated = { [weak self] in self?.machine.invalidateTarget() }
+        hotkey.allowsLocalTest = { [weak self] in self?.testEditor?.isFocused == true || self?.bindingTest == true || self?.destination == .microphoneTest }
+        hotkey.installLocalTestHandler()
         watchdog = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.tick() } }
         let workspace = NSWorkspace.shared.notificationCenter
         for event in [NSWorkspace.willSleepNotification, NSWorkspace.sessionDidResignActiveNotification, NSWorkspace.willPowerOffNotification] {
             observers.append(workspace.addObserver(forName: event, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.suspend() } })
         }
         observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.machine.invalidateTarget() } })
+        observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.recheck() } })
         observers.append(NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { if self?.machine.id != nil { self?.cancel("Microphone configuration changed. Retry with the current default input.") } } })
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
         memoryPressure = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
         memoryPressure?.setEventHandler { [weak self] in Task { @MainActor in self?.unloadIfIdle() } }; memoryPressure?.resume()
-        recheck()
+        recheck(prepareModel: false)
         preparation = Task {
             try? await ModelStore(root: modelsRoot).cleanInterruptedStages()
             preparation = nil
@@ -71,15 +87,26 @@ import AparteSpeech
     var sessionBusy: Bool { machine.id != nil || machine.engineBusy || audioDraining || startup != nil || operation != nil || preparation != nil }
     func installed(_ id: String) -> Bool { FileManager.default.fileExists(atPath: modelsRoot.appendingPathComponent(id).appendingPathComponent("tokenizer.json").path) }
     func persist() { UserDefaults.standard.set(try? JSONEncoder().encode(preferences), forKey: "preferences.v1"); hotkey.binding = preferences.shortcut }
-    func recheck() {
+    func recheck(prepareModel: Bool = true) {
         let permissions = PermissionStatus(); permissionSummary = permissions.summary
-        if permissions.accessibility && permissions.posting { tapFailed = !hotkey.start() }
-        else if machine.id != nil { cancel("Permissions changed. Open Settings and recheck.") }
+        if permissions.accessibility {
+            if !sessionBusy { hotkey.stop() }
+            tapFailed = !hotkey.start()
+        } else {
+            hotkey.stop(); tapFailed = false
+            if destination == .external { cancel("Accessibility is unavailable to this running app. Reopen the installed Aparté after granting it.") }
+        }
+        if prepareModel, !sessionBusy, !modelLoaded, installed(preferences.model) { prepare(preferences.model) }
         refresh()
     }
     private func refresh() {
+        let permissions = PermissionStatus()
+        let readiness = SetupReadiness(microphone: permissions.microphone == .authorized, accessibility: permissions.accessibility, model: modelLoaded, shortcut: hotkey.isRunning && !tapFailed)
+        readinessSummary = readiness.canDictate ? "Ready for the global shortcut. Unvalidated external targets still use Recovery." : readiness.blockers.joined(separator: " · ")
+        if preparation != nil && !installing { readinessSummary = "Preparing \(preferences.model)… Wait for the model to finish loading." }
+        shortcutStatus = hotkey.isRunning ? "Global shortcut listener active" : "Global listener unavailable. The test text box can still receive the shortcut inside Aparté."
         if machine.id == nil && !machine.engineBusy && preparation == nil && !audioDraining && startup == nil && operation == nil {
-            machine.prepared(modelLoaded && PermissionStatus().canDictate && hotkey.isRunning && !tapFailed)
+            machine.prepared(readiness.canDictate)
         }
         state = machine.state
         if recoveryText != nil && state == .ready { state = .recovery }
@@ -107,23 +134,46 @@ import AparteSpeech
         }
         refresh()
     }
-    private func begin() {
-        if bindingTest { notice = "Shortcut detected. Release it to finish the test. Other apps may still conflict."; onStatus?(); return }
+    func startMicrophoneTest() { bindingTest = false; begin(manualTest: true) }
+    func stopMicrophoneTest() { if destination == .microphoneTest { release() } }
+    func invalidateTestTarget() { if destination == .setupField { machine.invalidateTarget() } }
+    func closeSetupTests() {
+        if destination == .microphoneTest || destination == .setupField { cancel("Setup test closed. Recording cancelled.") }
+        if lastResultWasTest { discardRecovery() }
+        testEditor?.clear(); testExpires = nil; lastResultWasTest = false
+        bindingTest = false; recordingBinding = false
+        testStatus = "Test cleared. No audio or transcript was saved."
+    }
+    private func begin(manualTest: Bool = false) {
+        guard !hotkey.capturingBinding else { return }
+        if bindingTest && !manualTest { notice = "\(hotkey.lastDelivery) detected: \(preferences.shortcut.displayLabel). Release to finish the test."; testStatus = notice; onStatus?(); return }
         guard !sessionBusy else { notice = "Busy — this hold was ignored."; onStatus?(); return }
-        guard modelLoaded, PermissionStatus().canDictate, !HotkeyService.secureInput else { notice = "Not ready. Recheck model, microphone and Accessibility in Settings."; recheck(); return }
-        do { target = try targetService.capture() } catch { notice = "Secure or read-only context. Dictation refused."; onStatus?(); return }
+        let localReceipt = manualTest ? nil : testEditor?.receipt()
+        let local = manualTest || localReceipt != nil
+        let permissions = PermissionStatus()
+        guard modelLoaded, permissions.microphone == .authorized else { testStatus = "Prepare a model and grant Microphone before recording."; notice = testStatus; recheck(); return }
+        if !local {
+            guard permissions.canDictate, hotkey.isRunning, !HotkeyService.secureInput else { notice = "Global dictation unavailable. \(readinessSummary)"; recheck(); return }
+            do { target = try targetService.capture() } catch { notice = "Secure or read-only context. Dictation refused."; onStatus?(); return }
+        } else { target = nil }
+        destination = manualTest ? .microphoneTest : (local ? .setupField : .external)
+        sessionDelivery = manualTest ? "Start recording button" : hotkey.lastDelivery
+        testReceipt = localReceipt
         machine.prepared(true, clearError: true)
         guard let id = machine.begin() else { return }
-        discardRecovery(); startedAt = Date(); elapsed = 0
+        discardRecovery(); lastResultWasTest = false; startedAt = Date(); elapsed = 0
+        if local { testStatus = manualTest ? "Starting microphone…" : "\(sessionDelivery) received. Starting microphone…"; testExpires = Date().addingTimeInterval(300) }
         notice = "Starting microphone…"; let newTicket = CaptureTicket(); ticket = newTicket
         refresh()
         startup = Task {
             do {
                 try await audio.start(ticket: newTicket) { [weak self] in Task { @MainActor in
                     guard let self, self.machine.started(id) else { return }
-                    self.startedAt = Date(); self.notice = "Recording — release to transcribe, Escape to cancel."; self.refresh()
+                    self.startedAt = Date(); self.notice = self.destination == .microphoneTest ? "Recording — press Stop to transcribe, Escape to cancel." : "Recording — release to transcribe, Escape to cancel."
+                    if self.destination != .external { self.testStatus = self.notice }; self.refresh()
                 } }
             } catch { if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start." } }
+            if machine.id == nil && destination != .external { testStatus = notice; destination = nil }
             startup = nil; refresh()
         }
     }
@@ -132,8 +182,9 @@ import AparteSpeech
         if machine.state == .startingCapture { cancel("Released before capture started; nothing recorded."); return }
         guard machine.release(id) else { return }
         ticket?.cancel(); audioDrains += 1; notice = "Transcribing locally…"; refresh()
+        if destination != .external { testStatus = notice }
         operation = Task {
-            defer { deadline?.cancel(); deadline = nil; operation = nil; machine.unwind(); targetService.stopObserving(); refresh() }
+            defer { deadline?.cancel(); deadline = nil; operation = nil; destination = nil; testReceipt = nil; machine.unwind(); targetService.stopObserving(); refresh() }
             do {
                 let samples: [Float]
                 do { samples = try await audio.stop(discard: false); audioDrains -= 1 }
@@ -144,10 +195,18 @@ import AparteSpeech
                 let result = try await speech.transcribe(samples, language: preferences.language)
                 guard machine.decoded(id), !Task.isCancelled else { return }
                 deadline?.cancel(); deadline = nil
-                if result.noSpeech { notice = "No speech detected."; machine.finish(id); return }
+                if result.noSpeech { notice = "No speech detected."; if destination != .external { testStatus = notice }; machine.finish(id); return }
+                if destination == .microphoneTest || destination == .setupField {
+                    let isField = destination == .setupField
+                    let inserted = isField && !machine.invalidatedTarget && testReceipt.map { testEditor?.apply(result.text, receipt: $0) == true } == true
+                    recoveryText = result.text; recoveryUncertain = false; lastResultWasTest = true
+                    recoveryExpires = Date().addingTimeInterval(300); testExpires = recoveryExpires
+                    testStatus = isField ? (inserted ? "Inserted into the test text box using \(sessionDelivery.lowercased())." : "Text box lost focus or changed. Result shown below; nothing inserted.") : "Microphone test complete. Transcribed locally in \(String(format: "%.2f", result.seconds)) s."
+                    notice = testStatus; machine.finish(id, recovery: true); return
+                }
                 await insert(result.text, id: id)
             } catch {
-                if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Transcription failed. Retry or prepare the model again." }
+                if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Transcription failed. Retry or prepare the model again."; if destination != .external { testStatus = notice } }
             }
         }
     }
@@ -169,6 +228,7 @@ import AparteSpeech
             }
             return
         }
+        guard PermissionStatus().posting else { recover(text, id: id, uncertain: false); return }
         do {
             let snapshot = try await clipboard.snapshot()
             guard machine.id == id, !Task.isCancelled else { return }
@@ -189,9 +249,10 @@ import AparteSpeech
     func discardRecovery() { recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; refresh() }
     func copyRecovery() { if let recoveryText { clipboard.copyExplicit(recoveryText); notice = "Copied. Clipboard replaced intentionally." }; onStatus?() }
     func cancel(_ reason: String = "Cancelled") {
+        if destination == .microphoneTest || destination == .setupField { testStatus = reason }
         let wasActive = machine.id != nil || machine.engineBusy || startup != nil
         ticket?.cancel(); startup?.cancel(); operation?.cancel(); deadline?.cancel(); deadline = nil
-        machine.cancel(); targetService.stopObserving(); target = nil; clipboard.restore(); notice = reason
+        machine.cancel(); targetService.stopObserving(); target = nil; testReceipt = nil; destination = nil; clipboard.restore(); notice = reason
         if wasActive {
             audioDrains += 1
             Task { _ = try? await audio.stop(discard: true); audioDrains -= 1; ticket = nil; refresh() }
@@ -208,23 +269,24 @@ import AparteSpeech
             else if let target, !machine.invalidatedTarget, !targetService.valid(target) { machine.invalidateTarget() }
         }
         if let expiry = recoveryExpires, Date() >= expiry { discardRecovery(); notice = "Recovery expired." }
+        if let expiry = testExpires, Date() >= expiry { closeSetupTests() }
         if ticks % 20 == 0 {
             let permissions = PermissionStatus()
-            if machine.id != nil && !permissions.canDictate { cancel("Permission revoked. Recheck access in Settings.") }
+            if machine.id != nil && (permissions.microphone != .authorized || (destination == .external && !permissions.canDictate)) { cancel("Permission revoked. Recheck access in Settings.") }
             let changed = permissionSummary != permissions.summary
             permissionSummary = permissions.summary
-            if changed { refresh() }
+            if changed { recheck() }
         }
         if machine.state == .recording { onStatus?() }
     }
     @objc private func screenLocked() { suspend() }
-    private func suspend() { cancel("Session suspended; pending audio and result discarded."); discardRecovery() }
+    private func suspend() { cancel("Session suspended; pending audio and result discarded."); discardRecovery(); closeSetupTests() }
     private func unloadIfIdle() {
         guard !sessionBusy, modelLoaded else { return }
         modelLoaded = false; modelStatus = "Unloaded after memory pressure. Prepare before dictating."; refresh()
         Task { try? await speech.unload() }
     }
-    func shutdown() { suspend(); clipboard.restore(); hotkey.stop(); watchdog?.invalidate() }
+    func shutdown() { suspend(); clipboard.restore(); hotkey.shutdown(); watchdog?.invalidate() }
 }
 
 extension Coordinator {

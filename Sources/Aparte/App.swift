@@ -8,7 +8,7 @@ import AVFoundation
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     var body: some Scene { Settings { Text("Open Aparté’s menu bar item for Settings.").padding() } }
 }
-@MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var item: NSStatusItem!
     private var coordinator: Coordinator!
     private var settingsWindow: NSWindow?
@@ -55,6 +55,7 @@ import AVFoundation
         if settingsWindow == nil {
             settingsWindow = makeWindow("Aparté — Settings & Setup", size: NSSize(width: 630, height: 720), root: SettingsView(model: coordinator))
         }
+        settingsWindow?.delegate = self
         settingsWindow?.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
     }
     @objc private func showRecovery() {
@@ -65,6 +66,7 @@ import AVFoundation
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = title; window.contentView = NSHostingView(rootView: root); window.isReleasedWhenClosed = false; window.center(); return window
     }
+    func windowWillClose(_ notification: Notification) { if (notification.object as? NSWindow) === settingsWindow { coordinator.closeSetupTests() } }
     @objc private func cancel() { coordinator.cancel() }
     @objc private func quit() { NSApp.terminate(nil) }
     func applicationWillTerminate(_ notification: Notification) { coordinator.shutdown() }
@@ -75,7 +77,7 @@ struct IndicatorView: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: model.state == .recording ? "mic.fill" : "waveform").foregroundStyle(model.state == .recording ? .red : .primary)
-            VStack(alignment: .leading) { Text(model.state.rawValue).font(.headline); Text(model.state == .recording ? "\(Int(model.elapsed))s · Release to finish · Esc cancels" : "Please wait · Esc cancels").font(.caption) }
+            VStack(alignment: .leading) { Text(model.state.rawValue).font(.headline); Text(model.state == .recording ? "\(Int(model.elapsed))s · \(model.microphoneTestActive ? "Stop to finish" : "Release to finish") · Esc cancels" : "Please wait · Esc cancels").font(.caption) }
         }.padding().frame(maxWidth: .infinity).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
 }
@@ -96,19 +98,20 @@ struct SettingsView: View {
     @ObservedObject var model: Coordinator
     @State private var loginStatus = SMAppService.mainApp.status
     @State private var loginError = ""
-    @State private var recordingBinding = false
-    @State private var bindingMonitor: Any?
+    @State private var bindingPreview = "Press modifiers, then a key."
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("Aparté").font(.largeTitle.bold())
                 Text("Hold to speak. Release to transcribe on this Mac.").font(.title3)
                 Text("Speak once Recording appears. The default shortcut is Control–Option–Space. Escape cancels. No Return is sent.")
-                GroupBox("Status · \(model.state.rawValue)") { VStack(alignment: .leading) { Text(model.notice); Text(model.modelStatus).foregroundStyle(.secondary) }.frame(maxWidth: .infinity, alignment: .leading).padding(6) }
+                GroupBox("Status · \(model.state.rawValue)") { VStack(alignment: .leading) { Text(model.readinessSummary).font(.headline); Text(model.notice); Text(model.modelStatus).foregroundStyle(.secondary) }.frame(maxWidth: .infinity, alignment: .leading).padding(6) }
                 GroupBox("1 · Permissions") {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Microphone is used only during a hold. Accessibility enables the shortcut and interaction with the original text field.")
+                        Text("Microphone is used during a hold or an explicit recording test. Accessibility enables the global shortcut and interaction with the original text field.")
                         Text(model.permissionSummary).font(.caption).textSelection(.enabled)
+                        Text(model.shortcutStatus).font(.caption)
+                        if !model.permissionSummary.contains("Accessibility: Granted") { Text("If Settings already shows access granted, quit and reopen this installed Aparté. Rebuilds can change the identity macOS approved.").font(.caption) }
                         HStack { Button("Enable Microphone") { Task { _ = await PermissionStatus.requestMicrophone(); model.recheck() } }; Button("Accessibility Settings") { PermissionStatus.open("Accessibility") }; Button("Recheck") { model.recheck() } }
                         if AVCaptureDevice.authorizationStatus(for: .audio) == .denied || AVCaptureDevice.authorizationStatus(for: .audio) == .restricted { Button("Microphone Settings") { PermissionStatus.open("Microphone") } }
                         if model.tapFailed { Text("Event tap could not start. Review Input Monitoring if macOS requires it, then quit/reopen Aparté and recheck."); Button("Input Monitoring Settings") { PermissionStatus.open("ListenEvent") } }
@@ -129,11 +132,45 @@ struct SettingsView: View {
                         Text("Downloads require your click. Installed models work offline; nothing is downloaded during dictation.").font(.caption)
                     }.padding(6)
                 }
-                GroupBox("3 · Preferences") {
+                GroupBox("3 · Test dictation") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Microphone → transcription").font(.headline)
+                        Text("Start, wait for Recording, speak, then Stop. This test only needs a prepared model and Microphone access.").font(.caption)
+                        HStack {
+                            Button("Start recording") { model.startMicrophoneTest() }.disabled(!model.canStartMicrophoneTest || model.recordingBinding)
+                            Button("Stop & transcribe") { model.stopMicrophoneTest() }.disabled(!model.microphoneTestActive)
+                            Button("Cancel") { model.cancel("Test cancelled.") }.disabled(!model.sessionBusy)
+                        }
+                        Divider()
+                        Text("Shortcut → transcription → text box").font(.headline)
+                        Text("Click in the box, hold \(model.preferences.shortcut.displayLabel), speak after Recording appears, then release. Text is inserted at your caret or replaces your selection. Keep focus here until it finishes.").font(.caption)
+                        SetupEditor(model: model).frame(height: 120)
+                        Text("This uses the real microphone and speech engine. In-app shortcut delivery is labelled separately; it does not validate insertion into another app.").font(.caption).foregroundStyle(.secondary)
+                        Text(model.testStatus).accessibilityLabel("Test status: \(model.testStatus)")
+                        if model.lastResultWasTest, let text = model.recoveryText {
+                            Text("Transcribed text").font(.headline)
+                            ScrollView { Text(text).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }.frame(minHeight: 40, maxHeight: 100)
+                        }
+                        Button("Clear test results") { model.closeSetupTests() }
+                        Text("Tests are temporary: cleared after five minutes, when Setup closes, on lock or quit. No recordings or transcripts are saved.").font(.caption).foregroundStyle(.secondary)
+                    }.frame(maxWidth: .infinity, alignment: .leading).padding(6)
+                }
+                GroupBox("4 · Preferences") {
                     VStack(alignment: .leading, spacing: 10) {
                         Picker("Language", selection: $model.preferences.language) { Text("Auto").tag("auto"); Text("English").tag("en"); Text("French").tag("fr") }.onChange(of: model.preferences.language) { model.persist() }.disabled(model.sessionBusy)
-                        HStack { Text("Shortcut: \(shortcutLabel)"); Button(recordingBinding ? "Press a chord…" : "Change…") { captureBinding() }; Button("Reset") { model.preferences.shortcut = .standard; model.persist() } }.disabled(model.sessionBusy)
-                        Toggle("Test shortcut (does not record)", isOn: $model.bindingTest)
+                        HStack {
+                            Text("Shortcut: \(model.preferences.shortcut.displayLabel)")
+                            Button(model.recordingBinding ? "Cancel change" : "Change…") { model.recordingBinding.toggle(); model.bindingTest = false; bindingPreview = "Press modifiers, then a key." }
+                            Button("Reset") { model.recordingBinding = false; model.preferences.shortcut = .standard; model.persist() }
+                        }.disabled(model.sessionBusy)
+                        if model.recordingBinding {
+                            ShortcutRecorder(preview: { bindingPreview = $0 }, accept: { chord in
+                                if let chord { model.preferences.shortcut = chord; model.persist(); model.notice = "Shortcut saved: \(chord.displayLabel). Test it in the text box above." }
+                                model.recordingBinding = false
+                            }).frame(height: 44)
+                            Text(bindingPreview).font(.headline).accessibilityLabel("Shortcut entered: \(bindingPreview)")
+                        }
+                        Toggle("Check shortcut detection only (does not record)", isOn: $model.bindingTest).disabled(model.sessionBusy || model.recordingBinding)
                         Text("Use Control, Option or Command plus a key. Fn/Globe, bare letters, modifier-only and reserved bindings are unsupported. Key names use US physical positions. A successful test cannot rule out every app conflict.").font(.caption)
                         Toggle("Launch at login", isOn: Binding(get: { loginStatus == .enabled }, set: { enabled in
                             do { if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }; loginError = "" } catch { loginError = "Registration failed; install in ~/Applications/Aparte.app and retry." }
@@ -144,9 +181,9 @@ struct SettingsView: View {
                     }.padding(6)
                 }
                 GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Unvalidated targets use Recovery. See the supplied compatibility evidence before relying on automatic insertion.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.0 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                Text("Diagnostics: Aparté 0.4.1 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
-        }.onAppear { loginStatus = SMAppService.mainApp.status }.onDisappear { stopBindingCapture() }
+        }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }
     private var loginDescription: String {
         switch loginStatus {
@@ -157,22 +194,4 @@ struct SettingsView: View {
         @unknown default: return "Unknown; recheck Login Items"
         }
     }
-    private var shortcutLabel: String {
-        let s = model.preferences.shortcut
-        let modifiers = [(Shortcut.control,"⌃"),(Shortcut.option,"⌥"),(Shortcut.shift,"⇧"),(Shortcut.command,"⌘")].filter { s.modifiers & $0.0 != 0 }.map(\.1).joined()
-        let names: [UInt16: String] = [0:"A",1:"S",2:"D",3:"F",4:"H",5:"G",6:"Z",7:"X",8:"C",9:"V",10:"§",11:"B",12:"Q",13:"W",14:"E",15:"R",16:"Y",17:"T",18:"1",19:"2",20:"3",21:"4",22:"6",23:"5",24:"=",25:"9",26:"7",27:"−",28:"8",29:"0",30:"]",31:"O",32:"U",33:"[",34:"I",35:"P",37:"L",38:"J",39:"’",40:"K",41:";",42:"\\",43:",",44:"/",45:"N",46:"M",47:".",49:"Space",50:"`"]
-        return modifiers + (names[s.key] ?? "Unknown")
-    }
-    private func captureBinding() {
-        guard !recordingBinding else { stopBindingCapture(); return }; recordingBinding = true
-        bindingMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            if event.keyCode != 53 {
-                let proposed = Shortcut(key: event.keyCode, modifiers: UInt64(event.modifierFlags.rawValue) & Shortcut.mask)
-                if proposed.isValid { model.preferences.shortcut = proposed; model.persist(); model.notice = "Shortcut saved. Use the binding test to check it." }
-                else { model.notice = "Unsupported or reserved shortcut. Keep the previous binding." }
-            }
-            stopBindingCapture(); return nil
-        }
-    }
-    private func stopBindingCapture() { if let bindingMonitor { NSEvent.removeMonitor(bindingMonitor) }; bindingMonitor = nil; recordingBinding = false }
 }

@@ -108,8 +108,9 @@ public struct GestureMatcher: Sendable {
     private var ownedModifiers: UInt64 = 0
     private var holding = false
     private var escapeOwned = false
+    public var ownsGesture: Bool { ownedKey != nil || escapeOwned }
     public init() {}
-    public mutating func key(_ key: UInt16, down: Bool, flags: UInt64, repeated: Bool = false, active: Bool, ownEvent: Bool = false) -> Action {
+    public mutating func key(_ key: UInt16, down: Bool, flags: UInt64, repeated: Bool = false, active: Bool, ownEvent: Bool = false, allowNewBinding: Bool = true) -> Action {
         if ownEvent { return .pass }
         if key == 53 {
             if down && escapeOwned { return .consume }
@@ -120,7 +121,7 @@ public struct GestureMatcher: Sendable {
             if down { return .consume }
             ownedKey = nil; let ended = holding; holding = false; return ended ? .up : .consume
         }
-        if down && !repeated && key == binding.key && flags & Shortcut.mask == binding.modifiers {
+        if allowNewBinding && down && !repeated && key == binding.key && flags & Shortcut.mask == binding.modifiers {
             ownedKey = key; ownedModifiers = binding.modifiers; holding = true; return .down
         }
         return down && active ? .interaction : .pass
