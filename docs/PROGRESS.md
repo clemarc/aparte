@@ -2,11 +2,11 @@
 
 ## Current status
 
-**0.4.5 stable local signing implemented, installed and running.** Owner approved D016 to remove update-permission noise. Created a dedicated persistent local development certificate/keychain outside Git; no trust rules, TCC changes, Apple account or release credentials. Setup reuses the same identity. Build scripts sign/verify it without ad-hoc fallback. Installer checks both apps against each other's actual designated requirements, rejects unexpected identity changes unless explicitly migrating, and refuses a running app; staged replacement has rollback.
+**0.4.6 focus-resolution correction installed; actual destination success pending.** Owner reports the stable-signature update has correct permissions and supplies Recovery screenshot: no accessible focused text field at recording start. This branch follows successful transcription; the current failure is target discovery. Exact app/field requested asynchronously, unanswered so far. Changed lookup to app-scoped AX focus first, guarded system fallback, consistent original window resolution and specific transient error reasons (D017). Unknown apps are identified before AX probing; supported list unchanged. No clipboard blind-paste fallback or scope expansion.
 
-Debug and Release builds passed, have different binary hashes but the same certificate-backed requirement, and mutually verify. Real tampered-resource and ad-hoc negative checks pass. All 38 app regressions pass. The previous ad-hoc app was correctly refused without a migration flag; after orderly quit the authorized one-time migration installed 0.4.5 build 6 and reopened it. A later installation attempt correctly refused the running app before mutation. Keychain search list restored to its prior login-only state. Public-only evidence: `docs/evidence/stable-signing.json`; workflow: `docs/LOCAL-SIGNING.md`.
+Release and all 38 tests passed. Installed via ordinary update (no migration flag) after mutual designated-requirement verification against 0.4.5; same certificate identity, strict/deep signature passes, Launch Services reopen succeeded. Evidence: `docs/evidence/focus-resolution.json`.
 
-**Next step:** owner verifies/grants this newly signed app's Microphone/Accessibility access once, then confirms actual capture and post-update permission continuity. No signing implementation blocker remains. Matching signatures are not live TCC evidence, and D015's missing-sound report remains unresolved until owner testing. Native UI/helper still unavailable. M4 not accepted; no M5. Retain the private local signing identity across all future builds; never regenerate it casually or reinstall ad-hoc builds.
+**Next step:** collect exact target app/field and live retry. No permission reset. M4 remains unaccepted; native desktop helper externally blocked. Preserve the dedicated signing identity.
 
 ## Update-install permission finding (2026-09-24)
 

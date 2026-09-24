@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.6",
+  "build": "7",
+  "decision": "D017",
+  "ownerEvidence": "User confirms correct permissions and provides screenshot of nil-target Recovery reason; no private transcript collected.",
+  "change": "Application-scoped focused element first, same-PID system fallback, app/field window consistency and same lookup during validation; precise transient app/AX failure reasons; unsupported app named before focus query.",
+  "checks": {
+    "release": "PASS",
+    "unit": {
+      "count": 38,
+      "failures": 0,
+      "durationSeconds": 3.162
+    },
+    "identity": "PASS: installed 0.4.5 and new 0.4.6 mutually satisfy actual designated requirements; certificate unchanged",
+    "install": "PASS: ordinary install without migration flag, strict/deep verification, orderly restart/open",
+    "installedBinarySHA256": "56a43700ec8eecca4df50b4f50892bc32d2cda6d8311931b31bf20036ffb62a6",
+    "actualTarget": "BLOCKED: owner app/field unspecified and real retry pending; existing native desktop helper unavailable"
+  },
+  "limits": [
+    "No unsupported app enabled; no blind paste, refocus, surrounding text read or timeout increase.",
+    "Compilation and policy tests do not validate actual AX behavior in external apps.",
+    "This attempt reached insertion after a non-rejected transcript; not a complete live microphone/ASR acceptance matrix."
+  ],
+  "logs": {
+    "release": {
+      "path": "artifacts/focus-resolution-release.log",
+      "sha256": "62aff1883d4523fac855ad2491c13595f19ebc4fa1897570886b5dc52f62bfac"
+    },
+    "unit": {
+      "path": "artifacts/focus-resolution-unit.log",
+      "sha256": "af34c8dcaa8be3565830fe68f278bf2d04d12eb58ef2fb453b17c1f64218e09e"
+    },
+    "identity": {
+      "path": "artifacts/focus-resolution-identity.log",
+      "sha256": "5ea73c541b4ddaac28ff58e309149c5b066e16244fd17bbe56eb65dcab222e68"
+    }
+  }
+}

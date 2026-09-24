@@ -2,6 +2,10 @@
 
 **Implementation complete through the feasible M0–M4 scope; validation pending. M4 is not accepted.** Version 0.4.2 implements the owner-approved D013 clipboard/insertion change. No M5 work was started.
 
+## 0.4.6 destination focus update
+
+Owner confirms correct permissions but shows the “no focused text field” Recovery message. That branch follows a non-rejected transcription. The new build queries the foreground app's focused element directly, with guarded system fallback, and resolves/compares original window identity consistently. Unsupported apps now get a named explanation before AX lookup. The same signing identity is retained. Release and 38 tests pass; actual destination success is still pending because the owner has not identified the app/field and native UI inspection is blocked. See D017 and focus-resolution.json.
+
 ## 0.4.5 stable signing update
 
 Installed and opened 0.4.5 with a persistent local-only signing certificate (D016). Debug/Release binaries differ but satisfy the same actual designated requirement. Tamper/ad-hoc negatives and all 38 tests pass. Builds fail rather than fall back; installs require compatible identities and a stopped app. The one-time switch from ad-hoc signing was performed explicitly. Private signing material remains outside Git; no trust or TCC changes. See LOCAL-SIGNING.md and stable-signing.json.
@@ -60,7 +64,7 @@ File decode timings are not release-to-insertion latency. Synthetic speech quali
 
 ## Consolidated remaining human / external actions
 
-- [ ] In 0.4.5, verify/grant the new stable identity once (see LOCAL-SIGNING), then run the microphone Start/Stop test and report its status, input name, received seconds and whether the meter moves. Then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
+- [ ] In 0.4.6, click the intended destination field before holding the shortcut. Report the app/field and result or specific Recovery reason. The owner reports permissions now correct; do not reset/re-grant them without a new failure. If microphone trouble recurs, use the Start/Stop test and meter. Then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
 - [ ] Provide a consented local microphone session: ten short English/French/quiet dictations, no retained recordings. Measure shortcut-to-live-capture p95 and release-to-dispatch/visible-text timings; test default input, startup release, 59/60-second boundary, device unplug/change, missed key-up, permissions revoked, Escape, busy holds, sleep/lock/logout and stale completion.
 - [ ] Run the ten-attempt matrix for TextEdit, Terminal/Claude Code, VS Code, Chrome textarea/contenteditable and Slack drafts as described in COMPATIBILITY. Use disposable/inert text, no submission. Validate exact insertion once, selection, Unicode, rich context, focus/caret invalidation, secure/read-only refusal, ambiguous writes, delayed consumers, concurrent clipboard copies and orderly quit. Add validated catalog entries only after evidence passes.
 - [ ] Visually review onboarding/status/Recovery, keyboard navigation, contrast and VoiceOver with an available desktop UI connection. Native UI tool failure prevented these checks.

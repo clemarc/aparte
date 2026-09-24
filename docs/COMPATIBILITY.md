@@ -14,6 +14,8 @@ Version 0.4.2 enables guarded insertion for the five supported app adapters unde
 
 The owner reports Microphone/Accessibility granted and Setup tests working. Do not assume missing grants from historical CLI evidence. Native desktop testing remains blocked: SkyComputerUseService crashed with SIGTRAP in Array.remove(at:) on 2026-09-24, and its replacement still returned a closed pipe. No new grant or repeated unchanged tool retry is needed for implementation.
 
+Version 0.4.6 resolves AXFocusedUIElement on the foreground application first, retaining a PID-checked system-wide fallback. App/window/field identities are revalidated through the same path; conflicting window metadata refuses insertion. App-specific failure reasons distinguish unsupported app, absent focus, timeout and window inconsistency. The owner confirms permissions are correct but the exact failing app/field is still awaited; this lookup change is not live target acceptance.
+
 ## Protocol to validate an adapter
 
 Use disposable documents/drafts. Never send a message or test destructive commands. Capture target app version, macOS major.minor, method, produced transcript (synthetic only), exact resulting text and clipboard types/change behavior. Each target needs ten attempts covering: caret at end, caret mid-paragraph, selection replacement, accented French, non-BMP emoji, rich surrounding text, rapid Escape, app switch, window/field switch, and concurrent clipboard copy. Happy paths must insert exactly once without surrounding loss or submission; safety cases must insert nothing. Safety refusal is not a happy-path pass.

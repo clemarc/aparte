@@ -184,3 +184,17 @@ Evidence: `docs/evidence/microphone-diagnostics.json`. No threshold relaxation, 
 | No release/security-policy expansion | PASS | Only owner-authorized local development certificate used; no trust-root install, Gatekeeper/TCC reset, Developer ID, account, spending, publication or M5. Temporary keychain search entry removed after signing |
 
 Evidence: `docs/evidence/stable-signing.json`. Earlier ad-hoc signing rows are historical checkpoints; D016 supersedes that implementation. Private key, keychain, unlock secret and temporary exports are outside Git; no private material is included in evidence.
+
+
+## 0.4.6 focused target discovery follow-up
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Owner reports corrected permissions after signing update | PASS | User explicitly confirms update has correct permissions; not a formal repeated-update or live ten-attempt matrix |
+| Distinguish failed target discovery from failed recording | PASS | Screenshot shows nil-target Recovery reason reached after a non-rejected transcript in Coordinator; no private transcript collected |
+| Application-scoped focused element lookup | PASS | TargetService asks the recorded app first, then system convenience fallback, and rejects other PIDs; same lookup used during validation |
+| Preserve original window/field/selection protections | PASS | App and field window identities must agree if both available; exact revalidation, PID/launchDate checks and original selection remain; no focus setting or blind Cmd-V |
+| Explain unsupported app / missing field / AX timeout | PASS | Transient reason identifies branch/app/error; no titles or surrounding text read/logged |
+| Owner's exact destination now inserts successfully | BLOCKED | Await app/field and real retry; source correction does not establish actual external compatibility |
+
+Build/install results are recorded in `docs/evidence/focus-resolution.json`. Original five-app real protocol remains required; no unsupported app is silently enabled.

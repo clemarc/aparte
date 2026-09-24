@@ -223,7 +223,7 @@ import AparteSpeech
     }
     private func insert(_ text: String, id: UUID) async {
         guard machine.id == id else { return }
-        guard let target else { recover(text, id: id, uncertain: false, reason: "No accessible focused text field was found when recording began."); return }
+        guard let target else { recover(text, id: id, uncertain: false, reason: targetService.captureFailure); return }
         guard target.method != nil else { recover(text, id: id, uncertain: false, reason: "This app or input control is not supported for automatic insertion. Try a text field in TextEdit, Terminal, VS Code, Chrome or Slack."); return }
         guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original app, field or selection changed while dictating. Nothing was inserted."); return }
         state = .inserting; notice = "Waiting for shortcut modifiers to clear…"; onStatus?()
