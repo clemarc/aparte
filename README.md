@@ -46,7 +46,7 @@ Use the stable `~/Applications/Aparte.app` path. The script refuses an unrelated
 
 Quit/reopen the installed app after updating. In **Settings & Setup → Test dictation**:
 
-- **Microphone → transcription:** click Start recording, wait for Recording, speak, then Stop & transcribe. The text appears below. Only a prepared model and Microphone access are required.
+- **Microphone → transcription:** click Start recording, wait for Recording, speak, then Stop & transcribe. Version 0.4.4 shows the actual input device, received seconds and a live level meter. The result distinguishes no frames, silence, quiet audio and speech-recognition rejection. Sound Input Settings opens macOS input selection/volume; Aparté uses the system default. Only a prepared model and Microphone access are required.
 - **Shortcut → transcription → text box:** click the box, hold your shortcut, speak after Recording, and release. Keep focus in the box until insertion. Select text first to test replacement. The result reports whether the global tap or in-app shortcut handler received the chord; an in-app pass does not validate another application.
 - **Preferences → Change:** the recorder takes focus and previews modifiers and the chord. Escape cancels; unsupported/reserved chords are shown without replacing the previous binding. Detection-only mode deliberately does not record; switch it off before the text-box test.
 

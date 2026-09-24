@@ -153,3 +153,17 @@ Owner reports the Setup tests work; no private recording or transcript was colle
 | User-visible window, minimize/reopen and login-cycle validation | BLOCKED | Existing native desktop-tool crash; process check and source inspection do not establish visual correctness |
 
 See `docs/evidence/startup-fix.json`. No microphone input, permission changes or private transcript collection occurred during this check.
+
+
+## 0.4.4 microphone investigation
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Inspect input without recording or changing settings | PASS | Core Audio default input was built-in, alive, unmuted, volume scalar 0.4297; lid-state read open. This does not establish actual audio delivery |
+| Live capture telemetry and distinct result explanations | PASS | Actual engine input-unit device ID/name, tap-derived peak and copied frame duration wired to Setup; Release compiles. No frames/invalid/short/silent/quiet captures receive distinct messages |
+| Preserve speech admission thresholds | PASS | New boundary/nonfinite regression verifies diagnostic admission matches existing TranscriptPolicy; 38 tests pass |
+| Real ASR still works on local file | PASS | Small model, 3-second synthetic fixture, 0.288-second decode, zero observed outbound requests |
+| Fix owner's specific missing-sound instance | BLOCKED | Exact observed test state and live meter result needed; no consented live capture was collected by agent, native UI unavailable. Cause remains unestablished; diagnostics are not proof of a repair |
+| Native meter visual behavior / actual microphone frames | BLOCKED | Requires owner-operated recording test; not substituted by file inference or synthetic tests |
+
+Evidence: `docs/evidence/microphone-diagnostics.json`. No threshold relaxation, input-device switch or permission changes were made.

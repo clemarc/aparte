@@ -2,9 +2,9 @@
 
 ## Current status
 
-**0.4.3 launch visibility fix installed and running.** Owner reported app did not start. Installed 0.4.2 process was already running, signature valid, and a one-second sample showed a normal AppKit main event loop; no Aparté crash report was found. Source opened Settings only on first-ever onboarding and lacked a reopen handler. D014 makes ordinary launch/reopen show Settings, restores minimized windows, and keeps login/service startup quiet. Release build and all 36 regressions passed. Old instance terminated orderly through NSRunningApplication; 0.4.3 build 4 installed with verified ad-hoc signature, opened through Launch Services and observed running 21 seconds later. Evidence: `docs/evidence/startup-fix.json`.
+**0.4.4 microphone diagnostics installed; reported issue unresolved.** Owner reports microphone granted but no captured sound. Read-only Core Audio inspection found built-in default input alive, unmuted, scalar volume about 0.43 and lid open; none proves audio delivery. No live recording collected or device/permissions changed. Added live input meter, actual engine input name/frame duration, and distinct no-frames/silent/quiet/ASR-rejection explanations (D015). Thresholds unchanged. Final Release build, all 38 tests and real small-file ASR passed (0.288 s decode, zero observed URL requests). Installed verified ad-hoc 0.4.4 build 5 and restarted via orderly termination/Launch Services. Evidence: `docs/evidence/microphone-diagnostics.json`.
 
-**Next step:** owner verifies the Settings window is visible and continues actual insertion checks. No further implementation approval needed. Clipboard D013 remains included. Visual/reopen/minimize/login and target checks remain BLOCKED by the existing desktop-tool failure; process survival is not visual evidence. M4 is not accepted; no M5 work.
+**Next step:** owner runs Start recording → speak → Stop and supplies displayed status/input/received seconds/meter movement. Cause is not established; do not claim microphone capture repaired or live validated. Optional symptom question remained unanswered during implementation. Native UI/helper remains externally blocked. M4 not accepted; no M5. Existing launch and clipboard fixes remain included.
 
 ## Previous M4 checkpoint (historical evidence)
 

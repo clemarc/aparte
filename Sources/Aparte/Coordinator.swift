@@ -24,6 +24,8 @@ import AparteSpeech
     @Published private(set) var shortcutStatus = "Not checked"
     @Published private(set) var testStatus = "Choose a test below. Audio and results stay in memory."
     @Published private(set) var lastResultWasTest = false
+    @Published private(set) var inputStatus = "Input level appears while recording; no audio is captured while idle."
+    @Published private(set) var inputLevel = 0.0
     weak var testEditor: SetupTextView?
     private enum Destination { case external, microphoneTest, setupField }
     private var destination: Destination?
@@ -144,6 +146,7 @@ import AparteSpeech
         testEditor?.clear(); testExpires = nil; lastResultWasTest = false
         bindingTest = false; recordingBinding = false
         testStatus = "Test cleared. No audio or transcript was saved."
+        inputStatus = "Input level appears while recording; no audio is captured while idle."; inputLevel = 0
     }
     private func begin(manualTest: Bool = false) {
         guard !hotkey.capturingBinding else { return }
@@ -164,6 +167,7 @@ import AparteSpeech
         guard let id = machine.begin() else { return }
         discardRecovery(); lastResultWasTest = false; startedAt = Date(); elapsed = 0
         if local { testStatus = manualTest ? "Starting microphone…" : "\(sessionDelivery) received. Starting microphone…"; testExpires = Date().addingTimeInterval(300) }
+        inputStatus = "Waiting for audio from the system default input…"; inputLevel = 0
         notice = "Starting microphone…"; let newTicket = CaptureTicket(); ticket = newTicket
         refresh()
         startup = Task {
@@ -173,7 +177,7 @@ import AparteSpeech
                     self.startedAt = Date(); self.notice = self.destination == .microphoneTest ? "Recording — press Stop to transcribe, Escape to cancel." : "Recording — release to transcribe, Escape to cancel."
                     if self.destination != .external { self.testStatus = self.notice }; self.refresh()
                 } }
-            } catch { if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start." } }
+            } catch { if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start (\((error as NSError).domain), \((error as NSError).code)). Check Sound → Input." } }
             if machine.id == nil && destination != .external { testStatus = notice; destination = nil }
             startup = nil; refresh()
         }
@@ -193,10 +197,16 @@ import AparteSpeech
                 ticket = nil
                 guard machine.id == id, !Task.isCancelled else { return }
                 deadline = Task { try? await Task.sleep(for: .seconds(30)); guard !Task.isCancelled, self.machine.id == id else { return }; self.cancel(AparteError.timeout.localizedDescription); self.machine.fail(); self.refresh() }
+                let diagnostics = AudioDiagnostics(samples)
+                inputLevel = 0; inputStatus = "\(audio.status.name) · \(diagnostics.summary)"
+                if let problem = diagnostics.problem {
+                    notice = problem; if destination != .external { testStatus = problem }
+                    machine.finish(id); return
+                }
                 let result = try await speech.transcribe(samples, language: preferences.language)
                 guard machine.decoded(id), !Task.isCancelled else { return }
                 deadline?.cancel(); deadline = nil
-                if result.noSpeech { notice = "No speech detected."; if destination != .external { testStatus = notice }; machine.finish(id); return }
+                if result.noSpeech { notice = "Audio was captured, but no usable speech was recognized. Try a clear sentence and check the selected language."; if destination != .external { testStatus = notice }; machine.finish(id); return }
                 if destination == .microphoneTest || destination == .setupField {
                     let isField = destination == .setupField
                     let inserted = isField && !machine.invalidatedTarget && testReceipt.map { testEditor?.apply(result.text, receipt: $0) == true } == true
@@ -267,6 +277,11 @@ import AparteSpeech
     private var ticks = 0
     private func tick() {
         ticks += 1
+        if state == .startingCapture || state == .recording {
+            let status = audio.status
+            inputLevel = status.level
+            inputStatus = "\(status.name) · \(String(format: "%.1f", status.seconds)) s received"
+        } else { inputLevel = 0 }
         if machine.id != nil {
             elapsed = Date().timeIntervalSince(startedAt ?? Date())
             if machine.state == .recording && (elapsed >= 60 || audio.limitReached) { cancel("60-second limit reached. Recording discarded.") }

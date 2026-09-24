@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.4",
+  "build": "5",
+  "decision": "D015",
+  "status": "Diagnostics implemented; reported microphone issue unresolved",
+  "readOnlyDeviceChecks": {
+    "defaultInput": "Built-in microphone",
+    "alive": true,
+    "mute": false,
+    "volumeScalar": 0.42973077,
+    "lidClosed": false,
+    "caveat": "Hardware property reads do not prove captured sound or current app permission."
+  },
+  "checks": {
+    "unit": {
+      "count": 38,
+      "failures": 0,
+      "durationSeconds": 3.144,
+      "newCoverage": "Diagnostic admission equivalent to unchanged 250 ms/-60 dBFS gate across boundary values, NaN/infinity, empty/silent/quiet/usable data."
+    },
+    "release": "PASS",
+    "realFileASR": {
+      "audioSeconds": 3,
+      "decodeSeconds": 0.28778675,
+      "model": "small",
+      "noSpeech": false,
+      "outboundURLRequests": 0,
+      "prepareSeconds": 16.294774889945984,
+      "text": "Please open the window and close the door."
+    },
+    "install": "PASS: stable existing path, ad-hoc signature strict/deep verified, orderly restart/open success",
+    "installedBinarySHA256": "09151037a0ac105c868a8d78f06a06cabf38967661d165293c1105da62f8b166",
+    "realMicrophone": "BLOCKED: exact owner test status and live meter result missing; no live audio collected by agent; native UI unavailable"
+  },
+  "implementation": "Shows actual capture input-unit device name, copied frame duration, live peak meter; separate no-frames/invalid/short/silent/quiet/ASR-rejected explanations. Does not change device, gain, permissions, speech thresholds or engine.",
+  "privacy": "No live recording, private transcript or audio settings captured/changed by agent. Runtime diagnostics are transient UI metadata; audio remains bounded in memory as before.",
+  "logs": {
+    "unit": {
+      "path": "artifacts/microphone-diagnostics-unit.log",
+      "sha256": "da8f9fad0c1104caeee5cdff0c1c99a607e17e034a4db45037b45aa2e5be8b81"
+    },
+    "release": {
+      "path": "artifacts/microphone-diagnostics-release.log",
+      "sha256": "9d9518f5271211e3ebadafcb52dc42f9f8fcd61bde6d0be7b79df569a53529e8"
+    },
+    "integration": {
+      "path": "artifacts/microphone-diagnostics-integration.log",
+      "sha256": "d9257187263be3f973f645bd4b686cbfe922cfb50f7bd1b4ba44b33a9a750f00"
+    }
+  }
+}

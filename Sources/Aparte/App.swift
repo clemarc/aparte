@@ -161,6 +161,11 @@ struct SettingsView: View {
                             Button("Stop & transcribe") { model.stopMicrophoneTest() }.disabled(!model.microphoneTestActive)
                             Button("Cancel") { model.cancel("Test cancelled.") }.disabled(!model.sessionBusy)
                         }
+                        ProgressView(value: model.inputLevel).accessibilityLabel("Microphone input level")
+                        Text(model.inputStatus).font(.caption).textSelection(.enabled)
+                        Button("Sound Input Settings") {
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension?input") { NSWorkspace.shared.open(url) }
+                        }
                         Divider()
                         Text("Shortcut → transcription → text box").font(.headline)
                         Text("Click in the box, hold \(model.preferences.shortcut.displayLabel), speak after Recording appears, then release. Text is inserted at your caret or replaces your selection. Keep focus here until it finishes.").font(.caption)
@@ -201,7 +206,7 @@ struct SettingsView: View {
                     }.padding(6)
                 }
                 GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Supported text fields can receive automatic insertion. Other contexts use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.3 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                Text("Diagnostics: Aparté 0.4.4 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }
