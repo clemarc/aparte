@@ -11,3 +11,11 @@ xcuserdata/
 *.caf
 *.mp3
 .env*
+
+# Local signing private material must never enter the repository.
+*.key
+*.p12
+*.pfx
+*.keychain
+*.keychain-db
+__pycache__/

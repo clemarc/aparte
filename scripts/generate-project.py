@@ -29,7 +29,7 @@ for kind in ['project','target']:
  for config in ['Debug','Release']:
   settings='MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; ARCHS = arm64; SWIFT_VERSION = 5.0; CLANG_ENABLE_MODULES = YES; '
   settings+='SWIFT_OPTIMIZATION_LEVEL = '+ ('"-Onone"' if config=='Debug' else '"-O"')+'; '
-  if kind=='target':settings+='PRODUCT_NAME = Aparte; PRODUCT_BUNDLE_IDENTIFIER = dev.aparte.Aparte; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; ENABLE_HARDENED_RUNTIME = NO; ENABLE_APP_SANDBOX = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks"; '
+  if kind=='target':settings+='PRODUCT_NAME = Aparte; PRODUCT_BUNDLE_IDENTIFIER = dev.aparte.Aparte; INFOPLIST_FILE = Resources/Info.plist; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Manual; ENABLE_HARDENED_RUNTIME = NO; ENABLE_APP_SANDBOX = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks"; '
   ids.append(add(kind+config,f'isa = XCBuildConfiguration; buildSettings = {{ {settings} }}; name = {config};'))
  configs[kind]=add(kind+'configs',f'isa = XCConfigurationList; buildConfigurations = {arr(ids)}; defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;')
 target=add('target',f'isa = PBXNativeTarget; buildConfigurationList = {configs["target"]}; buildPhases = {arr(phases)}; buildRules = (); dependencies = (); name = Aparte; productName = Aparte; productReference = {product}; productType = "com.apple.product-type.application"; packageProductDependencies = {arr(products)};')

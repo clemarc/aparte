@@ -167,3 +167,20 @@ See `docs/evidence/startup-fix.json`. No microphone input, permission changes or
 | Native meter visual behavior / actual microphone frames | BLOCKED | Requires owner-operated recording test; not substituted by file inference or synthetic tests |
 
 Evidence: `docs/evidence/microphone-diagnostics.json`. No threshold relaxation, input-device switch or permission changes were made.
+
+
+## 0.4.5 stable local development signing (owner-approved D016)
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Compatible identity across changed builds | PASS | Actual Debug and Release executables have different SHA-256 hashes, identical certificate-root + bundle-ID requirements, and each passes the other's actual requirement |
+| Dedicated local identity reused, not regenerated per build | PASS | Setup rerun reports same public fingerprint; sign/verify succeeds after keychain relock; 0700 directory and 0600 private files |
+| Reject tampered/ad-hoc updates | PASS | Real modified resource and ad-hoc-signed copy fail pinned verification; no fallback path in build script |
+| Prevent accidental update identity migration | PASS | Default install against old ad-hoc app returned 2 before mutation; explicit authorized migration succeeded. Final installer checks mutual actual designated requirements |
+| Prevent replacing a running app | PASS | Post-migration install returned 2 while installed process ran; no bundle replacement attempted. Staging/rollback paths source-reviewed |
+| Local Release 0.4.5 build 6 installed and opened | PASS | Strict/deep certificate-backed verification, stable path, successful Launch Services open; installed/running identity checked |
+| Existing app behavior regression suite | PASS | 38 tests, zero failures. No speech behavior changes; last real ASR fixture evidence remains 0.4.4 |
+| Actual grants persist after later update | BLOCKED | Owner must grant the new identity and test capabilities across another update; cryptographic continuity does not establish stored TCC state |
+| No release/security-policy expansion | PASS | Only owner-authorized local development certificate used; no trust-root install, Gatekeeper/TCC reset, Developer ID, account, spending, publication or M5. Temporary keychain search entry removed after signing |
+
+Evidence: `docs/evidence/stable-signing.json`. Earlier ad-hoc signing rows are historical checkpoints; D016 supersedes that implementation. Private key, keychain, unlock secret and temporary exports are outside Git; no private material is included in evidence.

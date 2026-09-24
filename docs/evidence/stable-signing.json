@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "builds": {
+    "Debug": {
+      "requirement": "identifier \"dev.aparte.Aparte\" and certificate root = H\"8abee9fa77fadad566c290b7f6a7baf2e8a02c8e\"",
+      "binarySHA256": "ff7a85d01777b93c6afb20445ce20741043038d1b9bee75bd3a1676fbe26b2a5"
+    },
+    "Release": {
+      "requirement": "identifier \"dev.aparte.Aparte\" and certificate root = H\"8abee9fa77fadad566c290b7f6a7baf2e8a02c8e\"",
+      "binarySHA256": "645e6d3184511dfab1dd417a2322795fe390315342fbdab3db38e53b7605e96d"
+    }
+  },
+  "mutualRequirementVerification": "PASS",
+  "tamperedResourceRejected": "PASS",
+  "adHocFallbackRejected": "PASS",
+  "privacyPermissionPersistence": "BLOCKED: requires owner grant and real post-update capability check; signatures alone do not establish TCC behavior",
+  "date": "2026-09-24",
+  "appVersion": "0.4.5",
+  "build": "6",
+  "decision": "D016",
+  "certificateSHA1": "8ABEE9FA77FADAD566C290B7F6A7BAF2E8A02C8E",
+  "certificateSHA256": "A4853A1936F49AA5F76474BC1CF5CB2588D07244419567C07423CE7F7F3A563D",
+  "scope": "Dedicated local-only development identity; no trust rules, TCC changes, release credentials or M5",
+  "unit": {
+    "count": 38,
+    "failures": 0,
+    "seconds": 3.085
+  },
+  "setupIdempotence": "PASS: second setup reused the same fingerprint",
+  "privatePermissions": "Directory 0700; configuration, dedicated keychain and unlock-secret 0600; no private values in evidence",
+  "installation": {
+    "defaultAdHocMigration": "PASS: refused with exit 2 before mutation",
+    "explicitMigration": "PASS: orderly quit, staged verified replacement, installed 0.4.5, Launch Services open succeeded",
+    "runningReplacement": "PASS: refused with exit 2 before mutation",
+    "installedMutualRequirementCheck": "PASS"
+  },
+  "keychainSearchList": "Restored to original login-only list after signing",
+  "investigation": "Initial isolated signing failed because keychain was outside search list. codesign man page confirmed required search-list presence; temporary membership fixed it without certificate trust changes. Python compile-cache sandbox failure was replaced with in-memory syntax compilation; no skipped build/check claimed.",
+  "logs": {
+    "debug": {
+      "path": "artifacts/stable-signing-debug.log",
+      "sha256": "0f352b43ce342403cc613c1e264f83665dc976a4a82932b0631b282b1ac73ec2"
+    },
+    "release": {
+      "path": "artifacts/stable-signing-release.log",
+      "sha256": "3a75783a9e363566fd1c8c909ce8cef48b3859a6c8a6f054ccbfc705996a6474"
+    },
+    "unit": {
+      "path": "artifacts/stable-signing-unit.log",
+      "sha256": "194ebe2d3e3da27c00c38a1031d976810f7fcf1416eff7326bacafd5a56e7a0f"
+    },
+    "test": {
+      "path": "artifacts/stable-signing-test.log",
+      "sha256": "e8ea4ad00cf8662c785ec6b29957df18f9817ac5277373ca9f90189bd3635000"
+    }
+  }
+}

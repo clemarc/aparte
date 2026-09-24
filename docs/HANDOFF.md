@@ -2,6 +2,12 @@
 
 **Implementation complete through the feasible M0–M4 scope; validation pending. M4 is not accepted.** Version 0.4.2 implements the owner-approved D013 clipboard/insertion change. No M5 work was started.
 
+## 0.4.5 stable signing update
+
+Installed and opened 0.4.5 with a persistent local-only signing certificate (D016). Debug/Release binaries differ but satisfy the same actual designated requirement. Tamper/ad-hoc negatives and all 38 tests pass. Builds fail rather than fall back; installs require compatible identities and a stopped app. The one-time switch from ad-hoc signing was performed explicitly. Private signing material remains outside Git; no trust or TCC changes. See LOCAL-SIGNING.md and stable-signing.json.
+
+Owner action: verify/grant this newly signed app once, then test microphone and permission continuity after a later normal update. Existing enabled checkboxes may belong to the old ad-hoc identity. No live persistence success is claimed yet.
+
 ## 0.4.4 microphone diagnostics — reported issue unresolved
 
 The owner reports granted microphone access but missing sound. Read-only device checks found the built-in default input alive/unmuted with nonzero volume; no microphone recording was made. Version 0.4.4 displays actual engine input name, received seconds and a live meter, plus separate no-frames/silent/quiet/ASR-rejection reasons. Release and all 38 tests pass; real file ASR passes. The cause is not established and microphone repair is not claimed. Next: use Start recording, speak, Stop, and report the displayed status and whether the meter moved. D015 explains the unchanged thresholds and transient diagnostics.
@@ -23,7 +29,7 @@ The owner reports the Setup tests are working. The installed 0.4.3 includes the 
 ## Delivered
 
 - Native arm64 macOS14+ source, Xcode project/shared scheme, testable modules and exact Swift dependency/model pins.
-- Local ad-hoc Release app at `~/Applications/Aparte.app` and `artifacts/DerivedData/Build/Products/Release/Aparte.app`; signature verified. No Developer ID, notarisation, DMG or public release.
+- Local development certificate-signed Release app at `~/Applications/Aparte.app` and `artifacts/DerivedData/Build/Products/Release/Aparte.app`; signature verified. No Developer ID, notarisation, DMG or public release.
 - Verified public multilingual small model installed under `~/Library/Application Support/Aparte/Models/small/` for offline use. Base/small evaluation assets remain ignored in `artifacts/models/`.
 - Native capture, WhisperKit inference, guarded target/AX/clipboard paths, transient recovery, configurable hold shortcut/language/model management and truthful launch-at-login controls.
 - 36 passing tests including actual named-pasteboard and separate lazy-owner process checks; real offline engine/corpus, model installer, cancellation and model-switch evidence.
@@ -41,19 +47,20 @@ File decode timings are not release-to-insertion latency. Synthetic speech quali
 
 ## Decision review, ordered by impact / uncertainty
 
-1. **D015 — Missing microphone sound remains unresolved.** Highest current uncertainty. The owner test status and meter will distinguish input delivery from recognition. Do not lower thresholds or switch devices without evidence.
-2. **D013 — Bounded foreign clipboard reads and supported adapters.** Highest usability/privacy impact and uncertainty. Actual target matrix and one-second consumption timing are the valuable next checks. Catalog eligibility is inexpensive to revise; safe universal atomic paste/restore is unavailable. D002/D008 are superseded for runtime enablement, with their original rationale preserved.
-3. **D011 / D012 — Setup readiness and diagnostics.** Owner reports tests working; formal global shortcut/permission-recovery and visual coverage remain incomplete. Changes are localized; retain separate in-app/global labels.
-4. **D007 / D009 — Speech gate and small default.** Small passes the frozen synthetic corpus; real quiet/noisy microphone speech remains uncertain. Model switching is easy. Recalibrate on a separate calibration set, retain held-out data and the original gates; do not silently relax thresholds. Base's 50% term result remains a recorded failure.
-5. **D003 — Local tokenizer protocol bridge.** It avoids upstream's remote fallback; bilingual and offline tests pass. Revisit when upstream offers a strict local-only public initializer. Replacement is localized but needs repeat offline/tokenizer/inference validation.
-6. **D006 — Recovery after attempted insertion.** Conservative “unconfirmed” labeling avoids duplicate retries. Easy UX change, but any automatic retry would require stronger acknowledgement than the OS generally provides.
-7. **D010 — Physical shortcut labels.** US physical key names are disclosed; test alternate layouts. Label improvements are inexpensive and do not require changing stored chords.
-8. **D014 — Explicit launch visibility.** Low-cost UX change: explicit Open now reveals Settings. Verify minimized/reopened windows and quiet login startup; the actual UI connection remains unavailable.
-9. **D001 / D004 — Toolchain and asset pins.** Xcode27 builds a macOS14 target, but minimum-OS runtime is missing. Asset updates require new immutable manifests and full real-engine checks. D005 only affects local author metadata, not product behavior.
+1. **D016 — Stable local identity.** Highest current priority: retain the private signing directory and verify real grants survive a later normal update. Signature continuity passes; actual TCC persistence remains pending.
+2. **D015 — Missing microphone sound remains unresolved.** Highest current uncertainty. The owner test status and meter will distinguish input delivery from recognition. Do not lower thresholds or switch devices without evidence.
+3. **D013 — Bounded foreign clipboard reads and supported adapters.** Highest usability/privacy impact and uncertainty. Actual target matrix and one-second consumption timing are the valuable next checks. Catalog eligibility is inexpensive to revise; safe universal atomic paste/restore is unavailable. D002/D008 are superseded for runtime enablement, with their original rationale preserved.
+4. **D011 / D012 — Setup readiness and diagnostics.** Owner reports tests working; formal global shortcut/permission-recovery and visual coverage remain incomplete. Changes are localized; retain separate in-app/global labels.
+5. **D007 / D009 — Speech gate and small default.** Small passes the frozen synthetic corpus; real quiet/noisy microphone speech remains uncertain. Model switching is easy. Recalibrate on a separate calibration set, retain held-out data and the original gates; do not silently relax thresholds. Base's 50% term result remains a recorded failure.
+6. **D003 — Local tokenizer protocol bridge.** It avoids upstream's remote fallback; bilingual and offline tests pass. Revisit when upstream offers a strict local-only public initializer. Replacement is localized but needs repeat offline/tokenizer/inference validation.
+7. **D006 — Recovery after attempted insertion.** Conservative “unconfirmed” labeling avoids duplicate retries. Easy UX change, but any automatic retry would require stronger acknowledgement than the OS generally provides.
+8. **D010 — Physical shortcut labels.** US physical key names are disclosed; test alternate layouts. Label improvements are inexpensive and do not require changing stored chords.
+9. **D014 — Explicit launch visibility.** Low-cost UX change: explicit Open now reveals Settings. Verify minimized/reopened windows and quiet login startup; the actual UI connection remains unavailable.
+10. **D001 / D004 — Toolchain and asset pins.** Xcode27 builds a macOS14 target, but minimum-OS runtime is missing. Asset updates require new immutable manifests and full real-engine checks. D005 only affects local author metadata, not product behavior.
 
 ## Consolidated remaining human / external actions
 
-- [ ] In restarted 0.4.4, run the microphone Start/Stop test and report its status, input name, received seconds and whether the meter moves. Then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
+- [ ] In 0.4.5, verify/grant the new stable identity once (see LOCAL-SIGNING), then run the microphone Start/Stop test and report its status, input name, received seconds and whether the meter moves. Then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
 - [ ] Provide a consented local microphone session: ten short English/French/quiet dictations, no retained recordings. Measure shortcut-to-live-capture p95 and release-to-dispatch/visible-text timings; test default input, startup release, 59/60-second boundary, device unplug/change, missed key-up, permissions revoked, Escape, busy holds, sleep/lock/logout and stale completion.
 - [ ] Run the ten-attempt matrix for TextEdit, Terminal/Claude Code, VS Code, Chrome textarea/contenteditable and Slack drafts as described in COMPATIBILITY. Use disposable/inert text, no submission. Validate exact insertion once, selection, Unicode, rich context, focus/caret invalidation, secure/read-only refusal, ambiguous writes, delayed consumers, concurrent clipboard copies and orderly quit. Add validated catalog entries only after evidence passes.
 - [ ] Visually review onboarding/status/Recovery, keyboard navigation, contrast and VoiceOver with an available desktop UI connection. Native UI tool failure prevented these checks.

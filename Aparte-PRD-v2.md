@@ -12,6 +12,10 @@
 
 D013 in `docs/DECISIONS.md` records the owner's approved clipboard/insertion fix after testing. It supersedes only the operational requirement to wait for validated adapters (§2, INS-02/03/05, M2 and related Appendix A wording) and §6's blanket refusal of ordinary lazy data: the five named app adapters may attempt guarded insertion before the real matrix is complete, and snapshots may materialize ordinary foreign data within the existing 500 ms / 8 MiB limits. Explicit promise/lazy-marker formats remain unsupported. No unknown app/control is enabled. No whole-field writes, retries after mutation, synthetic Return, focus restoration or permission bypass are authorized. The original specification below is preserved as history; all actual compatibility and M4 acceptance gates remain required and unpassed checks remain BLOCKED. See D013 for privacy, race and native timeout limitations.
 
+## Owner-approved local signing amendment — 24 September 2026
+
+After diagnosing update-related permission churn, the owner authorized D016: create and reuse a dedicated local development code-signing identity and verify cross-build identity continuity. This supersedes the blanket signing-credentials prohibition only for this local identity. Keep private material outside Git with owner-only access. No release/Developer ID credentials, accounts, trust-root installation, privacy reset, notarisation, publication or M5 work is authorized. See `docs/LOCAL-SIGNING.md`; actual permission continuity remains a real-device acceptance check.
+
 ## 1. Agent execution contract
 
 Implement M0-M4 in order, continuing without routine design approvals. Resolve implementation details using this specification and record consequential choices in `docs/DECISIONS.md`. Do not substitute a demo or mock implementation for the real audio, transcription or insertion paths.
