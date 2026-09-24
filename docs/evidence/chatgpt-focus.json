@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.8",
+  "build": "9",
+  "decision": "D019",
+  "ownerEvidence": "The 0.4.7 screenshot reports ChatGPT exposed no focused input through either application or system AX focused-element lookup. No transcript was collected.",
+  "change": "Direct documented AXManualAccessibility request when already trusted, plus bounded unique focused text-control lookup inside the active AX window after direct focus links are absent.",
+  "checks": {
+    "release": "PASS: signed native Release build",
+    "unit": { "count": 41, "failures": 0 },
+    "identity": "PASS: built 0.4.8 and installed 0.4.7 mutually satisfy actual designated requirements",
+    "install": "PASS: ordinary stable-signature update without migration; strict/deep verification; Launch Services open",
+    "runningProcess": "PASS: inventory found one running Aparté, installed bundle at ~/Applications/Aparte.app (PID 13056)",
+    "installedVersion": "0.4.8",
+    "installedBinarySHA256": "b0a3cc2b55d7808b614903ef2806364887c39ffa3a2d8f978681a4784587bca5",
+    "actualChatGPTInsertion": "BLOCKED: owner retry pending; native desktop helper unavailable"
+  },
+  "limits": [
+    "The fallback refuses a missing/ambiguous/over-limit active-window focus and does not paste blindly.",
+    "The 300 ms bounded scan may affect shortcut-to-recording latency in apps without direct AX focus; real timing remains unmeasured.",
+    "No permission setting, TCC record, private transcript or target field content was changed/read for verification."
+  ],
+  "logs": {
+    "release": { "path": "artifacts/chatgpt-focus-release.log", "sha256": "14c86a2299fde44605293bc397a0a924398c2841072fba180cfe556a550edfb3" },
+    "unit": { "path": "artifacts/chatgpt-focus-unit.log", "sha256": "37085797b033e988d5d846d2bfcf627e3971cc98964191916ebf30d7de55a6a2" }
+  }
+}

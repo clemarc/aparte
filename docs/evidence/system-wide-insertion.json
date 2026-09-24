@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.7",
+  "build": "8",
+  "decision": "D018",
+  "change": "Removed app-name admission list; generic guarded clipboard insertion for standard accessible editable text controls across foreground apps; optional known-app method overrides; Electron AXManualAccessibility preparation only when advertised and already AX-trusted.",
+  "checks": {
+    "release": "PASS: final Release build succeeded with stable certificate-backed local signature",
+    "unit": { "count": 41, "failures": 0 },
+    "identity": "PASS: installed 0.4.6 and built 0.4.7 mutually satisfy actual designated requirements",
+    "install": "PASS: ordinary local install without signing migration; strict/deep signature verification; Launch Services open returned success",
+    "runningProcess": "PASS: an older Debug copy was found running concurrently; it was closed orderly, then the installed 0.4.7 app was opened with a fresh Launch Services instance. Final process inventory showed only the installed bundle at ~/Applications/Aparte.app (PID 12272). No permission setting was changed.",
+    "installedVersion": "0.4.7",
+    "installedBinarySHA256": "3eab473dfaa5e49a1a5fa4e7e017c3427ac82266502df5cb85c4a60288c6c71f",
+    "actualChatGPTInsertion": "BLOCKED: owner live retry pending; native desktop helper unavailable"
+  },
+  "limits": [
+    "No claim of visible insertion in ChatGPT or any external target from policy tests or a successful build.",
+    "Unknown/custom/inaccessible text controls can still use Recovery; the owner should report the exact reason.",
+    "No permission settings or TCC state were changed."
+  ],
+  "logs": {
+    "release": { "path": "artifacts/system-wide-release.log", "sha256": "8b66ccf7e0bc6ffdb73089918c48d0f36c864557c542ec8937b3c0cf90614e86" },
+    "unit": { "path": "artifacts/system-wide-unit.log", "sha256": "c15dafed2e8d6a8750e216428799fc6dddb66f6db65f003c5e7d4ee5a064f8fc" }
+  }
+}

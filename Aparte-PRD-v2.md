@@ -16,6 +16,10 @@ D013 in `docs/DECISIONS.md` records the owner's approved clipboard/insertion fix
 
 After diagnosing update-related permission churn, the owner authorized D016: create and reuse a dedicated local development code-signing identity and verify cross-build identity continuity. This supersedes the blanket signing-credentials prohibition only for this local identity. Keep private material outside Git with owner-only access. No release/Developer ID credentials, accounts, trust-root installation, privacy reset, notarisation, publication or M5 work is authorized. See `docs/LOCAL-SIGNING.md`; actual permission continuity remains a real-device acceptance check.
 
+## Owner-approved system-wide insertion amendment — 24 September 2026
+
+D018 records the owner's clarification that dictation should work across the system, including ChatGPT, rather than only in five named applications. Standard accessible editable controls in any foreground app may use the guarded clipboard route without app-name approval. Existing per-app methods remain optional overrides. This supersedes D013/D017's five-app operational gate; it does not mark any app validated or weaken secure/read-only refusal, original context checks, clipboard preservation, no Return or no retry. Custom/inaccessible controls and remote/elevated contexts have no universal compatibility guarantee. The original target matrix remains required validation, now with ChatGPT added as an owner-reported target.
+
 ## 1. Agent execution contract
 
 Implement M0-M4 in order, continuing without routine design approvals. Resolve implementation details using this specification and record consequential choices in `docs/DECISIONS.md`. Do not substitute a demo or mock implementation for the real audio, transcription or insertion paths.

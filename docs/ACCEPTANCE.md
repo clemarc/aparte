@@ -198,3 +198,28 @@ Evidence: `docs/evidence/stable-signing.json`. Earlier ad-hoc signing rows are h
 | Owner's exact destination now inserts successfully | BLOCKED | Await app/field and real retry; source correction does not establish actual external compatibility |
 
 Build/install results are recorded in `docs/evidence/focus-resolution.json`. Original five-app real protocol remains required; no unsupported app is silently enabled.
+
+## 0.4.7 system-wide editable-field insertion
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Remove Aparté's app-name restriction | PASS | Schema 3 catalog makes five known entries method overrides. Generic AXTextField/AXTextArea/AXComboBox route accepts arbitrary bundle IDs with positive editability evidence; three new regression cases in 41 passing tests |
+| Retain target and secure-field protections | PASS | Policy refuses secure, disabled, explicitly read-only, unknown-role and unproven-editability controls; TargetService still checks exact PID, window, element, selection and focus before insertion. Native Release compiled; no external runtime safety claim |
+| Ask lazy Electron-based apps to expose accessibility tree | PASS | TargetService checks already-granted AX trust and settable AXManualAccessibility before requesting it on activation/recheck/capture; Release compiled. Actual ChatGPT support for this attribute remains unverified |
+| Keep existing clipboard preservation and no-retry behavior | PASS | Existing real isolated pasteboard regressions remain in 41 passing tests; Coordinator insertion/restore behavior unchanged. Actual target consumption remains BLOCKED |
+| Signed 0.4.7 update | PASS | Release build, 41/41 unit tests, mutual actual designated requirements, strict/deep signature check, ordinary install without migration and Launch Services open. Evidence in system-wide-insertion.json |
+| ChatGPT and representative cross-app visible insertion | BLOCKED | No live foreground ChatGPT/paste validation. Native desktop helper still unavailable; owner must try the installed 0.4.7 prompt. Generic eligibility does not establish actual target success |
+
+The prior five-app restriction in the 0.4.2 and 0.4.6 checkpoint rows is historical and superseded by D018. The ten-attempt compatibility matrix, live microphone gates and macOS14 runtime remain pending; **M4 is not accepted**.
+
+## 0.4.8 ChatGPT focus follow-up
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Diagnose owner's actual 0.4.7 failure | PASS | Owner screenshot: `ChatGPT did not expose a focused input (app: no focused element exposed; system: no focused element exposed)`; this identifies AX focus discovery, not app authorization or proven microphone failure |
+| Retry documented accessibility-tree request without unreliable metadata precheck | PASS | TargetService calls AXManualAccessibility setter when already AX-trusted; unsupported setter harmlessly fails; Release compiled. Actual target effect remains unverified |
+| Safe fallback within original active window | PASS | Source review: window-level focus first, then one AXFocused standard text control from same PID under 96 nodes/10 levels/300 ms; multiple/missing/overlimit cases refuse. Existing eligibility and context checks still apply; runtime ChatGPT behavior unverified |
+| Signed 0.4.8 local update | PASS | Release build, 41/41 unit tests, mutual actual designated requirements, ordinary install, verified single running installed instance. Evidence in chatgpt-focus.json |
+| Visible insertion into ChatGPT | BLOCKED | Owner must retry 0.4.8; native desktop helper remains unavailable. Build/tests and the 0.4.7 failure do not prove the fallback succeeds |
+
+No external compatibility target is marked validated; **M4 is not accepted**.

@@ -74,7 +74,7 @@ import AparteSpeech
         for event in [NSWorkspace.willSleepNotification, NSWorkspace.sessionDidResignActiveNotification, NSWorkspace.willPowerOffNotification] {
             observers.append(workspace.addObserver(forName: event, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.suspend() } })
         }
-        observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.machine.invalidateTarget() } })
+        observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.machine.invalidateTarget(); self?.targetService.prepareCurrentApplication() } })
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.recheck() } })
         observers.append(NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { if self?.machine.id != nil { self?.cancel("Microphone configuration changed. Retry with the current default input.") } } })
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
@@ -95,6 +95,7 @@ import AparteSpeech
         if permissions.accessibility {
             if !sessionBusy { hotkey.stop() }
             tapFailed = !hotkey.start()
+            targetService.prepareCurrentApplication()
         } else {
             hotkey.stop(); tapFailed = false
             if destination == .external { cancel("Accessibility is unavailable to this running app. Reopen the installed Aparté after granting it.") }
@@ -105,7 +106,7 @@ import AparteSpeech
     private func refresh() {
         let permissions = PermissionStatus()
         let readiness = SetupReadiness(microphone: permissions.microphone == .authorized, accessibility: permissions.accessibility, model: modelLoaded, shortcut: hotkey.isRunning && !tapFailed)
-        readinessSummary = readiness.canDictate ? "Ready. Automatic insertion is enabled for supported text fields; other contexts use Recovery." : readiness.blockers.joined(separator: " · ")
+        readinessSummary = readiness.canDictate ? "Ready. Dictation works across apps in accessible editable text fields; other contexts use Recovery." : readiness.blockers.joined(separator: " · ")
         if preparation != nil && !installing { readinessSummary = "Preparing \(preferences.model)… Wait for the model to finish loading." }
         shortcutStatus = hotkey.isRunning ? "Global shortcut listener active" : "Global listener unavailable. The test text box can still receive the shortcut inside Aparté."
         if machine.id == nil && !machine.engineBusy && preparation == nil && !audioDraining && startup == nil && operation == nil {
@@ -224,7 +225,7 @@ import AparteSpeech
     private func insert(_ text: String, id: UUID) async {
         guard machine.id == id else { return }
         guard let target else { recover(text, id: id, uncertain: false, reason: targetService.captureFailure); return }
-        guard target.method != nil else { recover(text, id: id, uncertain: false, reason: "This app or input control is not supported for automatic insertion. Try a text field in TextEdit, Terminal, VS Code, Chrome or Slack."); return }
+        guard target.method != nil else { recover(text, id: id, uncertain: false, reason: "This input control is not exposed as an editable text field. Click inside the destination text input before dictating."); return }
         guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original app, field or selection changed while dictating. Nothing was inserted."); return }
         state = .inserting; notice = "Waiting for shortcut modifiers to clear…"; onStatus?()
         let until = ContinuousClock.now.advanced(by: .seconds(2))

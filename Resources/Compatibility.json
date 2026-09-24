@@ -1,8 +1,8 @@
 {
-  "schema": 2,
+  "schema": 3,
   "validated": [],
-  "note": "Enabled supported adapters are operational with runtime safety checks under owner-approved D013. Validated is separate evidence metadata; an enabled entry does not claim the live compatibility protocol has passed.",
-  "enabled": [
+  "note": "D018: system-wide clipboard insertion into standard editable text controls, independent of app identity. Overrides select known app methods; validated remains separate real-test evidence. Secure/disabled/explicitly read-only controls always refuse. Generic controls require positive editability evidence.",
+  "overrides": [
     {
       "bundleID": "com.apple.TextEdit",
       "method": "selectedText",
@@ -42,5 +42,10 @@
         "AXTextField"
       ]
     }
+  ],
+  "genericClipboardRoles": [
+    "AXTextField",
+    "AXTextArea",
+    "AXComboBox"
   ]
 }

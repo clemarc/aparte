@@ -1,6 +1,6 @@
 # Aparté implementation
 
-Authority: `Aparte-PRD-v2.md` (read completely), including the owner-approved D013 clipboard/insertion amendment recorded in `docs/DECISIONS.md`. Scope: M0–M4 only; no M5, remote, hosted CI, release-signing credentials, notarisation, publication, or paid services. Owner-approved D016 permits a dedicated local-only development signing identity for stable permissions; never commit its private material.
+Authority: `Aparte-PRD-v2.md` (read completely), including the owner-approved D013 clipboard/insertion and D018 system-wide editable-field amendments recorded in `docs/DECISIONS.md`. Scope: M0–M4 only; no M5, remote, hosted CI, release-signing credentials, notarisation, publication, or paid services. Owner-approved D016 permits a dedicated local-only development signing identity for stable permissions; never commit its private material.
 
 Commands:
 - `./scripts/build-local.sh --configuration Debug|Release`

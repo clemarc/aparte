@@ -205,8 +205,8 @@ struct SettingsView: View {
                         if loginStatus == .requiresApproval { Button("Open Login Items") { SMAppService.openSystemSettingsLoginItems() } }
                     }.padding(6)
                 }
-                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Supported text fields can receive automatic insertion. Other contexts use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.6 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Editable text fields across apps can receive automatic insertion. Secure, read-only and inaccessible controls use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
+                Text("Diagnostics: Aparté 0.4.8 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }

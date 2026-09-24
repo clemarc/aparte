@@ -2,11 +2,15 @@
 
 ## Current status
 
-**0.4.6 focus-resolution correction installed; actual destination success pending.** Owner reports the stable-signature update has correct permissions and supplies Recovery screenshot: no accessible focused text field at recording start. This branch follows successful transcription; the current failure is target discovery. Exact app/field requested asynchronously, unanswered so far. Changed lookup to app-scoped AX focus first, guarded system fallback, consistent original window resolution and specific transient error reasons (D017). Unknown apps are identified before AX probing; supported list unchanged. No clipboard blind-paste fallback or scope expansion.
+**0.4.8 ChatGPT focus fallback installed; live validation pending.** Owner's 0.4.7 screenshot shows ChatGPT reached target discovery but neither app nor system returned a focused element. D019 now attempts the documented accessibility-tree request directly and checks only the active AX window for a uniquely focused standard text control under strict bounds. The 0.4.7 D018 app-name removal and guardrails remain. No OS permissions changed.
 
-Release and all 38 tests passed. Installed via ordinary update (no migration flag) after mutual designated-requirement verification against 0.4.5; same certificate identity, strict/deep signature passes, Launch Services reopen succeeded. Evidence: `docs/evidence/focus-resolution.json`.
+Final 0.4.8 Release passed; all 41 unit tests passed. Built and installed with the same stable signing identity as 0.4.7; Launch Services started the installed bundle, and process inventory showed it as the only Aparté instance. **Next step:** owner retries ChatGPT and supplies the exact Recovery reason if insertion still fails. Real ChatGPT insertion is not verified; native desktop helper remains unavailable. M4 not accepted. Evidence: `docs/evidence/chatgpt-focus.json`.
 
-**Next step:** collect exact target app/field and live retry. No permission reset. M4 remains unaccepted; native desktop helper externally blocked. Preserve the dedicated signing identity.
+## 0.4.7 system-wide insertion checkpoint
+
+Owner clarified that dictation must work across the system; D018 removed Aparté's app-name gate. Generic clipboard insertion accepts standard accessible text controls with positive editability evidence in any foreground app. Per-app methods are overrides only. Secure/disabled/read-only/unknown contexts and original context checks remain. The first AXManualAccessibility preparation used a settable-metadata precheck; D019 updates it after the 0.4.7 ChatGPT focus failure.
+
+The 0.4.7 Release and all 41 unit tests passed (three new generic target safety cases). Old/new apps mutually satisfied their actual designated requirements. Ordinary local install without migration and Launch Services open succeeded; installed binary SHA-256 was `3eab473dfaa5e49a1a5fa4e7e017c3427ac82266502df5cb85c4a60288c6c71f`. An older Debug copy was running simultaneously; it was closed orderly. The owner's real ChatGPT retry then exposed the focus failure addressed by 0.4.8. Evidence: `docs/evidence/system-wide-insertion.json`.
 
 ## Update-install permission finding (2026-09-24)
 
