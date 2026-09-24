@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.10",
+  "build": "11",
+  "decision": "D020",
+  "ownerEvidence": "0.4.8 ChatGPT Recovery reports an active window with no uniquely focused editable control. Owner reports dictation works in Claude and Chrome native UI, but not webpage inputs. No private transcript collected.",
+  "change": "Request Chromium web accessibility once per already-trusted foreground process, detected by a bundled Chromium runtime marker; if direct focus remains absent, accept only a recently clicked, hit-tested, editable text control in the original active window with revalidation.",
+  "checks": {
+    "release": "PASS: signed native 0.4.10 Release build",
+    "unit": { "count": 41, "failures": 0 },
+    "chromiumMarker": "PASS: same detection rule matched installed /Applications/ChatGPT.app and /Applications/Google Chrome.app bundles",
+    "identity": "PASS: built 0.4.10 and previously installed 0.4.9 mutually satisfy actual designated requirements",
+    "install": "PASS: ordinary local install without signing migration; strict/deep verification; Launch Services open",
+    "runningProcess": "PASS: only installed ~/Applications/Aparte.app running after update (PID 15163)",
+    "installedVersion": "0.4.10",
+    "installedBinarySHA256": "c98ff372d818c38adea7bdf7fba09af3716c3c0203b6193c34ba72c90f7d431e",
+    "actualWebInsertion": "BLOCKED: owner ChatGPT/Chrome webpage retry pending; native desktop helper unavailable",
+    "backgroundOriginalTarget": "BLOCKED: requested workflow not implemented; see D021"
+  },
+  "limits": [
+    "Chromium may take about two seconds to enable full web accessibility after the request; immediate first focus capture can still fail.",
+    "AXEnhancedUserInterface is undocumented by Apple but recognized in current Chromium source. It is sent only for bundles with a Chromium runtime marker and balanced on orderly quit when the true request succeeded.",
+    "A clicked field is accepted only with app/window/role/editability evidence and is re-hit-tested; no blind paste or background paste was added.",
+    "No browser settings, app launch flags, VoiceOver, TCC or macOS security settings were changed."
+  ],
+  "logs": {
+    "release": { "path": "artifacts/web-focus-final-release.log", "sha256": "5205bf5bd29504cad85472ccd06219f4e22177ff143cc81394caf718e050788d" },
+    "unit": { "path": "artifacts/web-focus-final-unit.log", "sha256": "a54c95af7d54539d77c398ef7ec29bff0af7c0d46ec7b7569a44eff97483270e" }
+  }
+}

@@ -50,6 +50,24 @@ import AppKit
         XCTAssertThrowsError(try service.write("must not paste", snapshot: old))
         XCTAssertEqual(board.string(forType: .string), "new")
     }
+    func testRecoveryKeepsTranscriptAfterAttemptedPasteWithoutRestoringOldClipboard() async throws {
+        let board = board(); defer { board.releaseGlobally() }
+        let service = ClipboardService(boardName: board.name)
+        service.copyExplicit("old")
+        try service.write("dictation", snapshot: await service.snapshot())
+        XCTAssertTrue(service.copyRecovery("dictation"))
+        service.restore()
+        XCTAssertEqual(board.string(forType: .string), "dictation")
+    }
+    func testRecoveryDoesNotOverwriteNewerClipboardOwner() async throws {
+        let board = board(); defer { board.releaseGlobally() }
+        let service = ClipboardService(boardName: board.name)
+        service.copyExplicit("old")
+        try service.write("dictation", snapshot: await service.snapshot())
+        board.clearContents(); board.setString("new user copy", forType: .string)
+        XCTAssertFalse(service.copyRecovery("dictation"))
+        XCTAssertEqual(board.string(forType: .string), "new user copy")
+    }
     func testRealPromisedAndOversizedClipboardAborts() async throws {
         let board = board(); defer { board.releaseGlobally() }
         board.setData(Data([1]), forType: .init("com.apple.pasteboard.promised-file-url"))

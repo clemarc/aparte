@@ -130,4 +130,19 @@ private final class SnapshotRace: @unchecked Sendable {
     public func copyExplicit(_ text: String) {
         try? replaceContentsExplicitly([[.init(type: NSPasteboard.PasteboardType.string.rawValue, data: Data(text.utf8))]])
     }
+    /// The owner requested that a result which cannot be inserted be ready for
+    /// manual paste. A dispatched paste may still consume our temporary board;
+    /// never restore the old contents before leaving the transcript available.
+    /// If someone else copied after our dispatch, preserve that newer clipboard.
+    @discardableResult public func copyRecovery(_ text: String) -> Bool {
+        let board = NSPasteboard(name: boardName)
+        if let pending {
+            guard pending.text == text, owns() else { return false }
+            restoration?.cancel(); restoration = nil
+            self.pending = nil
+            return true
+        }
+        board.clearContents()
+        return board.setString(text, forType: .string)
+    }
 }

@@ -108,8 +108,8 @@ struct RecoveryView: View {
             if let text = model.recoveryText {
                 Text(model.recoveryReason).font(.callout).foregroundStyle(.secondary)
                 ScrollView { Text(text).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }
-                Text("Kept in memory for five minutes. Lock, quit, discard or the next recording clears it. A new recording replaces this result.").font(.caption).foregroundStyle(.secondary)
-                HStack { Button("Copy (replaces clipboard)") { model.copyRecovery() }; Button("Discard", role: .destructive) { model.discardRecovery() } }
+                Text("Kept in Aparté for five minutes. The clipboard may retain or sync this text after Recovery expires. Lock, quit, discard or the next recording clears Aparté's copy.").font(.caption).foregroundStyle(.secondary)
+                HStack { Button("Copy again (replaces clipboard)") { model.copyRecovery() }; Button("Discard", role: .destructive) { model.discardRecovery() } }
             } else { Text("No pending result.") }
         }.padding(24)
     }
@@ -205,8 +205,8 @@ struct SettingsView: View {
                         if loginStatus == .requiresApproval { Button("Open Login Items") { SMAppService.openSystemSettingsLoginItems() } }
                     }.padding(6)
                 }
-                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Editable text fields across apps can receive automatic insertion. Secure, read-only and inaccessible controls use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.8 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. After a failed insertion, Recovery puts your transcript on the system clipboard for manual paste; it may remain there after Aparté's five-minute Recovery expires or sync through Universal Clipboard. An unconfirmed paste may already have inserted text, so check before pasting again. Editable text fields across apps can receive automatic insertion. Secure, read-only and inaccessible controls use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
+                Text("Diagnostics: Aparté 0.4.11 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }

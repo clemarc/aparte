@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-24",
+  "version": "0.4.11",
+  "build": "12",
+  "scope": "D020 browser accessibility, D021 original-window return, D022 Recovery clipboard handoff",
+  "release": {
+    "command": "./scripts/build-local.sh --configuration Release",
+    "result": "PASS",
+    "log": "artifacts/original-target-release.log",
+    "logSHA256": "462115b49350d87a0bbefe5798a2d5b1f1899bf9e1a20bee8dbfb8c492dacd88"
+  },
+  "unit": {
+    "command": "./scripts/test-local.sh --suite unit",
+    "result": "PASS",
+    "tests": 43,
+    "failures": 0,
+    "log": "artifacts/original-target-unit.log",
+    "logSHA256": "8c2c6f7d39a3adf7f3cd055a25823bef4537f2985b37209649f94cbd9a5a97b6"
+  },
+  "integration": {
+    "command": "./scripts/test-local.sh --suite integration",
+    "result": "PASS",
+    "model": "small",
+    "decodeSeconds": 0.302533083,
+    "outboundURLRequests": 0,
+    "log": "artifacts/original-target-integration.log",
+    "logSHA256": "fc83409dba37609790f70e65bb0331a183da5ab590a1ca61432b00b1dbc3a7ec"
+  },
+  "install": {
+    "path": "~/Applications/Aparte.app",
+    "version": "0.4.11",
+    "build": "12",
+    "binarySHA256": "99ba28bc4f7714107d7994443d3c44468e34ac46964fb8cd11370d25aa70d403",
+    "signingCertificateSHA1": "8ABEE9FA77FADAD566C290B7F6A7BAF2E8A02C8E",
+    "identityContinuity": "Old and new apps satisfy each other's actual designated requirements",
+    "strictSignatureVerification": "PASS",
+    "launch": "PASS: one running installed instance, PID 18006 at inspection"
+  },
+  "liveChecks": {
+    "chromiumWebpageField": "BLOCKED: owner has not yet retried 0.4.11 in a disposable webpage field",
+    "originalWindowReturn": "BLOCKED: no available trusted desktop interaction to verify activation and exact field focus",
+    "systemClipboardAndTarget": "BLOCKED: isolated named-pasteboard tests do not prove real paste consumption or general clipboard UI behavior"
+  },
+  "acceptance": "Implementation complete; M4 validation pending. No external-app insertion success claimed."
+}

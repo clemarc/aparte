@@ -43,6 +43,12 @@ import AparteSpeech
     private let clipboard = ClipboardService()
     private var target: TargetContext?
     private var ticket: CaptureTicket?
+    private var switchedAwayAt: Date?
+    private var returnedAt: Date?
+    private var targetMismatchSince: Date?
+    private var deferredText: String?
+    private var deferredExpires: Date?
+    private var returnRequested = false
     private var startup: Task<Void, Never>?
     private var operation: Task<Void, Never>?
     private var preparation: Task<Void, Never>?
@@ -64,9 +70,9 @@ import AparteSpeech
         hotkey.onDown = { [weak self] in self?.begin() }
         hotkey.onUp = { [weak self] in if self?.destination != .microphoneTest { self?.release() } }
         hotkey.onCancel = { [weak self] in self?.cancel("Cancelled") }
-        hotkey.onInteraction = { [weak self] in self?.machine.invalidateTarget() }
+        hotkey.onInteraction = { [weak self] pid, clicked in self?.observeInteraction(targetPID: pid, clicked: clicked) }
         hotkey.onDisabled = { [weak self] in self?.cancel("Shortcut tap interrupted. Recheck permissions.") }
-        targetService.onInvalidated = { [weak self] in self?.machine.invalidateTarget() }
+        targetService.onInvalidated = { [weak self] notification in self?.observeTargetChange(notification) }
         hotkey.allowsLocalTest = { [weak self] in self?.testEditor?.isFocused == true || self?.bindingTest == true || self?.destination == .microphoneTest }
         hotkey.installLocalTestHandler()
         watchdog = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.tick() } }
@@ -74,7 +80,7 @@ import AparteSpeech
         for event in [NSWorkspace.willSleepNotification, NSWorkspace.sessionDidResignActiveNotification, NSWorkspace.willPowerOffNotification] {
             observers.append(workspace.addObserver(forName: event, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.suspend() } })
         }
-        observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.machine.invalidateTarget(); self?.targetService.prepareCurrentApplication() } })
+        observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.activatedApplication(); self?.targetService.prepareCurrentApplication() } })
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.recheck() } })
         observers.append(NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { if self?.machine.id != nil { self?.cancel("Microphone configuration changed. Retry with the current default input.") } } })
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
@@ -149,17 +155,72 @@ import AparteSpeech
         testStatus = "Test cleared. No audio or transcript was saved."
         inputStatus = "Input level appears while recording; no audio is captured while idle."; inputLevel = 0
     }
+    private func activatedApplication() {
+        guard machine.id != nil else { return }
+        guard let target else { machine.invalidateTarget(); return }
+        if NSWorkspace.shared.frontmostApplication?.processIdentifier == target.process.processIdentifier {
+            if switchedAwayAt != nil { returnedAt = Date() }
+            resumeDeferredIfReady()
+        } else {
+            if switchedAwayAt == nil { switchedAwayAt = Date() }
+            returnedAt = nil
+        }
+    }
+    private func observeTargetChange(_ notification: String) {
+        guard machine.id != nil else { return }
+        if notification == kAXValueChangedNotification as String ||
+            notification == kAXSelectedTextChangedNotification as String ||
+            notification == kAXUIElementDestroyedNotification as String {
+            machine.invalidateTarget(); return
+        }
+        guard let target else { machine.invalidateTarget(); return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self, self.machine.id != nil else { return }
+            if NSWorkspace.shared.frontmostApplication?.processIdentifier != target.process.processIdentifier {
+                if self.switchedAwayAt == nil { self.switchedAwayAt = Date() }
+                self.returnedAt = nil
+            } else if self.switchedAwayAt == nil { self.machine.invalidateTarget() }
+        }
+    }
+    private func observeInteraction(targetPID: pid_t?, clicked: Bool) {
+        guard machine.id != nil else { return }
+        guard let target else { machine.invalidateTarget(); return }
+        if let targetPID, targetPID != target.process.processIdentifier {
+            if switchedAwayAt == nil { switchedAwayAt = Date() }
+            returnedAt = nil
+            return
+        }
+        if targetPID == target.process.processIdentifier && !clicked {
+            machine.invalidateTarget(); return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self, self.machine.id != nil else { return }
+            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == target.process.processIdentifier else {
+                if self.switchedAwayAt == nil { self.switchedAwayAt = Date() }
+                self.returnedAt = nil
+                return
+            }
+            if clicked, let departure = self.switchedAwayAt {
+                if self.targetService.validAfterReturn(target, recentClick: self.hotkey.recentClickReceipt, since: departure) {
+                    self.resumeDeferredIfReady()
+                }
+                return // An unproven return click keeps the result pending.
+            }
+            self.machine.invalidateTarget()
+        }
+    }
     private func begin(manualTest: Bool = false) {
         guard !hotkey.capturingBinding else { return }
         if bindingTest && !manualTest { notice = "\(hotkey.lastDelivery) detected: \(preferences.shortcut.displayLabel). Release to finish the test."; testStatus = notice; onStatus?(); return }
         guard !sessionBusy else { notice = "Busy — this hold was ignored."; onStatus?(); return }
+        switchedAwayAt = nil; returnedAt = nil; targetMismatchSince = nil; deferredText = nil; deferredExpires = nil; returnRequested = false
         let localReceipt = manualTest ? nil : testEditor?.receipt()
         let local = manualTest || localReceipt != nil
         let permissions = PermissionStatus()
         guard modelLoaded, permissions.microphone == .authorized else { testStatus = "Prepare a model and grant Microphone before recording."; notice = testStatus; recheck(); return }
         if !local {
             guard permissions.canDictate, hotkey.isRunning, !HotkeyService.secureInput else { notice = "Global dictation unavailable. \(readinessSummary)"; recheck(); return }
-            do { target = try targetService.capture() } catch { notice = "Secure or read-only context. Dictation refused."; onStatus?(); return }
+            do { target = try targetService.capture(recentClick: hotkey.recentClickPoint) } catch { notice = "Secure or read-only context. Dictation refused."; onStatus?(); return }
         } else { target = nil }
         destination = manualTest ? .microphoneTest : (local ? .setupField : .external)
         sessionDelivery = manualTest ? "Start recording button" : hotkey.lastDelivery
@@ -190,7 +251,7 @@ import AparteSpeech
         ticket?.cancel(); audioDrains += 1; notice = "Transcribing locally…"; refresh()
         if destination != .external { testStatus = notice }
         operation = Task {
-            defer { deadline?.cancel(); deadline = nil; operation = nil; destination = nil; testReceipt = nil; machine.unwind(); targetService.stopObserving(); refresh() }
+            defer { deadline?.cancel(); deadline = nil; operation = nil; destination = nil; testReceipt = nil; machine.unwind(); if machine.id == nil { targetService.stopObserving() }; refresh() }
             do {
                 let samples: [Float]
                 do { samples = try await audio.stop(discard: false); audioDrains -= 1 }
@@ -226,14 +287,28 @@ import AparteSpeech
         guard machine.id == id else { return }
         guard let target else { recover(text, id: id, uncertain: false, reason: targetService.captureFailure); return }
         guard target.method != nil else { recover(text, id: id, uncertain: false, reason: "This input control is not exposed as an editable text field. Click inside the destination text input before dictating."); return }
-        guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original app, field or selection changed while dictating. Nothing was inserted."); return }
+        guard !machine.invalidatedTarget else { recover(text, id: id, uncertain: false, reason: "The original field changed while dictating. Nothing was inserted."); return }
+        if NSWorkspace.shared.frontmostApplication?.processIdentifier != target.process.processIdentifier {
+            if switchedAwayAt == nil { switchedAwayAt = Date() }
+            deferOriginal(text, id: id)
+            requestOriginalWindow(target, text: text, id: id)
+            return
+        }
+        guard validOriginal(target) else {
+            if switchedAwayAt != nil {
+                deferOriginal(text, id: id)
+                requestOriginalWindow(target, text: text, id: id)
+            }
+            else { recover(text, id: id, uncertain: false, reason: "The original app, field or selection changed while dictating. Nothing was inserted.") }
+            return
+        }
         state = .inserting; notice = "Waiting for shortcut modifiers to clear…"; onStatus?()
         let until = ContinuousClock.now.advanced(by: .seconds(2))
         while !HotkeyService.modifiersClear(preferences.shortcut), .now < until {
             try? await Task.sleep(for: .milliseconds(20)); guard machine.id == id, !Task.isCancelled else { return }
         }
         guard machine.id == id else { return }
-        guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original input changed before insertion. Nothing was inserted."); return }
+        guard !machine.invalidatedTarget, validOriginal(target) else { recover(text, id: id, uncertain: false, reason: "The original input changed before insertion. Nothing was inserted."); return }
         guard HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false, reason: "Shortcut modifiers were still held after two seconds. Release them before the next dictation."); return }
         if target.method == "selectedText" {
             targetService.stopObserving() // Own mutation must not invalidate itself.
@@ -248,27 +323,79 @@ import AparteSpeech
         do {
             let snapshot = try await clipboard.snapshot()
             guard machine.id == id, !Task.isCancelled else { return }
-            guard !machine.invalidatedTarget, targetService.valid(target), HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false, reason: "Focus, selection or held modifiers changed while saving the clipboard. Nothing was pasted."); return }
+            guard !machine.invalidatedTarget, validOriginal(target), HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false, reason: "Focus, selection or held modifiers changed while saving the clipboard. Nothing was pasted."); return }
             try clipboard.write(text, snapshot: snapshot)
-            guard machine.id == id, !machine.invalidatedTarget, targetService.valid(target) else { clipboard.restore(); recover(text, id: id, uncertain: false, reason: "The target changed before paste dispatch. Nothing was pasted."); return }
+            guard machine.id == id, !machine.invalidatedTarget, validOriginal(target) else { clipboard.restore(); recover(text, id: id, uncertain: false, reason: "The target changed before paste dispatch. Nothing was pasted."); return }
             targetService.stopObserving()
-            if clipboard.dispatchPaste() { recover(text, id: id, uncertain: true, reason: "Paste sent once. The previous clipboard will be restored after one second if no newer copy replaces it. Check the target before copying this backup.") }
+            if clipboard.dispatchPaste() { recover(text, id: id, uncertain: true, reason: "Paste sent once. Check the target before manually pasting again to avoid duplication.") }
             else { recover(text, id: id, uncertain: false, reason: "Paste could not be dispatched because clipboard ownership or macOS posting access changed.") }
         } catch { recover(text, id: id, uncertain: false, reason: (error as? ClipboardFailure)?.localizedDescription ?? "The clipboard could not be preserved. Nothing was pasted.") }
     }
+    private func validOriginal(_ target: TargetContext) -> Bool {
+        if let departure = switchedAwayAt {
+            return targetService.validAfterReturn(target, recentClick: hotkey.recentClickReceipt, since: departure)
+        }
+        return targetService.valid(target)
+    }
+    private func deferOriginal(_ text: String, id: UUID) {
+        guard machine.id == id else { return }
+        deferredText = text; deferredExpires = Date().addingTimeInterval(2)
+        recoveryText = text; recoveryExpires = deferredExpires; recoveryUncertain = false
+        recoveryReason = "Returning to the original window and checking its original text field. No paste has been attempted."
+        notice = recoveryReason; refresh()
+    }
+    private func requestOriginalWindow(_ target: TargetContext, text: String, id: UUID) {
+        guard !returnRequested, machine.id == id else { return }
+        returnRequested = true
+        guard targetService.canReturnToOriginal(target) else {
+            recover(text, id: id, uncertain: false, reason: "The original window or field changed while dictating. Nothing was inserted.")
+            return
+        }
+        if !targetService.requestReturnToOriginal(target) {
+            recover(text, id: id, uncertain: false, reason: "macOS did not bring back the original window. Nothing was inserted.")
+        }
+        // Activation is a request, not a synchronous focus guarantee. The normal
+        // frontmost/window/field/selection checks below decide whether to paste.
+    }
+    private func resumeDeferredIfReady() {
+        guard let text = deferredText, let id = machine.id, let target, !machine.invalidatedTarget,
+              NSWorkspace.shared.frontmostApplication?.processIdentifier == target.process.processIdentifier,
+              returnedAt.map({ Date().timeIntervalSince($0) >= 0.35 }) == true,
+              validOriginal(target) else { return }
+        deferredText = nil; deferredExpires = nil; recoveryText = nil; recoveryExpires = nil; recoveryReason = ""
+        Task { await self.insert(text, id: id) }
+    }
     private func recover(_ text: String, id: UUID, uncertain: Bool, reason: String) {
         guard machine.id == id else { return }
+        deferredText = nil; deferredExpires = nil; switchedAwayAt = nil; returnedAt = nil; targetMismatchSince = nil; returnRequested = false
+        targetService.stopObserving()
         recoveryText = text; recoveryExpires = Date().addingTimeInterval(300); recoveryUncertain = uncertain; recoveryReason = reason
-        notice = reason
+        let copied = clipboard.copyRecovery(text)
+        recoveryReason += copied ? " Transcript is on the clipboard for manual paste." : " Clipboard changed after Aparté's paste attempt; use Copy in Recovery if needed."
+        notice = recoveryReason
         machine.finish(id, recovery: true); refresh()
     }
-    func discardRecovery() { recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; recoveryReason = ""; refresh() }
-    func copyRecovery() { if let recoveryText { clipboard.copyExplicit(recoveryText); notice = "Copied. Clipboard replaced intentionally." }; onStatus?() }
+    func discardRecovery() {
+        if deferredText != nil { cancel("Pending original-field insertion discarded.") }
+        recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; recoveryReason = ""; refresh()
+    }
+    func copyRecovery() {
+        if deferredText != nil, let id = machine.id {
+            deferredText = nil; deferredExpires = nil; switchedAwayAt = nil; returnedAt = nil
+            machine.finish(id, recovery: true); targetService.stopObserving(); target = nil
+            recoveryReason = "Automatic insertion into the original field was cancelled when you copied this result."
+        }
+        if let recoveryText { clipboard.copyExplicit(recoveryText); notice = "Copied. Clipboard replaced intentionally." }
+        onStatus?()
+    }
     func cancel(_ reason: String = "Cancelled") {
         if destination == .microphoneTest || destination == .setupField { testStatus = reason }
-        let wasActive = machine.id != nil || machine.engineBusy || startup != nil
+        let wasDeferring = deferredText != nil
+        let wasActive = ticket != nil || machine.engineBusy || startup != nil || audioDraining
         ticket?.cancel(); startup?.cancel(); operation?.cancel(); deadline?.cancel(); deadline = nil
-        machine.cancel(); targetService.stopObserving(); target = nil; testReceipt = nil; destination = nil; clipboard.restore(); notice = reason
+        machine.cancel(); targetService.stopObserving(); target = nil; testReceipt = nil; destination = nil
+        deferredText = nil; deferredExpires = nil; switchedAwayAt = nil; returnedAt = nil; targetMismatchSince = nil; returnRequested = false; clipboard.restore(); notice = reason
+        if wasDeferring { recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; recoveryReason = "" }
         if wasActive {
             audioDrains += 1
             Task { _ = try? await audio.stop(discard: true); audioDrains -= 1; ticket = nil; refresh() }
@@ -287,13 +414,30 @@ import AparteSpeech
             elapsed = Date().timeIntervalSince(startedAt ?? Date())
             if machine.state == .recording && (elapsed >= 60 || audio.limitReached) { cancel("60-second limit reached. Recording discarded.") }
             else if machine.state == .startingCapture && elapsed > 5 { cancel("Microphone did not start. Recheck the default input device.") }
-            else if let target, !machine.invalidatedTarget, !targetService.valid(target) { machine.invalidateTarget() }
+            else if let target, !machine.invalidatedTarget {
+                if NSWorkspace.shared.frontmostApplication?.processIdentifier != target.process.processIdentifier {
+                    if switchedAwayAt == nil { switchedAwayAt = Date() }
+                    returnedAt = nil
+                    targetMismatchSince = nil
+                } else if switchedAwayAt == nil {
+                    if targetService.valid(target) { targetMismatchSince = nil }
+                    else if let since = targetMismatchSince, Date().timeIntervalSince(since) >= 0.3 { machine.invalidateTarget() }
+                    else if targetMismatchSince == nil { targetMismatchSince = Date() }
+                } else if returnedAt == nil { returnedAt = Date() }
+            }
+        }
+        if let text = deferredText, let id = machine.id {
+            if machine.invalidatedTarget {
+                recover(text, id: id, uncertain: false, reason: "The original field changed before return. Nothing was inserted.")
+            } else if let expiry = deferredExpires, Date() >= expiry {
+                recover(text, id: id, uncertain: false, reason: "The original field did not become verifiably focused after the return request. Nothing was inserted.")
+            } else { resumeDeferredIfReady() }
         }
         if let expiry = recoveryExpires, Date() >= expiry { discardRecovery(); notice = "Recovery expired." }
         if let expiry = testExpires, Date() >= expiry { closeSetupTests() }
         if ticks % 20 == 0 {
             let permissions = PermissionStatus()
-            if machine.id != nil && (permissions.microphone != .authorized || (destination == .external && !permissions.canDictate)) { cancel("Permission revoked. Recheck access in Settings.") }
+            if machine.id != nil && (permissions.microphone != .authorized || ((destination == .external || deferredText != nil) && !permissions.canDictate)) { cancel("Permission revoked. Recheck access in Settings.") }
             let changed = permissionSummary != permissions.summary
             permissionSummary = permissions.summary
             if changed { recheck() }
@@ -307,7 +451,7 @@ import AparteSpeech
         modelLoaded = false; modelStatus = "Unloaded after memory pressure. Prepare before dictating."; refresh()
         Task { try? await speech.unload() }
     }
-    func shutdown() { suspend(); clipboard.restore(); hotkey.shutdown(); watchdog?.invalidate() }
+    func shutdown() { suspend(); clipboard.restore(); hotkey.shutdown(); targetService.releaseAccessibility(); watchdog?.invalidate() }
 }
 
 extension Coordinator {

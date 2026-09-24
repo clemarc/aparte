@@ -2,9 +2,19 @@
 
 ## Current status
 
-**0.4.8 ChatGPT focus fallback installed; live validation pending.** Owner's 0.4.7 screenshot shows ChatGPT reached target discovery but neither app nor system returned a focused element. D019 now attempts the documented accessibility-tree request directly and checks only the active AX window for a uniquely focused standard text control under strict bounds. The 0.4.7 D018 app-name removal and guardrails remain. No OS permissions changed.
+**0.4.11 original-window return and Recovery clipboard handoff installed; live validation pending.** Owner's 0.4.8 screenshot showed ChatGPT's active window had no uniquely focused editable control. Owner reports Claude and Chrome native UI work, but webpage inputs do not. D020's Chromium web accessibility request and recent-click field fallback remain in place; actual webpage insertion remains unverified.
 
-Final 0.4.8 Release passed; all 41 unit tests passed. Built and installed with the same stable signing identity as 0.4.7; Launch Services started the installed bundle, and process inventory showed it as the only Aparté instance. **Next step:** owner retries ChatGPT and supplies the exact Recovery reason if insertion still fails. Real ChatGPT insertion is not verified; native desktop helper remains unavailable. M4 not accepted. Evidence: `docs/evidence/chatgpt-focus.json`.
+The owner approved D021: after recording while consulting another app, request the captured original app/window/field to the foreground once, then insert only after exact context and selection revalidation. If activation or focus proof fails within two seconds, use Recovery. D022 places the transcript on the clipboard automatically for manual paste in Recovery while preserving a newer clipboard owner. This intentionally changes Recovery clipboard retention and is documented in Privacy. Release compiles, 43 isolated unit tests pass, and actual small-model offline integration passes with zero observed outbound URL requests. Stable signing continuity and strict signature verification pass; 0.4.11 is installed and is the sole running instance at inspection. Evidence: `docs/evidence/original-target.json`. Real activation, focus restoration, webpage and clipboard-to-target behavior remain BLOCKED pending owner interaction. Next: owner exercises a disposable Chrome webpage field and the switch-app workflow. M4 is not accepted.
+
+Final 0.4.10 Release passed; all 41 unit tests passed. The installed app kept the stable signing identity and is the only running Aparté instance. Owner retry in ChatGPT and a disposable Chrome webpage input is the next independent validation; a two-second Chromium accessibility debounce may matter immediately after app activation. Actual web insertion is unverified, so M4 is not accepted. Evidence: `docs/evidence/web-focus.json`.
+
+The earlier wait-until-return proposal was superseded by the owner's explicit automatic-return preference in D021. D022 supersedes the Recovery clipboard behavior only; normal guarded paste still takes and conditionally restores a snapshot until a Recovery handoff occurs.
+
+## 0.4.8 ChatGPT focus checkpoint
+
+Owner's 0.4.7 screenshot showed ChatGPT reached target discovery but neither app nor system returned a focused element. D019 attempted the documented accessibility-tree request directly and checked only the active AX window for a uniquely focused standard text control under strict bounds. The owner then supplied the 0.4.8 result showing no unique focused editable descendant.
+
+The 0.4.8 Release and all 41 unit tests passed. It used the same stable signing identity as 0.4.7; Launch Services started the installed bundle, and process inventory showed it as the only Aparté instance. The 0.4.8 owner retry remained blocked in ChatGPT. Evidence: `docs/evidence/chatgpt-focus.json`.
 
 ## 0.4.7 system-wide insertion checkpoint
 

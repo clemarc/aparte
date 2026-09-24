@@ -50,7 +50,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 
 | Requirement | Status | Actual evidence |
 |---|---|---|
-| INS-01 original process/window/field/selection metadata; no surrounding text/refocus | PASS | TargetService implementation inspection; process launchDate and PID, CFEqual elements, selection range only |
+| INS-01 original process/window/field/selection metadata; no surrounding text | PASS | TargetService implementation inspection; process launchDate and PID, CFEqual elements, selection range only. D021 now permits guarded refocus after transcription |
 | INS-01 actual cross-app context race protection | BLOCKED | Requires trusted Accessibility and desktop session/target interaction |
 | INS-02 secure/read-only/unknown refusal, secure input public API | BLOCKED | Public IsSecureEventInputEnabled/AX checks compiled; secure/password control behavior requires device exercise |
 | INS-03 safe selected-text-only mutation / no whole-field write | PASS | Only kAXSelectedTextAttribute is written; no AXValue/Select All calls in production |
@@ -63,7 +63,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Clipboard externally-owned ordinary/rich/image snapshot/restoration | PASS | Separate owner process supplies text/RTF/PNG/multi-item data; original bytes plus additional AppKit encodings preserved/restored after owner exits. Actual target paste consumption remains BLOCKED |
 | Clipboard full eager-owned multi-item/rich/image/empty restoration | PASS | Real named-pasteboard production service tests; all representations retained; user's clipboard untouched |
 | Clipboard concurrent new copy preserved / snapshot-to-write race | PASS | Real isolated-board tests + marker/content/changeCount checks; newer foreign lazy owner is not read during restoration |
-| Clipboard one-second delay and slow/custom target consumption | BLOCKED | Restoration task implemented; exact target consumption/delayed paste requires real compatibility tests |
+| Clipboard one-second delay and slow/custom target consumption | BLOCKED | Conditional restoration task remains for normal insertion, but D022 retains Recovery text; exact target consumption/delayed paste requires real compatibility tests |
 | Clipboard cancel/orderly quit / crash boundaries | BLOCKED | Conditional restore code present; actual app quit-during-paste needs grants. Crash recovery explicitly not promised |
 | Recovery one result / 5min / Copy/View/Discard / expiry | PASS | Implemented observable memory-only result, timer, lock/new-session clearing, explicit-copy tests; visual panel/lock exercise BLOCKED |
 | Five target apps ×10 exact happy/safety attempts | BLOCKED | Versions recorded in evidence; five adapters operational under D013, none falsely marked validated; protocol in COMPATIBILITY |
@@ -223,3 +223,31 @@ The prior five-app restriction in the 0.4.2 and 0.4.6 checkpoint rows is histori
 | Visible insertion into ChatGPT | BLOCKED | Owner must retry 0.4.8; native desktop helper remains unavailable. Build/tests and the 0.4.7 failure do not prove the fallback succeeds |
 
 No external compatibility target is marked validated; **M4 is not accepted**.
+
+## 0.4.10 Chromium webpage follow-up
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Distinguish native-control success from webpage-input failure | PASS | Owner reports Claude and Chrome native UI work, whereas inputs inside webpages do not; 0.4.8 ChatGPT Recovery showed an active window but no uniquely focused editable child. This is user evidence of the split, not proof of the exact browser mechanism |
+| Request Chromium web accessibility from already trusted Aparté | PASS | TargetService detects the Chromium `icudtl.dat` framework marker in both installed ChatGPT and Chrome bundles, then sends one AXEnhancedUserInterface request per process. Chromium source implements the request with a two-second debounce; Release compiled. Actual target response remains unverified |
+| Recent-click fallback identifies a field without blind window paste | PASS | Source review: only a left click from the last ten seconds with no intervening ordinary key can be app-scoped hit-tested; candidate must be a standard editable control in the same active window/PID and pass secure/read-only/context checks again before mutation. Release compiled. Actual browser hit test remains unverified |
+| Signed 0.4.10 local update | PASS | Release build, 41/41 unit tests, mutual actual designated requirements, ordinary install and strict/deep signature checks; final process inventory showed only installed 0.4.10. See web-focus.json |
+| Exact visible insertion in ChatGPT and Chrome webpage input | BLOCKED | Owner live retry pending. Native desktop helper remains unavailable; unit tests and successful build do not prove web focus or paste consumption |
+| Dictate while consulting another app, then deliver to original field | BLOCKED | D021 owner amendment implemented in 0.4.11: one activation/window raise/field-focus request and exact foreground/field/selection revalidation before insertion; live switch-app and browser-field result remain unverified |
+
+The owner can retry web inputs in 0.4.10 after allowing Chromium's accessibility mode to settle. No app is marked compatibility validated and **M4 is not accepted**.
+
+## 0.4.11 original-window and Recovery follow-up
+
+| Requirement | Status | Actual evidence |
+|---|---|---|
+| Original process/window/field/selection captured at shortcut-down | PASS | TargetContext and capture path source review; no surrounding text read |
+| Return original window after consulting another app | BLOCKED | Coordinator requests one activation, AX raise and field focus; native Release compiles. macOS may decline; no live app-switch check has run |
+| Refuse paste unless same original context is foreground | BLOCKED | Source guards before and after clipboard snapshot; browser and focus race need live verification |
+| Fall back promptly when original field cannot be proven | PASS | Two-second deferred timer then Recovery path in Coordinator; no live target result claimed |
+| Put Recovery text on clipboard automatically | PASS | D022 implementation; two new real isolated named-pasteboard tests show transcript retained after a pending paste and newer clipboard owner preserved. Actual general-clipboard behavior remains BLOCKED |
+| Make clipboard retention/duplicate risk visible | PASS | Recovery panel, Settings privacy text, README and PRIVACY documentation; visual UI review remains BLOCKED |
+| Native Release and regression suite | PASS | 0.4.11 Release build and 43/43 unit tests pass; `artifacts/original-target-release.log` and `artifacts/original-target-unit.log` |
+| Real offline engine and local install | PASS | Small model transcribed locked 3-second fixture with 0 observed outbound URL requests; 0.4.11 installed at stable path with mutual designated requirements, strict signature and matching binary hash; sole running instance at inspection. See `docs/evidence/original-target.json` |
+
+No live external-app insertion or original-window return is claimed; **M4 is not accepted**.

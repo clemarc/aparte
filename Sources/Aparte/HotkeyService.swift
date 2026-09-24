@@ -9,6 +9,7 @@ import AparteCore
     private var source: CFRunLoopSource?
     private var matcher = GestureMatcher()
     private var localMonitor: Any?
+    private var recentClick: (point: CGPoint, time: Date)?
     var capturingBinding = false
     var allowsLocalTest: (() -> Bool)?
     private(set) var lastDelivery = "Global shortcut"
@@ -16,10 +17,18 @@ import AparteCore
     var onDown: (() -> Void)?
     var onUp: (() -> Void)?
     var onCancel: (() -> Void)?
-    var onInteraction: (() -> Void)?
+    var onInteraction: ((pid_t?, Bool) -> Void)?
     var onDisabled: (() -> Void)?
     var binding: Shortcut { get { matcher.binding } set { matcher.binding = newValue } }
     var isRunning: Bool { tap.map { CFMachPortIsValid($0) && CGEvent.tapIsEnabled(tap: $0) } ?? false }
+    var recentClickPoint: CGPoint? {
+        guard let recentClick, Date().timeIntervalSince(recentClick.time) <= 10 else { return nil }
+        return recentClick.point
+    }
+    var recentClickReceipt: (point: CGPoint, time: Date)? {
+        guard let recentClick, Date().timeIntervalSince(recentClick.time) <= 10 else { return nil }
+        return recentClick
+    }
     func installLocalTestHandler() {
         guard localMonitor == nil else { return }
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged, .leftMouseDown, .rightMouseDown]) { [weak self] event in
@@ -50,7 +59,7 @@ import AparteCore
     func stop() {
         if let tap { CGEvent.tapEnable(tap: tap, enable: false); CFMachPortInvalidate(tap) }
         if let source { CFRunLoopRemoveSource(CFRunLoopGetMain(), source, .commonModes) }
-        tap = nil; source = nil
+        tap = nil; source = nil; recentClick = nil
     }
     func shutdown() { stop(); if let localMonitor { NSEvent.removeMonitor(localMonitor) }; localMonitor = nil }
     private func handle(_ type: CGEventType, _ event: CGEvent, delivery: String = "Global shortcut") -> Unmanaged<CGEvent>? {
@@ -60,20 +69,27 @@ import AparteCore
             return Unmanaged.passUnretained(event)
         }
         if event.getIntegerValueField(.eventSourceUserData) == Self.eventMarker { return Unmanaged.passUnretained(event) }
+        if type == .leftMouseDown { recentClick = (event.location, Date()) }
+        if type == .rightMouseDown || type == .otherMouseDown || type == .scrollWheel { recentClick = nil }
         let action: GestureMatcher.Action
         switch type {
         case .keyDown, .keyUp:
             action = matcher.key(UInt16(event.getIntegerValueField(.keyboardEventKeycode)), down: type == .keyDown, flags: event.flags.rawValue, repeated: event.getIntegerValueField(.keyboardEventAutorepeat) != 0, active: active, allowNewBinding: !capturingBinding)
         case .flagsChanged: action = matcher.flags(event.flags.rawValue)
-        default: if active { onInteraction?() }; return Unmanaged.passUnretained(event)
+        default: if active { onInteraction?(nil, type == .leftMouseDown) }; return Unmanaged.passUnretained(event)
         }
+        if type == .keyDown && action != .down { recentClick = nil }
         // Dispatch coordinator work after this short callback has returned.
         switch action {
         case .down: lastDelivery = delivery; DispatchQueue.main.async { self.onDown?() }; return nil
         case .up: DispatchQueue.main.async { self.onUp?() }; return type == .flagsChanged ? Unmanaged.passUnretained(event) : nil
         case .escape: DispatchQueue.main.async { self.onCancel?() }; return nil
         case .consume: return nil
-        case .interaction: onInteraction?(); return Unmanaged.passUnretained(event)
+        case .interaction:
+            let switchingApps = type == .keyDown && event.getIntegerValueField(.keyboardEventKeycode) == 48 && event.flags.contains(.maskCommand)
+            let rawPID = event.getIntegerValueField(.eventTargetUnixProcessID)
+            onInteraction?(switchingApps || rawPID <= 0 ? nil : pid_t(rawPID), false)
+            return Unmanaged.passUnretained(event)
         case .pass: return Unmanaged.passUnretained(event)
         }
     }
