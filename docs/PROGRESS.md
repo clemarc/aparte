@@ -2,9 +2,9 @@
 
 ## Current status
 
-**0.4.1 setup follow-up complete; live validation pending.** Installed at the stable local path. Fixed unconditional event-posting gate before tap startup, added actual tap status + actionable readiness blockers and automatic rechecks, replaced shortcut capture with a native focused recorder/preview, and added real Start/Stop microphone and guarded shortcut/text-box tests. All share production audio/WhisperKit and lifecycle limits. D011–D012 record scope/capability/privacy decisions. Debug and Release builds passed, all 33 tests passed, real small fixture integration passed with 0 observed outbound requests. Signature checked during install. Desktop inspection still fails closed; no live recording was collected. Updated test evidence: `docs/evidence/setup-fix.json`.
+**0.4.2 clipboard fix complete; live validation pending.** Owner-approved D013 enables supported adapters independently of validation evidence and replaces blanket foreign clipboard refusal with bounded complete snapshot attempts. Recovery explains each refusal or single attempted paste. Debug/Release builds and all 36 final tests passed, including real separate-process rich/image/multi-item restoration, fast provider materialization, timeout/no-late-write and newer-copy protection. Real small-model integration passed with zero observed outbound requests. Installed 0.4.2 build 3 at the stable path, verified ad-hoc signature; evidence in `docs/evidence/clipboard-fix.json`.
 
-**Next step:** owner quits/reopens 0.4.1, presses Recheck, then tests microphone and the owned text box (with detection-only mode off). Readiness now states exactly what this running app sees; owner reports grants already enabled, so do not assume permissions are still absent. No additional implementation or approval is pending. Live desktop behavior and external target gates remain unaccepted.
+**Next step:** quit/reopen installed 0.4.2 and validate actual insertion in supported target apps using COMPATIBILITY's protocol. No implementation approval remains. The owner reports Setup tests working; the native UI helper still crashes (SkyComputerUseService SIGTRAP/Array.remove(at:), 2026-09-24), so actual target/UI validation remains BLOCKED. Do not repeatedly retry unchanged transport failures. M4 is not accepted; no M5 work.
 
 ## Previous M4 checkpoint (historical evidence)
 
@@ -33,9 +33,9 @@ Current next step: human/external validation in HANDOFF only. Final-source clean
 
 ## External blockers — do not repeatedly retry unchanged prerequisites
 
-1. Owner-granted microphone, Accessibility and actual event-posting/tap capabilities; consented live speech. These block native capture, physical shortcut/cancellation/revocation/device/sleep/lock gates and measured end-to-end latency.
+1. Owner reports Microphone/Accessibility granted and setup tests working. Formal live capture/shortcut/cancellation/revocation/device/sleep/lock gates and measured end-to-end latency still need recorded evidence; no current missing grant is inferred.
 2. Trusted desktop target interaction and exact-version ten-attempt matrix for TextEdit, Terminal/Claude Code, VS Code, Chrome and Slack. All adapters remain unvalidated.
-3. D008 clipboard eager/lazy proof limitation. More permissions do not solve it. Preserve conservative Recovery until a reliable public method or explicit requirement revision exists.
+3. D013 supersedes D008's operational restriction with owner-approved bounded materialization. Real clipboard-to-target consumption/one-second restoration still requires the live matrix.
 4. Native UI connection failed closed, then timeout after restart; visual/VoiceOver/onboarding review blocked.
 5. macOS14 runtime unavailable; compile target does not establish minimum-OS execution.
 6. User-directed login-item approval/login cycle and actual Ready cold-start/five-minute resource sample remain pending.

@@ -2,17 +2,6 @@ import AppKit
 import ApplicationServices
 import AparteCore
 
-struct CompatibilityCatalog: Decodable {
-    struct Adapter: Decodable {
-        let bundleID: String
-        let method: String
-        let roles: [String]
-        let appVersion: String?
-        let osVersion: String?
-    }
-    let validated: [Adapter]
-    let candidates: [Adapter]
-}
 struct TargetContext {
     let process: NSRunningApplication
     let launched: Date?
@@ -43,6 +32,8 @@ struct TargetContext {
         let axApp = AXUIElementCreateApplication(app.processIdentifier); AXUIElementSetMessagingTimeout(axApp, 0.05)
         guard let focused = element(value(system, kAXFocusedUIElementAttribute)), let window = element(value(axApp, kAXFocusedWindowAttribute)) else { return nil }
         AXUIElementSetMessagingTimeout(focused, 0.05)
+        var focusedPID: pid_t = 0
+        guard AXUIElementGetPid(focused, &focusedPID) == .success, focusedPID == app.processIdentifier else { return nil }
         let role = value(focused, kAXRoleAttribute) as? String ?? ""
         let subrole = value(focused, kAXSubroleAttribute) as? String ?? ""
         guard subrole != kAXSecureTextFieldSubrole, role != kAXSecureTextFieldSubrole,
@@ -51,8 +42,15 @@ struct TargetContext {
         let version = app.bundleURL.flatMap(Bundle.init(url:))?.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
         let os = ProcessInfo.processInfo.operatingSystemVersion
         let osVersion = "\(os.majorVersion).\(os.minorVersion)"
-        let adapter = catalog?.validated.first { $0.bundleID == app.bundleIdentifier && $0.roles.contains(role) && $0.appVersion == version && $0.osVersion == osVersion }
-        let context = TargetContext(process: app, launched: app.launchDate, window: window, element: focused, selection: value(focused, kAXSelectedTextRangeAttribute), method: adapter?.method)
+        let adapter = catalog?.adapter(bundleID: app.bundleIdentifier ?? "", role: role, appVersion: version, osVersion: osVersion)
+        let selection = value(focused, kAXSelectedTextRangeAttribute)
+        var method = adapter?.method
+        if method == "selectedText" {
+            var settable = DarwinBoolean(false)
+            // Decide before any mutation; never fall back after an AX write attempt.
+            if selection == nil || AXUIElementIsAttributeSettable(focused, kAXSelectedTextAttribute as CFString, &settable) != .success || !settable.boolValue { method = "clipboard" }
+        }
+        let context = TargetContext(process: app, launched: app.launchDate, window: window, element: focused, selection: selection, method: method)
         observe(app: axApp, focused: focused, pid: app.processIdentifier)
         return context
     }

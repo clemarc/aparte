@@ -1,6 +1,6 @@
 # Aparté implementation
 
-Authority: `Aparte-PRD-v2.md` (read completely). Scope: M0–M4 only; no M5, remote, hosted CI, signing credentials, notarisation, publication, or paid services.
+Authority: `Aparte-PRD-v2.md` (read completely), including the owner-approved D013 clipboard/insertion amendment recorded in `docs/DECISIONS.md`. Scope: M0–M4 only; no M5, remote, hosted CI, signing credentials, notarisation, publication, or paid services.
 
 Commands:
 - `./scripts/build-local.sh --configuration Debug|Release`

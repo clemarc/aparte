@@ -11,6 +11,7 @@ import AparteSpeech
     @Published var preferences = Preferences.decode(UserDefaults.standard.data(forKey: "preferences.v1"))
     @Published private(set) var recoveryText: String?
     @Published private(set) var recoveryUncertain = false
+    @Published private(set) var recoveryReason = ""
     @Published private(set) var elapsed = 0.0
     @Published private(set) var modelLoaded = false
     @Published var modelStatus = "Not prepared"
@@ -102,7 +103,7 @@ import AparteSpeech
     private func refresh() {
         let permissions = PermissionStatus()
         let readiness = SetupReadiness(microphone: permissions.microphone == .authorized, accessibility: permissions.accessibility, model: modelLoaded, shortcut: hotkey.isRunning && !tapFailed)
-        readinessSummary = readiness.canDictate ? "Ready for the global shortcut. Unvalidated external targets still use Recovery." : readiness.blockers.joined(separator: " · ")
+        readinessSummary = readiness.canDictate ? "Ready. Automatic insertion is enabled for supported text fields; other contexts use Recovery." : readiness.blockers.joined(separator: " · ")
         if preparation != nil && !installing { readinessSummary = "Preparing \(preferences.model)… Wait for the model to finish loading." }
         shortcutStatus = hotkey.isRunning ? "Global shortcut listener active" : "Global listener unavailable. The test text box can still receive the shortcut inside Aparté."
         if machine.id == nil && !machine.engineBusy && preparation == nil && !audioDraining && startup == nil && operation == nil {
@@ -199,7 +200,7 @@ import AparteSpeech
                 if destination == .microphoneTest || destination == .setupField {
                     let isField = destination == .setupField
                     let inserted = isField && !machine.invalidatedTarget && testReceipt.map { testEditor?.apply(result.text, receipt: $0) == true } == true
-                    recoveryText = result.text; recoveryUncertain = false; lastResultWasTest = true
+                    recoveryText = result.text; recoveryUncertain = false; recoveryReason = "Setup test result."; lastResultWasTest = true
                     recoveryExpires = Date().addingTimeInterval(300); testExpires = recoveryExpires
                     testStatus = isField ? (inserted ? "Inserted into the test text box using \(sessionDelivery.lowercased())." : "Text box lost focus or changed. Result shown below; nothing inserted.") : "Microphone test complete. Transcribed locally in \(String(format: "%.2f", result.seconds)) s."
                     notice = testStatus; machine.finish(id, recovery: true); return
@@ -212,41 +213,45 @@ import AparteSpeech
     }
     private func insert(_ text: String, id: UUID) async {
         guard machine.id == id else { return }
-        guard let target, target.method != nil, !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false); return }
+        guard let target else { recover(text, id: id, uncertain: false, reason: "No accessible focused text field was found when recording began."); return }
+        guard target.method != nil else { recover(text, id: id, uncertain: false, reason: "This app or input control is not supported for automatic insertion. Try a text field in TextEdit, Terminal, VS Code, Chrome or Slack."); return }
+        guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original app, field or selection changed while dictating. Nothing was inserted."); return }
         state = .inserting; notice = "Waiting for shortcut modifiers to clear…"; onStatus?()
         let until = ContinuousClock.now.advanced(by: .seconds(2))
         while !HotkeyService.modifiersClear(preferences.shortcut), .now < until {
             try? await Task.sleep(for: .milliseconds(20)); guard machine.id == id, !Task.isCancelled else { return }
         }
-        guard machine.id == id, !machine.invalidatedTarget, targetService.valid(target), HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false); return }
+        guard machine.id == id else { return }
+        guard !machine.invalidatedTarget, targetService.valid(target) else { recover(text, id: id, uncertain: false, reason: "The original input changed before insertion. Nothing was inserted."); return }
+        guard HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false, reason: "Shortcut modifiers were still held after two seconds. Release them before the next dictation."); return }
         if target.method == "selectedText" {
             targetService.stopObserving() // Own mutation must not invalidate itself.
             switch targetService.insertSelectedText(text, into: target) {
-            case .attempted: recover(text, id: id, uncertain: true)
-            case .uncertain: recover(text, id: id, uncertain: true)
-            case .unattempted: recover(text, id: id, uncertain: false)
+            case .attempted: recover(text, id: id, uncertain: true, reason: "Text insertion was attempted once. Check the target before copying this backup.")
+            case .uncertain: recover(text, id: id, uncertain: true, reason: "The text field returned an error after the insertion attempt. No second attempt was made.")
+            case .unattempted: recover(text, id: id, uncertain: false, reason: "The original field stopped accepting selected-text insertion. Nothing was inserted.")
             }
             return
         }
-        guard PermissionStatus().posting else { recover(text, id: id, uncertain: false); return }
+        guard PermissionStatus().posting else { recover(text, id: id, uncertain: false, reason: "macOS currently denies paste-key posting to this running app. Recheck Accessibility and reopen the installed Aparté."); return }
         do {
             let snapshot = try await clipboard.snapshot()
             guard machine.id == id, !Task.isCancelled else { return }
-            guard !machine.invalidatedTarget, targetService.valid(target), HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false); return }
+            guard !machine.invalidatedTarget, targetService.valid(target), HotkeyService.modifiersClear(preferences.shortcut) else { recover(text, id: id, uncertain: false, reason: "Focus, selection or held modifiers changed while saving the clipboard. Nothing was pasted."); return }
             try clipboard.write(text, snapshot: snapshot)
-            guard machine.id == id, !machine.invalidatedTarget, targetService.valid(target) else { clipboard.restore(); recover(text, id: id, uncertain: false); return }
+            guard machine.id == id, !machine.invalidatedTarget, targetService.valid(target) else { clipboard.restore(); recover(text, id: id, uncertain: false, reason: "The target changed before paste dispatch. Nothing was pasted."); return }
             targetService.stopObserving()
-            if clipboard.dispatchPaste() { recover(text, id: id, uncertain: true) }
-            else { recover(text, id: id, uncertain: false) }
-        } catch { recover(text, id: id, uncertain: false) }
+            if clipboard.dispatchPaste() { recover(text, id: id, uncertain: true, reason: "Paste sent once. The previous clipboard will be restored after one second if no newer copy replaces it. Check the target before copying this backup.") }
+            else { recover(text, id: id, uncertain: false, reason: "Paste could not be dispatched because clipboard ownership or macOS posting access changed.") }
+        } catch { recover(text, id: id, uncertain: false, reason: (error as? ClipboardFailure)?.localizedDescription ?? "The clipboard could not be preserved. Nothing was pasted.") }
     }
-    private func recover(_ text: String, id: UUID, uncertain: Bool) {
+    private func recover(_ text: String, id: UUID, uncertain: Bool, reason: String) {
         guard machine.id == id else { return }
-        recoveryText = text; recoveryExpires = Date().addingTimeInterval(300); recoveryUncertain = uncertain
-        notice = uncertain ? "Insertion unconfirmed — check the target before copying." : "Automatic insertion unavailable. Open Recovery to view, copy or discard."
+        recoveryText = text; recoveryExpires = Date().addingTimeInterval(300); recoveryUncertain = uncertain; recoveryReason = reason
+        notice = reason
         machine.finish(id, recovery: true); refresh()
     }
-    func discardRecovery() { recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; refresh() }
+    func discardRecovery() { recoveryText = nil; recoveryExpires = nil; recoveryUncertain = false; recoveryReason = ""; refresh() }
     func copyRecovery() { if let recoveryText { clipboard.copyExplicit(recoveryText); notice = "Copied. Clipboard replaced intentionally." }; onStatus?() }
     func cancel(_ reason: String = "Cancelled") {
         if destination == .microphoneTest || destination == .setupField { testStatus = reason }

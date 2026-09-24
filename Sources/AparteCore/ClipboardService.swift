@@ -14,16 +14,14 @@ private final class SnapshotRace: @unchecked Sendable {
     private let boardName: NSPasteboard.Name
     public init(boardName: NSPasteboard.Name = .general) { self.boardName = boardName }
     private var snapshotTaskBusy = false
-    private var provenEagerChangeCount: Int?
     private var pending: (snapshot: ClipboardSnapshot, count: Int, marker: String, text: String)?
     private var restoration: Task<Void, Never>?
     public func snapshot() async throws -> ClipboardSnapshot {
-        guard !snapshotTaskBusy else { throw AparteError.clipboardUnavailable }
+        guard !snapshotTaskBusy else { throw ClipboardFailure.busy }
         snapshotTaskBusy = true
         return try await withCheckedThrowingContinuation { continuation in
             let race = SnapshotRace(continuation)
             let name = boardName
-            let eagerReceipt = provenEagerChangeCount
             DispatchQueue.global(qos: .userInitiated).async {
                 let result: Result<ClipboardSnapshot, Error>
                 do {
@@ -35,10 +33,8 @@ private final class SnapshotRace: @unchecked Sendable {
                     PasteboardSynchronize(legacy)
                     var itemCount = 0
                     guard PasteboardGetItemCount(legacy, &itemCount) == noErr else { throw AparteError.clipboardUnavailable }
-                    // macOS 26.6 reports flags=0 for lazy AppKit providers. Only an
-                    // empty board or a still-owned eager write by this adapter is provable.
-                    // Unknown nonempty clipboards use Recovery without fetching any data.
-                    guard itemCount == 0 || eagerReceipt == count else { throw AparteError.clipboardUnavailable }
+                    // D013: request foreign data on demand, within the same bounded
+                    // snapshot. Successful materialization is not a claim of eagerness.
                     for index in 0..<Int(itemCount) {
                         var itemID: PasteboardItemID?
                         guard PasteboardGetItemIdentifier(legacy, CFIndex(index + 1), &itemID) == noErr, let itemID else { throw AparteError.clipboardUnavailable }
@@ -53,30 +49,32 @@ private final class SnapshotRace: @unchecked Sendable {
                             // the clipboard owner. Never ask AppKit for pasteboardItems here:
                             // that accessor can eagerly resolve foreign promises.
                             if flags.rawValue & (1 << 8) != 0 { continue } // kPasteboardFlavorSystemTranslated
-                            guard flags.rawValue & (1 << 9) == 0 else { throw AparteError.clipboardUnavailable } // kPasteboardFlavorPromised
-                            guard ClipboardPolicy.allowedType(type), start.duration(to: .now) < .milliseconds(500) else { throw AparteError.clipboardUnavailable }
+                            guard ClipboardPolicy.allowedType(type) else { throw ClipboardFailure.unsupportedType }
+                            guard start.duration(to: .now) < .milliseconds(500) else { throw ClipboardFailure.timeout }
+                            guard board.changeCount == count else { throw ClipboardFailure.changed }
                             var copied: CFData?
                             let copyStatus = PasteboardCopyItemFlavorData(legacy, itemID, type as CFString, &copied)
                             guard copyStatus == noErr, let copied else { throw AparteError.clipboardUnavailable }
                             let data = copied as Data
                             size += data.count
-                            guard size <= 8 * 1024 * 1024 else { throw AparteError.clipboardUnavailable }
+                            guard size <= 8 * 1024 * 1024 else { throw ClipboardFailure.tooLarge }
                             reps.append(.init(type: type, data: data))
                         }
                         items.append(reps)
                     }
-                    guard board.changeCount == count, start.duration(to: .now) < .milliseconds(500) else { throw AparteError.clipboardUnavailable }
+                    guard board.changeCount == count else { throw ClipboardFailure.changed }
+                    guard start.duration(to: .now) < .milliseconds(500) else { throw ClipboardFailure.timeout }
                     result = .success(try ClipboardSnapshot(items: items, changeCount: count))
-                } catch { result = .failure(AparteError.clipboardUnavailable) }
+                } catch { result = .failure((error as? ClipboardFailure) ?? .unavailable) }
                 Task { @MainActor in self.snapshotTaskBusy = false; race.finish(result) }
             }
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) { race.finish(.failure(AparteError.clipboardUnavailable)) }
+            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) { race.finish(.failure(ClipboardFailure.timeout)) }
         }
     }
     public func write(_ text: String, snapshot: ClipboardSnapshot) throws {
         restore()
         let board = NSPasteboard(name: boardName)
-        guard board.changeCount == snapshot.changeCount else { throw AparteError.clipboardUnavailable }
+        guard board.changeCount == snapshot.changeCount else { throw ClipboardFailure.changed }
         let marker = UUID().uuidString; let item = NSPasteboardItem()
         item.setString(text, forType: .string); item.setString(marker, forType: Self.markerType)
         let clearedCount = board.clearContents()
@@ -88,7 +86,6 @@ private final class SnapshotRace: @unchecked Sendable {
             }
             throw AparteError.clipboardUnavailable
         }
-        provenEagerChangeCount = board.changeCount
         pending = (snapshot, board.changeCount, marker, text)
     }
     public func dispatchPaste() -> Bool {
@@ -124,9 +121,8 @@ private final class SnapshotRace: @unchecked Sendable {
         }
         if pending != nil && !owns() { return }
         board.clearContents(); if !items.isEmpty { board.writeObjects(items) }
-        provenEagerChangeCount = board.changeCount
     }
-    /// Explicit replacement is used for user-requested Copy and known eager restoration.
+    /// Explicit replacement is used only for user-requested Copy and snapshot restoration.
     public func replaceContentsExplicitly(_ items: [[ClipboardRepresentation]]) throws {
         let snapshot = try ClipboardSnapshot(items: items, changeCount: 0)
         restore(); restoreItems(snapshot, to: NSPasteboard(name: boardName))

@@ -8,6 +8,10 @@
 
 > Build a local, private, native macOS dictation app through M4. M4 produces a locally usable candidate and evidence, with no public repository, hosted CI, Developer ID signing, notarisation or public release. Start M5 only after the owner explicitly authorises the public repository and CI setup. Local compilation and tests begin in M0.
 
+## Owner-approved amendment — 24 September 2026
+
+D013 in `docs/DECISIONS.md` records the owner's approved clipboard/insertion fix after testing. It supersedes only the operational requirement to wait for validated adapters (§2, INS-02/03/05, M2 and related Appendix A wording) and §6's blanket refusal of ordinary lazy data: the five named app adapters may attempt guarded insertion before the real matrix is complete, and snapshots may materialize ordinary foreign data within the existing 500 ms / 8 MiB limits. Explicit promise/lazy-marker formats remain unsupported. No unknown app/control is enabled. No whole-field writes, retries after mutation, synthetic Return, focus restoration or permission bypass are authorized. The original specification below is preserved as history; all actual compatibility and M4 acceptance gates remain required and unpassed checks remain BLOCKED. See D013 for privacy, race and native timeout limitations.
+
 ## 1. Agent execution contract
 
 Implement M0-M4 in order, continuing without routine design approvals. Resolve implementation details using this specification and record consequential choices in `docs/DECISIONS.md`. Do not substitute a demo or mock implementation for the real audio, transcription or insertion paths.

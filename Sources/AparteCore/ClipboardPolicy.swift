@@ -1,4 +1,17 @@
 import Foundation
+public enum ClipboardFailure: Error, LocalizedError, Equatable {
+    case busy, changed, unavailable, tooLarge, timeout, unsupportedType
+    public var errorDescription: String? {
+        switch self {
+        case .busy: return "A previous clipboard read is still finishing. Nothing was pasted."
+        case .changed: return "The clipboard changed while preparing the paste. Your newer copy was kept."
+        case .unavailable: return "Some clipboard data could not be saved for restoration. Nothing was pasted."
+        case .tooLarge: return "The clipboard exceeds the 8 MiB preservation limit. Nothing was pasted."
+        case .timeout: return "Saving the clipboard took longer than 500 ms. Nothing was pasted."
+        case .unsupportedType: return "The clipboard contains a file promise or unsupported representation. Nothing was pasted."
+        }
+    }
+}
 public struct ClipboardRepresentation: Sendable, Equatable { public let type: String; public let data: Data; public init(type: String, data: Data) { self.type = type; self.data = data } }
 public struct ClipboardSnapshot: Sendable, Equatable {
     public let items: [[ClipboardRepresentation]]

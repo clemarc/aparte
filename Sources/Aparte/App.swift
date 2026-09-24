@@ -87,6 +87,7 @@ struct RecoveryView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(model.recoveryUncertain ? "Insertion unconfirmed — check the target before copying" : "Your last dictation").font(.headline)
             if let text = model.recoveryText {
+                Text(model.recoveryReason).font(.callout).foregroundStyle(.secondary)
                 ScrollView { Text(text).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }
                 Text("Kept in memory for five minutes. Lock, quit, discard or the next recording clears it. A new recording replaces this result.").font(.caption).foregroundStyle(.secondary)
                 HStack { Button("Copy (replaces clipboard)") { model.copyRecovery() }; Button("Discard", role: .destructive) { model.discardRecovery() } }
@@ -180,8 +181,8 @@ struct SettingsView: View {
                         if loginStatus == .requiresApproval { Button("Open Login Items") { SMAppService.openSystemSettingsLoginItems() } }
                     }.padding(6)
                 }
-                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Unvalidated targets use Recovery. See the supplied compatibility evidence before relying on automatic insertion.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.1 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Supported text fields can receive automatic insertion. Other contexts use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
+                Text("Diagnostics: Aparté 0.4.2 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }

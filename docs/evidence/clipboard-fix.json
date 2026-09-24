@@ -1,0 +1,93 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.2",
+  "build": "3",
+  "decision": "D013",
+  "scope": "Owner-approved supported-adapter enablement and bounded foreign clipboard preservation; M0-M4 only",
+  "environment": {
+    "os": "macOS 26.6 (25G72)",
+    "hardware": "Apple M5 Pro, 48 GiB, arm64",
+    "xcode": "27.0 (27A266a)",
+    "swift": "6.4",
+    "sdk": "27.0"
+  },
+  "checks": {
+    "unit": {
+      "status": "PASS",
+      "count": 36,
+      "failures": 0,
+      "durationSeconds": 3.006,
+      "command": "./scripts/test-local.sh --suite unit"
+    },
+    "debug": {
+      "status": "PASS",
+      "command": "./scripts/build-local.sh --configuration Debug"
+    },
+    "release": {
+      "status": "PASS",
+      "command": "./scripts/build-local.sh --configuration Release",
+      "warnings": "Existing implicit strong outer-capture warnings in Coordinator/AudioCapture and no-AppIntents metadata notice; no build errors."
+    },
+    "integration": {
+      "status": "PASS",
+      "command": "./scripts/test-local.sh --suite integration",
+      "result": {
+        "audioSeconds": 3,
+        "decodeSeconds": 0.305868083,
+        "model": "small",
+        "noSpeech": false,
+        "outboundURLRequests": 0,
+        "prepareSeconds": 16.79319703578949,
+        "text": "Please open the window and close the door."
+      }
+    },
+    "installation": {
+      "status": "PASS",
+      "path": "~/Applications/Aparte.app",
+      "command": "./scripts/install-local.sh",
+      "signature": "ad-hoc; strict/deep verified; no TeamIdentifier",
+      "binarySHA256": "9a2d140ffadb4e6b02202f4542ef2fe43be248d731b0cb2647e93ccdd0edac54"
+    },
+    "targetMatrix": {
+      "status": "BLOCKED",
+      "prerequisite": "Working native desktop interaction and physical target testing. SkyComputerUseService crashed SIGTRAP in Array.remove(at:) and replacement returned closed pipe; not retried unchanged. Owner reports grants and Setup tests working."
+    }
+  },
+  "clipboardEvidence": [
+    "All tests use isolated named pasteboards, never the general clipboard or real target paste events.",
+    "Separate-process ordinary fast lazy provider materializes and restores.",
+    "Separate-process text/RTF/PNG/multiple items snapshot; owner exits; original bytes and every captured representation round-trip.",
+    "Slow 1.5-second provider: 500 ms timeout returns before 1.2-second scheduling tolerance, no board mutation; single worker busy until native read ends, newer copy preserved after late completion.",
+    "Newer lazy owner not materialized during restore; concurrent copy and snapshot/write ownership races preserve new data.",
+    "Explicit promise marker and >8 MiB data return precise refusal errors; empty board restores.",
+    "Five enabled adapters checked separately from empty validation evidence; unknown app/roles/schema/method and mismatched optional versions refuse."
+  ],
+  "investigation": [
+    "New cross-process rich test initially expected exactly string and RTF flavors; AppKit also offers legacy text encodings. Test corrected to require original types and exact original bytes plus exact full-snapshot round trip; no production type removed. Final 36 tests pass."
+  ],
+  "limitations": [
+    "No live external insertion or paste-consumption evidence; enabled is not validated.",
+    "Native reads cannot be forcibly cancelled and can allocate beyond the accepted-snapshot cap before size is known.",
+    "Public focus/clipboard APIs cannot make transactions atomic; one-second restoration and actual AX rich-context behavior need target validation.",
+    "Full speech benchmarks not repeated for clipboard-only production change; existing evidence remains applicable, real integration smoke rerun.",
+    "Implementation complete; validation pending. M4 NOT accepted."
+  ],
+  "logs": {
+    "unit": {
+      "path": "artifacts/clipboard-fix-unit.log",
+      "sha256": "338259e1448c27dd0dc196a50e8e79610d71bf3028e0fb9dd853e28d7b873ecc"
+    },
+    "debug": {
+      "path": "artifacts/clipboard-fix-debug.log",
+      "sha256": "0b9f5a208a06d76b76e3dd12f67daa66a0e343af29b758a966fe21a6ef75de30"
+    },
+    "release": {
+      "path": "artifacts/clipboard-fix-release.log",
+      "sha256": "1923d3c717cb500048a032bb377646d3d962cddc84c10c081457f85612d76f78"
+    },
+    "integration": {
+      "path": "artifacts/clipboard-fix-integration.log",
+      "sha256": "b9cb3698b938700be29dd339408a7d2296d2530261d9da7f482b3873571c5b41"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Acceptance ledger — M0–M4
 
-**M4 NOT ACCEPTED.** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and evidence/verification.json. Real-device/target gates are blocked, and D008 restricts clipboard automation. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
+**M4 NOT ACCEPTED.** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and evidence/verification.json. Real-device/target gates are blocked; owner-approved D013 replaces D008's operational clipboard restriction in 0.4.2. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
 
 Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Target is arm64 macOS 14+. Initial-build CLI preflight: microphone notDetermined; Accessibility/listening/posting false. During 0.4.1 testing the owner reports Microphone and Accessibility granted; the running app state remains unobserved because native inspection fails. Original absent-grant rows below describe the initial evidence, not a new claim that the owner has not granted access. No grants or security settings were changed. Native UI inspection failed (closed pipe; after restart, timeoutReached).
 
@@ -59,14 +59,14 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | INS-05 terminal single-line/no Return/no execution | PASS | Sanitizer tests; only keycode9 Cmd-V synthesized; actual terminal behavior BLOCKED |
 | Clipboard target/modifier revalidation before touch and dispatch | PASS | Coordinator guards around awaited snapshot and mutation; real target integration BLOCKED |
 | Clipboard 8MiB/500ms bounded snapshot/ownership | PASS | Production cap, bounded continuation + one in-flight worker; cap and real named-board tests |
-| Clipboard lazy/unknown refusal without provider invocation | PASS | Separate real owner process regression passes; no clipboard data requested on unknown provenance |
-| Clipboard externally-owned ordinary/rich/image happy paths | BLOCKED | D008: public flavor metadata fails to distinguish AppKit lazy providers; automatic paste restricted to empty or known eager-owned clipboard |
+| Clipboard foreign provider policy (owner-amended D013) | PASS | Fast real provider materializes/restores; slow provider times out without mutation or late write; explicit promise formats refuse. Original blanket lazy-refusal criterion superseded by owner authorization |
+| Clipboard externally-owned ordinary/rich/image snapshot/restoration | PASS | Separate owner process supplies text/RTF/PNG/multi-item data; original bytes plus additional AppKit encodings preserved/restored after owner exits. Actual target paste consumption remains BLOCKED |
 | Clipboard full eager-owned multi-item/rich/image/empty restoration | PASS | Real named-pasteboard production service tests; all representations retained; user's clipboard untouched |
 | Clipboard concurrent new copy preserved / snapshot-to-write race | PASS | Real isolated-board tests + marker/content/changeCount checks; newer foreign lazy owner is not read during restoration |
 | Clipboard one-second delay and slow/custom target consumption | BLOCKED | Restoration task implemented; exact target consumption/delayed paste requires real compatibility tests |
 | Clipboard cancel/orderly quit / crash boundaries | BLOCKED | Conditional restore code present; actual app quit-during-paste needs grants. Crash recovery explicitly not promised |
 | Recovery one result / 5min / Copy/View/Discard / expiry | PASS | Implemented observable memory-only result, timer, lock/new-session clearing, explicit-copy tests; visual panel/lock exercise BLOCKED |
-| Five target apps ×10 exact happy/safety attempts | BLOCKED | Versions recorded in evidence; no target adapter falsely enabled; protocol in COMPATIBILITY |
+| Five target apps ×10 exact happy/safety attempts | BLOCKED | Versions recorded in evidence; five adapters operational under D013, none falsely marked validated; protocol in COMPATIBILITY |
 
 ## Settings, models and privacy
 
@@ -103,12 +103,12 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Repeats/startup/order/tap-disable/missed-up/conflict | BLOCKED | Deterministic gesture/startup tests PASS; real event tap disable/conflict/missed-up watchdog need grants |
 | Escape/cancellation/stale/sleep/lock | BLOCKED | Reducer and real engine cancellation PASS; actual sleep/lock and insertion-preparation timing need desktop |
 | App/window/field/caret/type/exit/secure/no-editable | BLOCKED | Implemented conservative guards; target matrix not executed |
-| Ambiguous AX/delayed paste/concurrent copy/rich/lazy/quit/crash | BLOCKED | Real clipboard ownership and strict lazy tests PASS; D008 and AX/target/quit tests blocked |
+| Ambiguous AX/delayed paste/concurrent copy/rich/lazy/quit/crash | BLOCKED | Real clipboard ownership/materialization/timeout tests PASS; AX/target/quit tests blocked |
 | Stereo/rates/silence/quiet/59/60/unplug/change | BLOCKED | File conversion and synthetic audio tests PASS; live route/unplug/capture boundaries need device |
 | Interrupted/corrupt/space/offline-tokenizer/bad selection/switch/revoke | BLOCKED | Store/engine tests PASS; actual permission revocation and visual model-failure UI remain unexercised; real post-verification Core ML rollback passed |
 | Local Release app | PASS | Native Release build, ad-hoc signature verified, stable install path and public small assets present |
 | Native visual/accessibility onboarding and indicators | BLOCKED | Computer-use connection closed/timeout; code-based accessible labels are not visual/VoiceOver evidence |
-| M0–M4 full acceptance | BLOCKED | Above device/runtime/target/clipboard proof gates; do not label M4 accepted |
+| M0–M4 full acceptance | BLOCKED | Above device/runtime/target/paste-consumption gates; do not label M4 accepted |
 
 ## 0.4.1 owner-testing follow-up
 
@@ -124,3 +124,18 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Temporary test results clear on close/lock/quit/expiry | PASS | Shared Recovery slot plus explicitly transient test editor; cancellation and cleanup paths source-reviewed. Actual window/lock exercise remains BLOCKED |
 
 Evidence for this patch is `docs/evidence/setup-fix.json`; the earlier verification.json remains the previous source checkpoint. M4 acceptance remains pending, and no external adapter was enabled by these diagnostics.
+
+
+## 0.4.2 owner-approved clipboard/insertion fix
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Supported apps no longer all disabled by empty validated catalog | PASS | Shipping catalog has five enabled adapters; real validation metadata remains empty. Two catalog regressions verify roles/unknown apps/schema/methods/version scopes |
+| Preserve ordinary clipboard from other apps | PASS | Real separate-process fast lazy and rich/image/multi-item cases, plus foreign ordinary text; exact bytes and complete round-trip snapshot checked |
+| 500 ms / 8 MiB refusal and late-read safety | PASS | 1.5-second provider returns timeout under 1.2-second test tolerance, board unchanged; second read refused while busy, newer copy survives late unwind. Oversize and promise errors checked explicitly |
+| Newer lazy clipboard owner untouched on restoration | PASS | Separate provider is not invoked after ownership changes |
+| Recovery explains refusal versus attempted paste | PASS | Coordinator supplies specific reasons; panel displays them; no automatic retry after AX or paste attempt; native UI compile |
+| Real target visible insertion, consumption and preservation | BLOCKED | Native desktop helper crash/closed pipe; isolated pasteboards and catalog checks do not substitute for the target matrix |
+| Release 0.4.2, build 3 | PASS | Native Release build succeeded; install/signature evidence in clipboard-fix.json |
+
+Owner reports the Setup tests work; no private recording or transcript was collected. The earlier setup-fix.json and verification.json remain historical checkpoints. Current patch evidence is `docs/evidence/clipboard-fix.json`. Full M4 acceptance remains pending.

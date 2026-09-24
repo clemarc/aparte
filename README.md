@@ -2,7 +2,7 @@
 
 Native, local hold-to-talk dictation for Apple Silicon Macs running macOS 14+. Swift/AppKit menu bar app, SwiftUI settings, open-source WhisperKit 1.1.0. No account, cloud inference, persistent recording or transcript history.
 
-**M4 candidate, not accepted.** Real offline speech inference and automated tests run on the reference Mac. Microphone/Accessibility grants, live dictation, target-app compatibility and macOS 14 runtime remain pending. Automatic adapters are disabled pending real compatibility evidence. Unknown nonempty clipboards use Recovery because macOS did not reliably expose lazy-data metadata. See [handoff](docs/HANDOFF.md), [acceptance](docs/ACCEPTANCE.md), [decisions](docs/DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
+**M4 candidate, not accepted.** Real offline speech inference and automated tests run on the reference Mac. Version 0.4.2 enables guarded insertion in TextEdit, Terminal, VS Code, Chrome and Slack text fields and attempts bounded clipboard preservation (owner-approved D013). Real external compatibility and macOS 14 runtime checks remain pending; the owner reports Setup tests working. See [handoff](docs/HANDOFF.md), [acceptance](docs/ACCEPTANCE.md), [decisions](docs/DECISIONS.md), and [compatibility](docs/COMPATIBILITY.md).
 
 ## Build and test
 
@@ -40,9 +40,9 @@ Use the stable `~/Applications/Aparte.app` path. The script refuses an unrelated
 4. Enable Microphone when ready. Open Accessibility Settings and grant Aparté. Recheck. Input Monitoring is suggested only after an observed tap failure; it is not an unconditional third prompt. The status card names every missing step. Recheck restarts the listener and prepares an installed selected model; reopening after a grant/rebuild may still be needed. Clipboard event posting is checked only for paste; it does not block the microphone test or shortcut recorder. No live recording was performed by the build agent.
 5. Choose Auto, English or French. The shortcut defaults to Control–Option–Space. Change it with a modifier-plus-key chord; use Test shortcut without recording. Other apps can still conflict. Launch at login is off initially and uses the actual SMAppService registration status.
 6. With grants and a prepared model, hold the shortcut, wait for Recording, speak, and release. Escape cancels; 60 seconds cancels and discards. Busy holds are ignored. A new recording clears the previous recovery result.
-7. Until an exact app/OS adapter has passed the compatibility protocol, open Recovery to View/Copy/Discard the result. Copy intentionally replaces the clipboard. Results expire after five minutes or on lock/quit/discard/new recording. For an unconfirmed insertion, inspect the target before copying again.
+7. Keep focus in a supported app's editable text field through insertion. Recovery explains any refusal and retains a backup after an attempted paste; a backup does not mean insertion failed. Open it to View/Copy/Discard the result. Copy intentionally replaces the clipboard. Results expire after five minutes or on lock/quit/discard/new recording. For an unconfirmed insertion, inspect the target before copying again.
 
-## Test Setup (0.4.1)
+## Test Setup (0.4.1 and later)
 
 Quit/reopen the installed app after updating. In **Settings & Setup → Test dictation**:
 
