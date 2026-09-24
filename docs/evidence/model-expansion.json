@@ -1,0 +1,91 @@
+{
+  "date": "2026-09-24",
+  "version": "0.4.12",
+  "status": "implementation complete; live model comparison pending owner test",
+  "host": "Apple M5 Pro, 48 GiB, macOS 26.6; Xcode 27.0 / Swift 6.4",
+  "source": {
+    "coreMLRepository": "argmaxinc/whisperkit-coreml",
+    "revision": "0f63a7800b00dd0226abd051b906c246e1907482",
+    "manifestSHA256": "1a7941aed43ea7936e50f715e58e2b30117e17620d567fc383b119592db685bf",
+    "tokenizers": {
+      "base": "e37978b90ca9030d5170a5c07aadb050351a65bb",
+      "small": "e37978b90ca9030d5170a5c07aadb050351a65bb",
+      "medium": "abdf7c39ab9d0397620ccaea8974cc764cd0953e",
+      "turbo": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9"
+    }
+  },
+  "models": {
+    "base": {
+      "installedBytes": 149484796,
+      "files": 22,
+      "qualityGates": "FAIL",
+      "englishWER": 0.023454157782515993,
+      "frenchWER": 0.10805084745762712,
+      "technicalTermsPreserved": 0.5,
+      "noSpeechRejections": 10,
+      "warm8P95Seconds": 0.2179,
+      "peakWholeProcessRSSBytes": 318291968,
+      "outboundURLRequests": 0,
+      "benchmarkSHA256": "b3fb2cb399c081da2b47cd2ba1ed8b75956a9e17a15dc1103af74b5f81315c48"
+    },
+    "small": {
+      "installedBytes": 489252808,
+      "files": 22,
+      "qualityGates": "PASS",
+      "englishWER": 0.006396588486140725,
+      "frenchWER": 0.048728813559322036,
+      "technicalTermsPreserved": 0.8333333333333334,
+      "noSpeechRejections": 10,
+      "warm8P95Seconds": 0.533002791,
+      "peakWholeProcessRSSBytes": 841826304,
+      "outboundURLRequests": 0,
+      "benchmarkSHA256": "c0f030b85c46df3b8ecc0211d11c3b4a1d698da2087dcc568f31dba3dfba7342"
+    },
+    "medium": {
+      "installedBytes": 1532419576,
+      "files": 23,
+      "qualityGates": "PASS",
+      "englishWER": 0.0042643923240938165,
+      "frenchWER": 0.00847457627118644,
+      "technicalTermsPreserved": 0.9166666666666666,
+      "noSpeechRejections": 10,
+      "warm8P95Seconds": 1.137388333,
+      "peakWholeProcessRSSBytes": 2505424896,
+      "outboundURLRequests": 0,
+      "benchmarkSHA256": "e5f2b52f76ceab50fdce71d4d0a2a410075c4d9688576b1efc935a75fa4ec8a7"
+    },
+    "turbo": {
+      "installedBytes": 1641459812,
+      "files": 27,
+      "qualityGates": "PASS",
+      "englishWER": 0.0042643923240938165,
+      "frenchWER": 0.019067796610169493,
+      "technicalTermsPreserved": 0.8333333333333334,
+      "noSpeechRejections": 10,
+      "warm8P95Seconds": 0.625349792,
+      "peakWholeProcessRSSBytes": 3243900928,
+      "outboundURLRequests": 0,
+      "benchmarkSHA256": "26f34f9c517163eb9ab47691cfbe87faa2702fd42d97b8e1ecdc1fd61343c0b9"
+    }
+  },
+  "checks": {
+    "unitTests": "43 passed, 0 failed",
+    "mediumRealOfflineInference": "PASS: 3-second synthetic fixture, 0 observed outbound requests",
+    "turboRealOfflineInference": "PASS: 3-second synthetic fixture, 0 observed outbound requests",
+    "mediumFullBenchmark": "PASS: frozen 55 clips, 30 warm decodes, 100 memory sessions, network denied",
+    "turboFullBenchmark": "PASS: frozen 55 clips, 30 warm decodes, 100 memory sessions, network denied",
+    "releaseBuild": "PASS",
+    "installedAppVersion": "0.4.12",
+    "oldNewDesignatedRequirements": "mutually satisfied",
+    "installedBinarySHA256": "50062e423b6a5b0738d21fce6fa935d4a26d3d24012e1eec86712db001177841",
+    "installedStrictSignature": "PASS",
+    "managedModelImports": "medium and turbo verified; small previously installed",
+    "realAccentAndMicrophoneUI": "BLOCKED: owner must speak the same English phrase into Setup with each model; no personal audio collected"
+  },
+  "limitations": [
+    "Synthetic voices do not test French-accented English.",
+    "Warm decode is file-only, not release-to-visible-text.",
+    "Peak RSS is whole-process and cache/hardware dependent.",
+    "No external insertion acceptance was inferred from model tests."
+  ]
+}

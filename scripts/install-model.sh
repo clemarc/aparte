@@ -1,6 +1,6 @@
 #!/bin/bash
 source "$(dirname "$0")/common.sh"
-[[ $# -ge 1 && ($1 == base || $1 == small) ]] || { echo 'Usage: install-model.sh base|small [destination-root] [offline-source-directory]' >&2; exit 64; }
+[[ $# -ge 1 && ($1 == base || $1 == small || $1 == medium || $1 == turbo) ]] || { echo 'Usage: install-model.sh base|small|medium|turbo [destination-root] [offline-source-directory]' >&2; exit 64; }
 model=$1
 root=${2:-artifacts/models}
 args=(install Resources/Models.json "$root" "$model")

@@ -140,16 +140,39 @@ struct SettingsView: View {
                 }
                 GroupBox("2 · Local model") {
                     VStack(alignment: .leading, spacing: 12) {
+                        Text("Compare measured choices on this M5 Pro (48 GB). Smaller numbers are better for preparation time, warm decoding and process memory; accuracy is measured separately on a synthetic English/French corpus.").font(.caption).foregroundStyle(.secondary)
+                        Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
+                            GridRow {
+                                Text("Model").bold().frame(width: 82, alignment: .leading)
+                                Text("Disk").bold().frame(width: 80, alignment: .leading)
+                                Text("Prepare").bold().frame(width: 72, alignment: .leading)
+                                Text("8 s p95").bold().frame(width: 70, alignment: .leading)
+                                Text("Peak RAM").bold().frame(width: 80, alignment: .leading)
+                            }
+                            ForEach(model.catalog?.models ?? []) { entry in
+                                let comparison = modelComparison(entry.id)
+                                GridRow {
+                                    Text(entry.id.capitalized).frame(width: 82, alignment: .leading)
+                                    Text(ByteCountFormatter.string(fromByteCount: entry.installedBytes, countStyle: .file)).frame(width: 80, alignment: .leading)
+                                    Text(comparison.prepare).frame(width: 72, alignment: .leading)
+                                    Text(comparison.warmP95).frame(width: 70, alignment: .leading)
+                                    Text(comparison.peakMemory).frame(width: 80, alignment: .leading)
+                                }
+                            }
+                        }.font(.caption).accessibilityLabel("Model comparison: disk, preparation, warm eight-second decode p95, and peak process memory")
+                        Text("Base: fastest, but failed the fixed technical-term gate. Small: recommended; passed every fixed synthetic gate. Medium and turbo offer larger models for comparison, with different speed and memory costs. These are file-decode measurements, not microphone-to-insertion latency; RAM is peak whole-process RSS, not model-only memory.").font(.caption).foregroundStyle(.secondary)
+                        Divider()
                         ForEach(model.catalog?.models ?? []) { entry in
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(entry.displayName).bold()
                                 Text("\(ByteCountFormatter.string(fromByteCount: entry.installedBytes, countStyle: .file)) installed · \(ByteCountFormatter.string(fromByteCount: entry.temporaryBytes, countStyle: .file)) free space needed for installation. First preparation may take several seconds or longer.").font(.caption)
-                                Text("Measured preparation: about \(entry.id == "base" ? "6" : "18") seconds on an M5 Pro with 48 GB RAM. Your Mac and cache state may differ.").font(.caption).foregroundStyle(.secondary)
+                                Text("Measured preparation: \(modelComparison(entry.id).prepare) on this Mac; OS and cache state can change it. \(modelComparison(entry.id).quality)").font(.caption).foregroundStyle(.secondary)
                                 HStack { Button("Download") { model.installModel(entry.id) }; Button("Import…") { model.importModel(entry.id) }; Button("Prepare / Use") { model.prepare(entry.id) }.disabled(!model.installed(entry.id)); Button("Delete", role: .destructive) { model.deleteModel(entry.id) }.disabled(!model.installed(entry.id)) }.disabled(model.sessionBusy || model.installing)
                             }
                         }
                         if model.installing { ProgressView(value: model.installProgress); Button("Cancel installation") { model.cancelInstall() } }
                         Text("Downloads require your click. Installed models work offline; nothing is downloaded during dictation.").font(.caption)
+                        Text("To compare your own accent, select Prepare / Use, speak the same English phrase in the Microphone test below, then switch models and repeat. Aparté does not save recordings or transcripts; copy results yourself if you want a lasting side-by-side record.").font(.caption).foregroundStyle(.secondary)
                     }.padding(6)
                 }
                 GroupBox("3 · Test dictation") {
@@ -206,7 +229,7 @@ struct SettingsView: View {
                     }.padding(6)
                 }
                 GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. After a failed insertion, Recovery puts your transcript on the system clipboard for manual paste; it may remain there after Aparté's five-minute Recovery expires or sync through Universal Clipboard. An unconfirmed paste may already have inserted text, so check before pasting again. Editable text fields across apps can receive automatic insertion. Secure, read-only and inaccessible controls use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.11 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                Text("Diagnostics: Aparté 0.4.12 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }
@@ -217,6 +240,15 @@ struct SettingsView: View {
         case .requiresApproval: return "Awaiting approval in Login Items"
         case .notFound: return "App not found; install at the stable path"
         @unknown default: return "Unknown; recheck Login Items"
+        }
+    }
+    private func modelComparison(_ id: String) -> (prepare: String, warmP95: String, peakMemory: String, quality: String) {
+        switch id {
+        case "base": return ("6.2 s", "0.218 s", "318 MB", "Technical terms: 50% (failed 80% gate).")
+        case "small": return ("18.3 s", "0.533 s", "842 MB", "All fixed synthetic quality gates passed; recommended default.")
+        case "medium": return ("10.3 s", "1.137 s", "2.51 GB", "All fixed synthetic quality gates passed; English/French WER 0.43%/0.85%; technical terms 91.7%.")
+        case "turbo": return ("94 s", "0.625 s", "3.24 GB", "All fixed synthetic quality gates passed; English/French WER 0.43%/1.91%.")
+        default: return ("Unknown", "Unknown", "Unknown", "No measurements available.")
         }
     }
 }

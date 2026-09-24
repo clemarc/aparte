@@ -1,0 +1,19 @@
+# Model comparison — reference Mac
+
+The supplied search-result table mixes original Whisper checkpoint sizes, estimated memory ranges and subjective use cases. Aparté installs pinned **Core ML** bundles, so its download sizes and live process memory must be measured separately. OpenAI's [model card](https://github.com/openai/whisper/blob/main/model-card.md) describes the families; Argmax's [pinned Core ML repository](https://huggingface.co/argmaxinc/whisperkit-coreml/tree/0f63a7800b00dd0226abd051b906c246e1907482) supplies the model files. Neither source establishes Apple M5 Pro RAM or end-to-end dictation latency.
+
+| Model | Pinned Core ML files plus tokenizer | Aparté status | M5 Pro process peak RSS | Warm 8 s decode p95 | Evidence-based choice |
+|---|---:|---|---:|---:|---|
+| Base | 149,484,796 bytes (149 MB) | Available | 318 MB | 0.218 s | Fastest, but only 50% of fixed technical terms preserved; not the default |
+| Small | 489,252,808 bytes (489 MB) | Available; default | 842 MB | 0.533 s | Passed all frozen quality gates at modest storage/memory cost |
+| Medium | 1,532,419,576 bytes (1.53 GB) | Available, optional | 2.51 GB | 1.137 s | Passed all fixed gates; best French and technical-term scores on this synthetic corpus, with the slowest warm decode |
+| Large-v3 turbo | 1,641,459,812 bytes (1.64 GB) | Available, optional | 3.24 GB | 0.625 s | Passed all frozen gates and improved synthetic French WER, but slower/more memory than small |
+| Large-v3 | ~3.09 GB Core ML files; tokenizer additional | Deferred by PRD; not measured in Aparté | Unknown | Unknown | No supported use-case claim without real validation |
+
+The untested large-v3 file size is a sum of file metadata at the **same immutable Argmax revision** used by Aparté ([large-v3 tree](https://huggingface.co/argmaxinc/whisperkit-coreml/tree/0f63a7800b00dd0226abd051b906c246e1907482/openai_whisper-large-v3)); it has not been downloaded or run here. Base, small, medium and turbo sizes are complete locally verified manifest sums including pinned tokenizers. The table's storage numbers are **decimal MB/GB**; installed filesystem allocation and Core ML caches can differ.
+
+The memory column is **peak resident size for the whole Aparté benchmark process**, not incremental model RAM or a guarantee on another Mac. The supplied search table's 250–500 MB, ~1 GB and 2.2–2.8 GB ranges are not supported as Aparté measurements; the measured turbo peak exceeds its range. OpenAI's published VRAM guidance measures a different software/hardware stack and should not be relabelled as macOS unified-memory usage.
+
+The same 55 original synthetic English/French clips, 30 warm decode timings and 100-session memory run were used for all available models; see [BENCHMARKS.md](BENCHMARKS.md) and `docs/evidence/benchmark-{base,small,medium,turbo}.summary.json`. Small and turbo preserved 83.33% of the fixed technical terms; medium preserved 91.67%. Medium English/French WER was 0.43%/0.85%, turbo 0.43%/1.91%, and small 0.64%/4.87%. These are synthetic results, **not** a test of French-accented English, natural microphone quality or release-to-visible-text latency. Turbo preparation was 93.6 seconds in the Release benchmark (96.7 seconds in a separate real integration load), versus 10.3 seconds for medium and 18.3 seconds for small; Core ML cache state can substantially change first preparation. The app does not download a new model until the user clicks Download, and it keeps one active engine at a time.
+
+For a useful personal comparison, select **Prepare / Use** for each installed model in Settings, speak the same English phrase in **Microphone → transcription**, and compare the transient text. This tests the owner's accent in the actual capture path; no recording or transcript is saved for the benchmark. The owner can copy results into their own notes if desired.

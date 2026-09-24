@@ -21,7 +21,7 @@ public struct ModelManifest: Codable, Sendable, Identifiable {
     public var installedBytes: Int64 { files.reduce(0) { $0 + $1.bytes } }
     public var temporaryBytes: Int64 { installedBytes * 2 + 256 * 1_024 * 1_024 }
     public func validate() throws {
-        guard ["base", "small"].contains(id), revision.count == 40, tokenizerRevision.count == 40,
+        guard ["base", "small", "medium", "turbo"].contains(id), revision.count == 40, tokenizerRevision.count == 40,
               !files.isEmpty, Set(files.map(\.path)).count == files.count, files.allSatisfy(\.isSafe),
               ["tokenizer.json", "tokenizer_config.json"].allSatisfy({ name in files.contains { $0.path == name } }) else { throw AparteError.invalidAsset }
     }

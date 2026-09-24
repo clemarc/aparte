@@ -1,0 +1,189 @@
+{"installedBytes":1641459812,"model":"turbo","phase":"prepare","residentBytes":2035515392,"seconds":93.609782934188843}
+{"id":"en-01","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.14521036825164937,"seconds":0.39906287499999998,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Please open the window and close the door.","wordErrors":0}
+{"id":"en-02","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.10689323799362115,"seconds":0.40708579099999997,"split":"calibration","termCount":0,"termsPreserved":0,"text":"The little garden looks beautiful in the morning.","wordErrors":0}
+{"id":"en-03","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.15796427942427552,"seconds":0.40611629199999999,"split":"calibration","termCount":0,"termsPreserved":0,"text":"We can review the changes after lunch today.","wordErrors":0}
+{"id":"en-04","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.10988751392936441,"seconds":0.40102045800000002,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Please save this draft before closing the window.","wordErrors":0}
+{"id":"en-05","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.13126756582328089,"seconds":0.404781583,"split":"calibration","termCount":0,"termsPreserved":0,"text":"I would like another cup of coffee please.","wordErrors":0}
+{"id":"en-06","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.10644392796040321,"seconds":0.53035408299999998,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Create a new branch in Git and add a unit test for the parser before you update the documentation for this change.","wordErrors":0}
+{"id":"en-07","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.15572335244966456,"seconds":0.52581941600000004,"split":"calibration","termCount":2,"termsPreserved":2,"text":"The API returns a JSON object with the username and a status code. Please check the response before saving the result.","wordErrors":2}
+{"id":"en-08","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.11189496505450652,"seconds":0.53747483299999999,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Our Swift application should keep the microphone closed while idle. Start recording only when the shortcut is held and stop on release.","wordErrors":0}
+{"id":"en-09","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.1620052668789061,"seconds":0.53288975000000005,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Run the Python script from the terminal and check the output carefully. The configuration file should contain a valid local database address.","wordErrors":0}
+{"id":"en-10","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.11775215759329136,"seconds":0.53218166700000002,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Please review the Docker configuration and the database migration together. We need a reliable backup before changing the production settings this afternoon.","wordErrors":0}
+{"id":"en-11","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":36,"rms":0.1469340754771899,"seconds":0.68284083399999995,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Tomorrow morning we will walk along the river and visit the small bookshop near the bridge. If the weather stays warm, we can have lunch outside and spend the afternoon reading before taking the train home.","wordErrors":0}
+{"id":"en-12","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":39,"rms":0.10253846619107168,"seconds":0.705683167,"split":"calibration","termCount":0,"termsPreserved":0,"text":"The team reviewed every page of the report and left a short comment beside each question. We will discuss the remaining issues at our next meeting, agree on the final wording, and send the revised draft to the editor.","wordErrors":0}
+{"id":"en-13","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":38,"rms":0.15528225006332241,"seconds":0.71158412500000001,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Please keep the original document open while you compare the two versions. The introduction needs a clearer explanation, but the examples are already helpful. After the review, save a separate copy so we can find the earlier draft.","wordErrors":0}
+{"id":"en-14","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":38,"rms":0.10469080629868711,"seconds":0.69483420799999995,"split":"calibration","termCount":0,"termsPreserved":0,"text":"The new library is on the corner beside the station, opposite the bakery. It has a quiet room upstairs where students can work together. I will meet you by the main entrance after my appointment on Thursday afternoon.","wordErrors":0}
+{"id":"en-15","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":38,"rms":0.15280288003074807,"seconds":0.68333920800000003,"split":"calibration","termCount":0,"termsPreserved":0,"text":"We should test the complete workflow before making any promises about speed or accuracy. A single successful example does not show that every case works. Record the results carefully and describe any missing evidence in the final report.","wordErrors":0}
+{"id":"en-16","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.12306444703456927,"seconds":0.47313212500000001,"split":"heldout","termCount":0,"termsPreserved":0,"text":"The afternoon train was delayed because a tree had fallen across the line during the storm.","wordErrors":0}
+{"id":"en-17","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.17154345628510839,"seconds":0.491810625,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Keep the original clipboard contents if another application copies a new image while dictation is running.","wordErrors":0}
+{"id":"en-18","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":17,"rms":0.12146016443010747,"seconds":0.47938220799999998,"split":"heldout","termCount":0,"termsPreserved":0,"text":"A small green notebook was left on the table beside the empty glass and the reading lamp.","wordErrors":0}
+{"id":"en-19","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":17,"rms":0.1721021304122736,"seconds":0.48916825000000003,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Cancel the current recording when the computer goes to sleep and ignore any result that arrives later.","wordErrors":0}
+{"id":"en-20","kind":"speech","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":15,"rms":0.11905331938906674,"seconds":0.46362416699999998,"split":"heldout","termCount":0,"termsPreserved":0,"text":"The final review should distinguish completed implementation from validation that still needs a real device.","wordErrors":0}
+{"id":"fr-01","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.17114514743249992,"seconds":0.43951666700000003,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Bonjour, pouvez-vous ouvrir la fenêtre ce matin?","wordErrors":0}
+{"id":"fr-02","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.16524113784526001,"seconds":0.44720612500000001,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Le petit jardin est très agréable au printemps.","wordErrors":0}
+{"id":"fr-03","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.1780873013269498,"seconds":0.45180508400000002,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Nous pouvons revoir les changements après le déjeuner.","wordErrors":0}
+{"id":"fr-04","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.1881370548712453,"seconds":0.452496167,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Enregistrez ce brouillon avant de fermer la fenêtre.","wordErrors":0}
+{"id":"fr-05","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":8,"rms":0.16148993879611617,"seconds":0.42867712499999999,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Je voudrais une autre tasse de café, merci.","wordErrors":0}
+{"id":"fr-06","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":22,"rms":0.17952388313701256,"seconds":0.58350216700000002,"split":"calibration","termCount":1,"termsPreserved":0,"text":"Créer une nouvelle branche d'enji et ajouter un test pour le programme avant de modifier la documentation de cette application locale.","wordErrors":4}
+{"id":"fr-07","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":23,"rms":0.17263343837050729,"seconds":0.60669245800000005,"split":"calibration","termCount":2,"termsPreserved":1,"text":"Cette appli renvoie un objet JSON avec le nom du client et un code de réponse. Vérifiez les données avant de les enregistrer.","wordErrors":1}
+{"id":"fr-08","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":23,"rms":0.19201196246710517,"seconds":0.63243354200000002,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Notre application Swift doit garder le microphone fermé au repos. Elle commence à enregistrer uniquement pendant que vous maintenez le raccourci du clavier.","wordErrors":0}
+{"id":"fr-09","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":23,"rms":0.18416908161895026,"seconds":0.63653308399999997,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Lancer le script Python dans le terminal et vérifier soigneusement le résultat. Le fichier de configuration doit contenir une adresse de base valide.","wordErrors":2}
+{"id":"fr-10","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":23,"rms":0.19271801928634713,"seconds":0.57998883400000001,"split":"calibration","termCount":1,"termsPreserved":1,"text":"Vérifier la configuration Docker et la migration de la base de données. Nous avons besoin de conserver une copie avant toute modification importante.","wordErrors":1}
+{"id":"fr-11","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":38,"rms":0.1561396643019316,"seconds":0.83086041700000002,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Demain matin, nous marcherons le long de la rivière avant de visiter la petite librairie près du pont. Si le temps reste agréable, nous pourrons déjeuner dehors et passer quelques heures à lire avant de rentrer en train.","wordErrors":0}
+{"id":"fr-12","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":40,"rms":0.1699504996531398,"seconds":0.80847024999999995,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Chaque membre de notre équipe a relu le rapport et ajouté une remarque à côté des questions importantes. Nous discuterons des derniers problèmes lors de la prochaine réunion pour préparer une version plus claire avant la fin de la semaine.","wordErrors":0}
+{"id":"fr-13","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":39,"rms":0.17887311978214634,"seconds":0.84727537500000005,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Gardez le document original ouvert pendant que vous comparez les deux versions. Le premier paragraphe demande une explication plus claire, mais les exemples sont déjà utiles. Après la lecture, enregistrez une nouvelle copie pour retrouver facilement le brouillon précédent.","wordErrors":0}
+{"id":"fr-14","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":40,"rms":0.17477370072444981,"seconds":0.85875208300000005,"split":"calibration","termCount":0,"termsPreserved":0,"text":"La nouvelle bibliothèque se trouve près de la gare, en face de la boulangerie. Une salle calme est disponible au premier étage pour travailler ensemble. Je vous retrouverai devant la porte principale après mon rendez-vous de jeudi après-midi.","wordErrors":0}
+{"id":"fr-15","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":39,"rms":0.15983817750623605,"seconds":0.81109937499999996,"split":"calibration","termCount":0,"termsPreserved":0,"text":"Nous devons tester le parcours complet avant de promettre une certaine vitesse ou une bonne précision. Un seul exemple réussi ne prouve pas que tous les cas fonctionnent. Notez les résultats et décrivez les éléments qui restent à vérifier.","wordErrors":0}
+{"id":"fr-16","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":19,"rms":0.19302351509052579,"seconds":0.56760250000000001,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Le train de cet après-midi a été retardé par un arbre tombé sur la voie pendant la tempête.","wordErrors":0}
+{"id":"fr-17","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":17,"rms":0.17803861529847917,"seconds":0.55394279199999996,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Conservez le contenu du presse-papier si une autre application copie une nouvelle image pendant la transcription.","wordErrors":1}
+{"id":"fr-18","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":18,"rms":0.19077100531937013,"seconds":0.526711292,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Un petit carnet vert était posé sur la table à côté du verre vide et de la lampe.","wordErrors":0}
+{"id":"fr-19","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":18,"rms":0.18554399661777041,"seconds":0.58027745799999997,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Annulez tout enregistrement lorsque cet ordinateur se met en veille et ignorez les résultats qui arrivent plus tard.","wordErrors":0}
+{"id":"fr-20","kind":"speech","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.20789350867348477,"seconds":0.55918137499999998,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Le dernier bilan doit distinguer le travail terminé des vérifications qui nécessitent encore un appareil réel.","wordErrors":0}
+{"id":"quiet-1","kind":"quiet","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.0042976601738561864,"seconds":0.46742816700000001,"split":"heldout","termCount":0,"termsPreserved":0,"text":"The afternoon train was delayed because a tree had fallen across the line during the storm.","wordErrors":0}
+{"id":"quiet-2","kind":"quiet","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.0059932770309128304,"seconds":0.485615625,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Keep the original clipboard contents if another application copies a new image while dictation is running.","wordErrors":0}
+{"id":"quiet-3","kind":"quiet","language":"en","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":17,"rms":0.0042413927286791969,"seconds":0.47641941599999998,"split":"heldout","termCount":0,"termsPreserved":0,"text":"A small green notebook was left on the table beside the empty glass and the reading lamp.","wordErrors":0}
+{"id":"quiet-4","kind":"quiet","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":18,"rms":0.0064837505407745744,"seconds":0.57393991700000002,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Annulez tout enregistrement lorsque cet ordinateur se met en veille et ignorez les résultats qui arrivent plus tard.","wordErrors":0}
+{"id":"quiet-5","kind":"quiet","language":"fr","model":"turbo","noSpeech":false,"phase":"quality","referenceWords":16,"rms":0.0072647035868390001,"seconds":0.55683816699999999,"split":"heldout","termCount":0,"termsPreserved":0,"text":"Le dernier bilan doit distinguer le travail terminé des vérifications qui nécessitent encore un appareil réel.","wordErrors":0}
+{"id":"noise-01","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0,"seconds":0,"split":"calibration","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-02","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0,"seconds":0,"split":"heldout","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-03","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0,"seconds":0,"split":"calibration","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-04","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0,"seconds":0,"split":"heldout","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-05","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0,"seconds":0,"split":"calibration","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-06","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0.00036994909694393753,"seconds":0,"split":"heldout","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-07","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0.00036817429664917731,"seconds":0,"split":"calibration","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-08","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0.00037078027362716029,"seconds":0,"split":"heldout","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-09","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0.00036969608694142019,"seconds":0,"split":"calibration","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"id":"noise-10","kind":"noSpeech","language":"none","model":"turbo","noSpeech":true,"phase":"quality","referenceWords":0,"rms":0.00036833994620512047,"seconds":0,"split":"heldout","termCount":0,"termsPreserved":0,"text":"","wordErrors":0}
+{"audioSeconds":3,"decodeSeconds":0.39981262499999998,"group":3,"id":"en-01","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.40000566599999998,"group":3,"id":"en-02","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.39909979200000001,"group":3,"id":"en-03","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.39939433299999999,"group":3,"id":"en-04","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.40030133400000001,"group":3,"id":"en-05","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.52781541700000001,"group":8,"id":"en-06","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.52107104100000001,"group":8,"id":"en-07","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.52780654199999999,"group":8,"id":"en-08","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.53066395799999999,"group":8,"id":"en-09","model":"turbo","phase":"warm"}
+{"audioSeconds":8.6262500000000006,"decodeSeconds":0.52992475000000006,"group":8,"id":"en-10","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.67089279199999996,"group":15,"id":"en-11","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.70360287499999996,"group":15,"id":"en-12","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.69201625,"group":15,"id":"en-13","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.68403704200000004,"group":15,"id":"en-14","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.67770387499999996,"group":15,"id":"en-15","model":"turbo","phase":"warm"}
+{"audioSeconds":3.2483749999999998,"decodeSeconds":0.43552745799999998,"group":3,"id":"fr-01","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.44349654199999999,"group":3,"id":"fr-02","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.45361591699999998,"group":3,"id":"fr-03","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.45665462499999998,"group":3,"id":"fr-04","model":"turbo","phase":"warm"}
+{"audioSeconds":3,"decodeSeconds":0.44599170799999999,"group":3,"id":"fr-05","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.58656670799999999,"group":8,"id":"fr-06","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.60109004200000005,"group":8,"id":"fr-07","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.62534979199999996,"group":8,"id":"fr-08","model":"turbo","phase":"warm"}
+{"audioSeconds":8.2636249999999993,"decodeSeconds":0.62397745800000004,"group":8,"id":"fr-09","model":"turbo","phase":"warm"}
+{"audioSeconds":8,"decodeSeconds":0.58386658300000005,"group":8,"id":"fr-10","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.83089229200000003,"group":15,"id":"fr-11","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.80541012499999998,"group":15,"id":"fr-12","model":"turbo","phase":"warm"}
+{"audioSeconds":15.195062500000001,"decodeSeconds":0.83793812499999998,"group":15,"id":"fr-13","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.91073416600000001,"group":15,"id":"fr-14","model":"turbo","phase":"warm"}
+{"audioSeconds":15,"decodeSeconds":0.80063775000000004,"group":15,"id":"fr-15","model":"turbo","phase":"warm"}
+{"phase":"memory","residentBytes":2103902208,"session":1}
+{"phase":"memory","residentBytes":2103902208,"session":2}
+{"phase":"memory","residentBytes":2103902208,"session":3}
+{"phase":"memory","residentBytes":2103902208,"session":4}
+{"phase":"memory","residentBytes":2103902208,"session":5}
+{"phase":"memory","residentBytes":2103902208,"session":6}
+{"phase":"memory","residentBytes":2103902208,"session":7}
+{"phase":"memory","residentBytes":2103902208,"session":8}
+{"phase":"memory","residentBytes":2103902208,"session":9}
+{"phase":"memory","residentBytes":2103902208,"session":10}
+{"phase":"memory","residentBytes":2103902208,"session":11}
+{"phase":"memory","residentBytes":2103918592,"session":12}
+{"phase":"memory","residentBytes":2103918592,"session":13}
+{"phase":"memory","residentBytes":2103918592,"session":14}
+{"phase":"memory","residentBytes":2103934976,"session":15}
+{"phase":"memory","residentBytes":2103934976,"session":16}
+{"phase":"memory","residentBytes":2103934976,"session":17}
+{"phase":"memory","residentBytes":2103934976,"session":18}
+{"phase":"memory","residentBytes":2104131584,"session":19}
+{"phase":"memory","residentBytes":2104131584,"session":20}
+{"phase":"memory","residentBytes":2104131584,"session":21}
+{"phase":"memory","residentBytes":2104131584,"session":22}
+{"phase":"memory","residentBytes":2104131584,"session":23}
+{"phase":"memory","residentBytes":2104147968,"session":24}
+{"phase":"memory","residentBytes":2104147968,"session":25}
+{"phase":"memory","residentBytes":2104147968,"session":26}
+{"phase":"memory","residentBytes":2104147968,"session":27}
+{"phase":"memory","residentBytes":2104147968,"session":28}
+{"phase":"memory","residentBytes":2104147968,"session":29}
+{"phase":"memory","residentBytes":2104147968,"session":30}
+{"phase":"memory","residentBytes":2104147968,"session":31}
+{"phase":"memory","residentBytes":2104147968,"session":32}
+{"phase":"memory","residentBytes":2104147968,"session":33}
+{"phase":"memory","residentBytes":2104147968,"session":34}
+{"phase":"memory","residentBytes":2104147968,"session":35}
+{"phase":"memory","residentBytes":2104147968,"session":36}
+{"phase":"memory","residentBytes":2104164352,"session":37}
+{"phase":"memory","residentBytes":2104164352,"session":38}
+{"phase":"memory","residentBytes":2104164352,"session":39}
+{"phase":"memory","residentBytes":2104164352,"session":40}
+{"phase":"memory","residentBytes":2104164352,"session":41}
+{"phase":"memory","residentBytes":2104164352,"session":42}
+{"phase":"memory","residentBytes":2104164352,"session":43}
+{"phase":"memory","residentBytes":2104164352,"session":44}
+{"phase":"memory","residentBytes":2104164352,"session":45}
+{"phase":"memory","residentBytes":2104164352,"session":46}
+{"phase":"memory","residentBytes":2104164352,"session":47}
+{"phase":"memory","residentBytes":2104164352,"session":48}
+{"phase":"memory","residentBytes":2104164352,"session":49}
+{"phase":"memory","residentBytes":2104164352,"session":50}
+{"phase":"memory","residentBytes":2104180736,"session":51}
+{"phase":"memory","residentBytes":2104180736,"session":52}
+{"phase":"memory","residentBytes":2104180736,"session":53}
+{"phase":"memory","residentBytes":2104180736,"session":54}
+{"phase":"memory","residentBytes":2104197120,"session":55}
+{"phase":"memory","residentBytes":2104197120,"session":56}
+{"phase":"memory","residentBytes":2104197120,"session":57}
+{"phase":"memory","residentBytes":2104213504,"session":58}
+{"phase":"memory","residentBytes":2104213504,"session":59}
+{"phase":"memory","residentBytes":2104213504,"session":60}
+{"phase":"memory","residentBytes":2104213504,"session":61}
+{"phase":"memory","residentBytes":2104213504,"session":62}
+{"phase":"memory","residentBytes":2104229888,"session":63}
+{"phase":"memory","residentBytes":2104229888,"session":64}
+{"phase":"memory","residentBytes":2104229888,"session":65}
+{"phase":"memory","residentBytes":2104246272,"session":66}
+{"phase":"memory","residentBytes":2104246272,"session":67}
+{"phase":"memory","residentBytes":2104246272,"session":68}
+{"phase":"memory","residentBytes":2104246272,"session":69}
+{"phase":"memory","residentBytes":2104246272,"session":70}
+{"phase":"memory","residentBytes":2104246272,"session":71}
+{"phase":"memory","residentBytes":2104246272,"session":72}
+{"phase":"memory","residentBytes":2104246272,"session":73}
+{"phase":"memory","residentBytes":2104246272,"session":74}
+{"phase":"memory","residentBytes":2104262656,"session":75}
+{"phase":"memory","residentBytes":2104279040,"session":76}
+{"phase":"memory","residentBytes":2104279040,"session":77}
+{"phase":"memory","residentBytes":2104279040,"session":78}
+{"phase":"memory","residentBytes":2104279040,"session":79}
+{"phase":"memory","residentBytes":2104279040,"session":80}
+{"phase":"memory","residentBytes":2104279040,"session":81}
+{"phase":"memory","residentBytes":2104279040,"session":82}
+{"phase":"memory","residentBytes":2104279040,"session":83}
+{"phase":"memory","residentBytes":2104279040,"session":84}
+{"phase":"memory","residentBytes":2104279040,"session":85}
+{"phase":"memory","residentBytes":2104279040,"session":86}
+{"phase":"memory","residentBytes":2104279040,"session":87}
+{"phase":"memory","residentBytes":2104279040,"session":88}
+{"phase":"memory","residentBytes":2104279040,"session":89}
+{"phase":"memory","residentBytes":2104279040,"session":90}
+{"phase":"memory","residentBytes":2088550400,"session":91}
+{"phase":"memory","residentBytes":2088550400,"session":92}
+{"phase":"memory","residentBytes":2088550400,"session":93}
+{"phase":"memory","residentBytes":2088566784,"session":94}
+{"phase":"memory","residentBytes":2088566784,"session":95}
+{"phase":"memory","residentBytes":2088566784,"session":96}
+{"phase":"memory","residentBytes":2088566784,"session":97}
+{"phase":"memory","residentBytes":2088566784,"session":98}
+{"phase":"memory","residentBytes":2088599552,"session":99}
+{"phase":"memory","residentBytes":2088615936,"session":100}
+{"completed":true,"phase":"boundary59","seconds":2.1413484999999999}
+{"phase":"boundary60","rejected":true}
+{"outboundURLRequests":0,"peakResidentBytes":3243900928,"phase":"summary"}

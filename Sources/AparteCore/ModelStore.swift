@@ -54,7 +54,7 @@ public actor ModelStore {
         progress(1)
     }
     public func delete(_ id: String) throws {
-        guard !busy, ["base","small"].contains(id) else { throw AparteError.busy }
+        guard !busy, ["base", "small", "medium", "turbo"].contains(id) else { throw AparteError.busy }
         try FileManager.default.removeItem(at: root.appendingPathComponent(id))
     }
     public func cleanInterruptedStages() throws {

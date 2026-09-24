@@ -78,12 +78,12 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | SET-01 actual binding conflict/keyboard layout behavior | BLOCKED | Event-tap grant and physical test needed; physical US key labels disclosed |
 | SET-02 SMAppService truthful status/off by default | PASS | No registration outside user-toggle handler; actual status mapping, stable install |
 | SET-02 enable/disable/login restart validation | BLOCKED | User-directed Login Items approval and actual login cycle required; not toggled by agent |
-| MODEL-01 curated verified base/small; measured sizes | PASS | Immutable catalog/actual bytes; both models run on real engine; optional turbo not added |
+| MODEL-01 curated verified base/small plus owner-authorized medium/turbo; measured sizes | PASS | Four immutable complete model/tokenizer manifests; all four run on real WhisperKit; installed bytes and measured preparation/memory in MODEL-COMPARISON and BENCHMARKS. D023–D024 amend the original medium deferral. |
 | MODEL-02 hashes/config/tokenizers/revision/licences | PASS | Per-file manifest; local SHA-256; third-party source/licence provenance documented |
 | MODEL-03 explicit HTTPS/progress/cancel/space/atomic install | PASS | Production downloader success; atomic import/replace/corrupt/cancel/symlink/space unit checks; real cancelled download final report |
 | MODEL-04 offline import/delete/one-engine switch and rollback | PASS | Actual offline lifecycle evidence; missing-tokenizer switch preserves current working engine; two-way real switch and inactive deletion |
 | MODEL-04 load-failure rollback after unload | PASS | Real Core ML rejected a deliberately invalid model.mil under a derived test-only matching manifest; the previous small engine reloaded and transcribed successfully (model-lifecycle.json) |
-| §8 no app-originated ASR network/cold offline/tokenizer fallback | PASS | Offline base/small full runs and lifecycle; 0 intercepted requests; strict local parser source audit |
+| §8 no app-originated ASR network/cold offline/tokenizer fallback | PASS | Offline base/small/medium/turbo full runs and lifecycle; 0 intercepted requests; strict local parser source audit |
 | §8 no persistent audio/transcript/snapshot/private fixtures | PASS | App write-path audit; only preferences/models persisted; committed corpus/evidence are synthetic; ignore/history audit |
 | §8 honest clipboard/destination/OS memory/privacy limitations | PASS | Onboarding, README, PRIVACY and D008; no “text never leaves” promise |
 
@@ -91,13 +91,13 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 
 | Gate/case group | Status | Evidence / exact blocker |
 |---|---|---|
-| Quality: EN≤20%, FR≤25%, terms≥80%, no-speech10/10 | PASS | Selected small: 0.64%, 4.87%, 83.33%, 10/10; fixed corpus and raw evidence |
+| Quality: EN≤20%, FR≤25%, terms≥80%, no-speech10/10 | PASS | Selected small: 0.64%, 4.87%, 83.33%, 10/10; optional medium 0.43%, 0.85%, 91.67%, 10/10; optional turbo 0.43%, 1.91%, 83.33%, 10/10. Fixed corpus/raw evidence. |
 | Base quality (retained comparison) | FAIL | Technical terms 50%; default changed to quality-passing small, not threshold relaxed |
-| 30 warm utterances by duration | PASS | Two real Release runs, 10 each group, raw decode timings and normalization policy |
+| 30 warm utterances by duration | PASS | Four real Release runs, 10 each duration group, raw decode timings and normalization policy |
 | Shortcut→capture≤300ms / release→dispatch2s/5s / visible text | BLOCKED | Microphone/AX/posting/desktop targets absent; decode times cannot substitute |
 | Ten consented live dictations | BLOCKED | No live speaker session or microphone grant; no recording collected |
 | 59s decode /60s refusal | PASS | Real engine file boundary results; live timer boundary remains BLOCKED |
-| 100-session memory/no crash | PASS | Base +0.717%, small +0.035% retained RSS; no observed crash/queue growth in sequential engine exercise |
+| 100-session memory/no crash | PASS | Base +0.717%, small +0.035%, medium +0.013%, turbo −0.727% retained RSS; no observed crash/queue growth in sequential engine exercise |
 | Fresh model prep/cold load/peak memory/bytes | PASS | BENCHMARKS and raw prepare/memory evidence; actual cold app-to-Ready requires grants |
 | Five-minute Ready CPU<1% and no mic | BLOCKED | Permission-free idle process sampled separately; Ready not established |
 | Repeats/startup/order/tap-disable/missed-up/conflict | BLOCKED | Deterministic gesture/startup tests PASS; real event tap disable/conflict/missed-up watchdog need grants |
@@ -251,3 +251,16 @@ The owner can retry web inputs in 0.4.10 after allowing Chromium's accessibility
 | Real offline engine and local install | PASS | Small model transcribed locked 3-second fixture with 0 observed outbound URL requests; 0.4.11 installed at stable path with mutual designated requirements, strict signature and matching binary hash; sole running instance at inspection. See `docs/evidence/original-target.json` |
 
 No live external-app insertion or original-window return is claimed; **M4 is not accepted**.
+
+## 0.4.12 owner-requested model expansion
+
+| Requirement | Status | Actual evidence |
+|---|---|---|
+| Complete immutable medium and turbo Core ML plus matching tokenizers | PASS | `Resources/Models.json` lists 23 medium / 27 turbo files, exact revision URLs, sizes and SHA-256; local verified manifest sums 1,532,419,576 / 1,641,459,812 bytes. Both imported to managed model folders. |
+| Real medium and turbo offline inference | PASS | Production WhisperKit 1.1.0 transcribed the locked 3-second synthetic fixture for each; zero observed outbound URL requests. Medium `artifacts/medium-integration.log`, turbo `artifacts/turbo-integration.log`. |
+| Frozen benchmark quality and resources | PASS | Both real Release engines passed 55-clip quality, 30 warm decodes and 100 sequential sessions under network denial. Medium EN/FR WER 0.43%/0.85%, terms 91.67%, 10/10 no speech, warm 8s p95 1.137s, peak whole-process RSS 2.51GB. Turbo 0.43%/1.91%, 83.33%, 10/10, 0.625s, 3.24GB. `docs/evidence/benchmark-{medium,turbo}.jsonl` and summaries. |
+| Accurate in-app comparison and optional selection | PASS | 0.4.12 Release compiles and includes all four catalog entries, measured disk/preparation/decode/RSS labels, quality notes, explicit Download/Import/Prepare/Delete and small default. Actual visual UI interaction separately BLOCKED. |
+| Stable local install and automated regression | PASS | 43/43 unit tests, Release build, mutual old/new designated requirements, ordinary install, matching binary SHA-256 `50062e423b6a5b0738d21fce6fa935d4a26d3d24012e1eec86712db001177841`, strict signature, sole installed Aparté process at inspection. `docs/evidence/model-expansion.json`. |
+| French-accented English comparison through live microphone | BLOCKED | The frozen synthetic corpus has no French-accented English. Owner must speak the same English phrase into Setup's Microphone test under small/medium/turbo; no personal audio or transcript collected. |
+
+External insertion, microphone timing/quality and macOS 14 runtime gates remain BLOCKED; **M4 is not accepted**.

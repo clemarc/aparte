@@ -44,6 +44,10 @@ final class PolicyTests: XCTestCase {
     }
     func testPreferencesFailSafely() {
         XCTAssertEqual(Preferences.decode(Data("bad".utf8)).shortcut, .standard)
+        var turbo = Preferences(); turbo.model = "turbo"
+        XCTAssertEqual(Preferences.decode(try? JSONEncoder().encode(turbo)).model, "turbo")
+        turbo.model = "medium"
+        XCTAssertEqual(Preferences.decode(try? JSONEncoder().encode(turbo)).model, "medium")
         XCTAssertFalse(Shortcut(key: 36, modifiers: Shortcut.control).isValid)
         XCTAssertFalse(Shortcut(key: 0, modifiers: 0).isValid)
         XCTAssertTrue(Shortcut.standard.isValid)

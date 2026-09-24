@@ -2,7 +2,7 @@
 
 Reference: Apple M5 Pro, 48 GiB RAM, macOS 26.6 (25G72), Xcode 27.0 (27A266a), SDK 27.0, Swift 6.4. Power mode 0 on AC/battery (normal), as recorded by `pmset -g custom`. No settings changed. This does not establish performance on other Apple Silicon Macs.
 
-WhisperKit 1.1.0 revision and exact model/tokenizer pins are in `Package.resolved`, `Resources/Models.json` and D003–D004. Measurements use the production adapter, Release optimization, Auto language, one loaded engine and no network. Two complete runs are retained in `docs/evidence/benchmark-{base,small}.jsonl` and corresponding `.summary.json`.
+WhisperKit 1.1.0 revision and exact model/tokenizer pins are in `Package.resolved`, `Resources/Models.json` and D003–D004/D023–D024. Measurements use the production adapter, Release optimization, Auto language, one loaded engine and no network. Four complete runs are retained in `docs/evidence/benchmark-{base,small,medium,turbo}.jsonl` and corresponding `.summary.json`.
 
 ## Corpus and quality
 
@@ -10,46 +10,46 @@ WhisperKit 1.1.0 revision and exact model/tokenizer pins are in `Package.resolve
 
 Normalization: NFC, lowercase, punctuation becomes whitespace (including apostrophes), retain accents, no number expansion; word-level Levenshtein aggregated by reference-word count. Overall language WER includes quiet speech; quiet is also reported separately. Terms are the fixed 12 occurrences in 10 developer clips, compared under the same normalization. Raw output is synthetic fixture output only.
 
-| Metric / threshold | Base | Small |
-|---|---:|---:|
-| English WER ≤20% | 2.35% PASS | 0.64% PASS |
-| French WER ≤25% | 10.81% PASS | 4.87% PASS |
-| Held-out English WER | 0% | 0% |
-| Held-out French WER | 20.49% | 10.66% |
-| Quiet WER | 3.61% | 0% |
-| Technical terms ≥80% | 50% **FAIL** | 83.33% PASS |
-| No speech: 10/10 rejected | 10 PASS | 10 PASS |
+| Metric / threshold | Base | Small | Medium | Large-v3 turbo |
+|---|---:|---:|---:|---:|
+| English WER ≤20% | 2.35% PASS | 0.64% PASS | 0.43% PASS | 0.43% PASS |
+| French WER ≤25% | 10.81% PASS | 4.87% PASS | 0.85% PASS | 1.91% PASS |
+| Held-out English WER | 0% | 0% | 0% | 0% |
+| Held-out French WER | 20.49% | 10.66% | 0% | 0.82% |
+| Quiet WER | 3.61% | 0% | 0% | 0% |
+| Technical terms ≥80% | 50% **FAIL** | 83.33% PASS | 91.67% PASS | 83.33% PASS |
+| No speech: 10/10 rejected | 10 PASS | 10 PASS | 10 PASS | 10 PASS |
 
-Small is the fastest tested candidate meeting all frozen-corpus quality thresholds (D009). Base is faster but fails a mandatory quality gate. Turbo was optional and not added. Small becomes the default for new settings; saved choices remain respected. Natural speech quality is still BLOCKED pending ten consented live dictations.
+Small remains the fastest tested candidate meeting all frozen-corpus quality thresholds (D009). Base is faster but fails a mandatory quality gate. Medium and turbo are optional, owner-requested comparisons; medium has the best French and term-preservation results on this synthetic corpus but slower warm decode, while turbo uses more peak memory. Small remains the default for new settings; saved choices remain respected. None of the synthetic voices tests French-accented English. Natural speech quality is still BLOCKED pending ten consented live dictations.
 
 ## Performance
 
 Each model warmed once before evaluation; the separately recorded warm set has 30 utterances (10 around each 3/8/15-second group). Raw actual clip durations are retained; synthetic speech is padded to group duration where shorter. No download, model load or compilation is included in decode timing.
 
-| Warm file decode | Base p50 / p95 (s) | Small p50 / p95 (s) |
-|---|---:|---:|
-| ~3 seconds, n=10 | 0.092 / 0.109 | 0.224 / 0.287 |
-| ~8 seconds, n=10 | 0.154 / 0.218 | 0.401 / 0.533 |
-| ~15 seconds, n=10 | 0.233 / 0.347 | 0.612 / 0.893 |
-| Overall, n=30 | 0.154 / 0.322 | 0.401 / 0.821 |
+| Warm file decode | Base p50 / p95 (s) | Small p50 / p95 (s) | Medium p50 / p95 (s) | Turbo p50 / p95 (s) |
+|---|---:|---:|---:|---:|
+| ~3 seconds, n=10 | 0.092 / 0.109 | 0.224 / 0.287 | 0.574 / 0.699 | 0.400 / 0.457 |
+| ~8 seconds, n=10 | 0.154 / 0.218 | 0.401 / 0.533 | 0.887 / 1.137 | 0.531 / 0.625 |
+| ~15 seconds, n=10 | 0.233 / 0.347 | 0.612 / 0.893 | 1.282 / 1.658 | 0.704 / 0.911 |
+| Overall, n=30 | 0.154 / 0.322 | 0.401 / 0.821 | 0.887 / 1.613 | 0.531 / 0.838 |
 
 These are **decode-only**. Shortcut-to-capture p95 ≤300 ms, release-to-dispatch p50 ≤2 s / p95 ≤5 s, and observed visible-text latency are BLOCKED by microphone/AX permissions and real target sessions. No end-to-end subsecond claim is made.
 
-| Other actual measurements | Base | Small |
-|---|---:|---:|
-| Installed bytes (manifest) | 149,484,796 | 489,252,808 |
-| Preparation in fresh Release process (includes hashing/prewarm/load) | 6.187 s | 18.334 s |
-| Peak process RSS | 318,291,968 bytes | 841,826,304 bytes |
-| RSS first→last across next 100 same-size sessions | 308,510,720→310,722,560 | 742,899,712→743,161,856 |
-| Retained RSS change | +0.717% | +0.035% |
+| Other actual measurements | Base | Small | Medium | Turbo |
+|---|---:|---:|---:|---:|
+| Installed bytes (manifest) | 149,484,796 | 489,252,808 | 1,532,419,576 | 1,641,459,812 |
+| Preparation in fresh Release process (includes hashing/prewarm/load) | 6.187 s | 18.334 s | 10.266 s | 93.61 s |
+| Peak process RSS | 318,291,968 bytes | 841,826,304 bytes | 2,505,424,896 bytes | 3,243,900,928 bytes |
+| RSS first→last across next 100 same-size sessions | 308,510,720→310,722,560 | 742,899,712→743,161,856 | 1,781,170,176→1,781,399,552 | 2,103,902,208→2,088,615,936 |
+| Retained RSS change | +0.717% | +0.035% | +0.013% | −0.727% |
 
-No crash or unbounded queue was observed in these sequential real-engine sessions. Growth is below the 10% investigation threshold; this does not prove absence of all leaks or real capture-buffer leaks. Separate 59-second input completed within 30 seconds for both models (exact timings in raw records); 60-second input was rejected by the production transcriber. Actual microphone timer/device boundaries remain blocked.
+No crash or unbounded queue was observed in these sequential real-engine sessions. Growth is below the 10% investigation threshold; this does not prove absence of all leaks or real capture-buffer leaks. Separate 59-second input completed within 30 seconds for all four models (exact timings in raw records); 60-second input was rejected by the production transcriber. Actual microphone timer/device boundaries remain blocked. Preparation times are sensitive to Core ML cache state; each is a measured run, not a first-install promise.
 
 Initial M0 fresh-model base preparation was 5.874 s with a public upstream JFK fixture (11 s); decode 0.860 s. A fresh-process network-denied reload then prepared in 5.869 s and decoded in 0.257 s. Core ML caches persist externally, so these are not a promise of first-install speed on every Mac. Cold app-to-Ready launch and five-minute **Ready** idle CPU cannot be accepted without privacy grants.
 
 ## Offline and logging evidence
 
-Both full benchmark processes ran under `(deny network*)` and a URLProtocol request interceptor: **0 observed outbound URL requests**, stderr empty. The source audit confirms local-only tokenizer parsing (no Hub fallback) and disabled WhisperKit logs. The offline lifecycle check imported verified assets, rejected a missing tokenizer without a request, preserved the working engine, switched both directions, cancelled real inference then retried successfully, and deleted an inactive model. A deliberately invalid Core ML model with a derived test-only integrity manifest failed to load after unload; the previous working small engine was reloaded and transcribed successfully. See `docs/evidence/model-lifecycle.json`.
+All four full benchmark processes ran under `(deny network*)` and a URLProtocol request interceptor: **0 observed outbound URL requests**, stderr empty. The source audit confirms local-only tokenizer parsing (no Hub fallback) and disabled WhisperKit logs. The offline lifecycle check imported verified assets, rejected a missing tokenizer without a request, preserved the working engine, switched both directions, cancelled real inference then retried successfully, and deleted an inactive model. A deliberately invalid Core ML model with a derived test-only integrity manifest failed to load after unload; the previous working small engine was reloaded and transcribed successfully. See `docs/evidence/model-lifecycle.json`.
 
 Process network denial proves offline operation; the interceptor and inspected production call path provide separate evidence about attempted requests. This is scoped to the exercised paths, not a proof about arbitrary future dependency changes.
 

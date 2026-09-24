@@ -26,6 +26,10 @@ D021 records the owner's request to consult another app while dictating, then ha
 
 D022 records the owner's request to place a Recovery transcript on the clipboard automatically for manual paste. This intentionally replaces the prior clipboard contents when insertion was not attempted, and retains Aparté's temporary transcript clipboard rather than restoring the old contents after a paste attempt when ownership is still Aparté's. A newer clipboard owner is preserved. The in-app Recovery text still expires after five minutes, but the system clipboard may retain or sync the transcript independently. No automatic second paste, Return, full-field write or bypass of secure controls is authorized. Original §4/§6 clipboard preservation rules remain for the normal guarded paste path; D022 governs the explicit Recovery handoff.
 
+## Owner-approved model comparison expansion — 24 September 2026
+
+D023 adds an optional, verified large-v3-turbo Core ML choice and an in-app comparison using measured Aparté data. D024 records the owner's explicit follow-up to benchmark multilingual medium and add it as an option, superseding MODEL-01's deferral of medium only. Both new entries must use immutable, complete manifests with matching pinned tokenizers, pass real WhisperKit loading/inference and run the existing fixed benchmark gates, recording any failures rather than hiding them. Keep small as the default unless the same measured evidence warrants a change; no model is downloaded during dictation. Tiny, unverified large-v3 and arbitrary model URLs remain deferred. These requests do not authorize M5 or change the existing privacy/permission boundaries.
+
 ## 1. Agent execution contract
 
 Implement M0-M4 in order, continuing without routine design approvals. Resolve implementation details using this specification and record consequential choices in `docs/DECISIONS.md`. Do not substitute a demo or mock implementation for the real audio, transcription or insertion paths.
