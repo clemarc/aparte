@@ -6,6 +6,10 @@
 
 **Next step:** owner runs Start recording → speak → Stop and supplies displayed status/input/received seconds/meter movement. Cause is not established; do not claim microphone capture repaired or live validated. Optional symptom question remained unanswered during implementation. Native UI/helper remains externally blocked. M4 not accepted; no M5. Existing launch and clipboard fixes remain included.
 
+## Update-install permission finding (2026-09-24)
+
+Owner reports grants remain displayed but cease applying after updates. Inspection confirms build script/project force ad-hoc `CODE_SIGN_IDENTITY=-`; installed 0.4.4's designated requirement is an exact `cdhash`, with a different hash for the older Debug build. Apple TN3127 documents that microphone authorization checks an app against the previously recorded designated requirement. Thus our changing ad-hoc identities provide a concrete mechanism for permission churn; the actual protected TCC record was not read and the microphone symptom is not conclusively attributed. D016 recommends stable certificate-backed local development signing before further test builds. No app rebuild, key/certificate creation, permission reset or security change was performed for this investigation. The owner's question was explanatory, not authorization to use release credentials.
+
 ## Previous M4 checkpoint (historical evidence)
 
 Implementation through feasible M0–M4 scope is complete; validation pending. **M4 is not accepted.** No M5 work was started. See ACCEPTANCE for scoped PASS/FAIL/BLOCKED results and HANDOFF for the single human-action checklist and ordered decision review.
