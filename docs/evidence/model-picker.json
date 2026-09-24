@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-24",
+  "version": "0.4.13",
+  "finding": "A stale 0.4.5 Debug Aparté process ran concurrently with installed 0.4.12; both shared a bundle ID/menu-bar identity. Installed 0.4.12 already contained four model entries. The exact window the owner saw was not observable.",
+  "action": [
+    "Orderly terminated the stale project Debug copy; no force kill or permission change.",
+    "Added a prominent model picker and selected-model actions.",
+    "Show the actual Info.plist version in the menu bar and Settings title.",
+    "Refuse local installation while any same-bundle-ID copy runs; explicit path-bounded orderly quit for project artifact copies.",
+    "Built, signed, installed and opened 0.4.13 at the stable path."
+  ],
+  "bundledModels": [
+    "base",
+    "small",
+    "medium",
+    "turbo"
+  ],
+  "sourceManifestSHA256": "1a7941aed43ea7936e50f715e58e2b30117e17620d567fc383b119592db685bf",
+  "installedManifestSHA256": "1a7941aed43ea7936e50f715e58e2b30117e17620d567fc383b119592db685bf",
+  "installedBinarySHA256": "140810749594ed7ab50805d5b870fe55f525f71b8edfcf8f9b0743f59ff735b5",
+  "checks": {
+    "releaseBuild": "PASS",
+    "unitTests": "43 passed, 0 failed",
+    "oldNewDesignatedRequirements": "mutually satisfied",
+    "installedStrictSignature": "PASS",
+    "soleInstalledApartéProcessAtInspection": "PASS",
+    "nativeSettingsVisualAndPrepareUse": "BLOCKED: Sky Computer Use native pipe closed before response on two attempts; owner must confirm visible picker/selection."
+  },
+  "scope": "Model engine and synthetic benchmark results from 0.4.12 are unchanged; external-app insertion and live accent accuracy remain unaccepted."
+}

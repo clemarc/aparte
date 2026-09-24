@@ -259,8 +259,20 @@ No live external-app insertion or original-window return is claimed; **M4 is not
 | Complete immutable medium and turbo Core ML plus matching tokenizers | PASS | `Resources/Models.json` lists 23 medium / 27 turbo files, exact revision URLs, sizes and SHA-256; local verified manifest sums 1,532,419,576 / 1,641,459,812 bytes. Both imported to managed model folders. |
 | Real medium and turbo offline inference | PASS | Production WhisperKit 1.1.0 transcribed the locked 3-second synthetic fixture for each; zero observed outbound URL requests. Medium `artifacts/medium-integration.log`, turbo `artifacts/turbo-integration.log`. |
 | Frozen benchmark quality and resources | PASS | Both real Release engines passed 55-clip quality, 30 warm decodes and 100 sequential sessions under network denial. Medium EN/FR WER 0.43%/0.85%, terms 91.67%, 10/10 no speech, warm 8s p95 1.137s, peak whole-process RSS 2.51GB. Turbo 0.43%/1.91%, 83.33%, 10/10, 0.625s, 3.24GB. `docs/evidence/benchmark-{medium,turbo}.jsonl` and summaries. |
-| Accurate in-app comparison and optional selection | PASS | 0.4.12 Release compiles and includes all four catalog entries, measured disk/preparation/decode/RSS labels, quality notes, explicit Download/Import/Prepare/Delete and small default. Actual visual UI interaction separately BLOCKED. |
+| 0.4.12 in-app comparison discoverability | FAIL | Although 0.4.12 bundled all four model entries, the owner could not see small/turbo in the UI; process inventory later found an old 0.4.5 Debug copy running alongside it. The exact viewed window was not observable. D025 changes the model selector and version labelling in 0.4.13. |
 | Stable local install and automated regression | PASS | 43/43 unit tests, Release build, mutual old/new designated requirements, ordinary install, matching binary SHA-256 `50062e423b6a5b0738d21fce6fa935d4a26d3d24012e1eec86712db001177841`, strict signature, sole installed Aparté process at inspection. `docs/evidence/model-expansion.json`. |
 | French-accented English comparison through live microphone | BLOCKED | The frozen synthetic corpus has no French-accented English. Owner must speak the same English phrase into Setup's Microphone test under small/medium/turbo; no personal audio or transcript collected. |
 
 External insertion, microphone timing/quality and macOS 14 runtime gates remain BLOCKED; **M4 is not accepted**.
+
+## 0.4.13 model-picker and duplicate-app correction
+
+| Requirement | Status | Actual evidence |
+|---|---|---|
+| Identify old copy behind missing model choices | PASS | Two live Aparté processes shared the bundle ID/menu-bar identity: stale project Debug 0.4.5 and installed 0.4.12. The installed bundle's four-entry `Models.json` hash matched source. Old Debug copy closed orderly; no force kill or permission changes. Exact window the owner saw remains unobserved. |
+| Make all models directly selectable in Settings | PASS | Source/Release review: a menu-style **Model to compare** picker lists every manifest entry, selected-model actions are immediately underneath, and active model is named. The 0.4.13 installed bundle has Base, Small, Medium and large-v3 turbo. Actual visible UI interaction remains BLOCKED. |
+| Distinguish running version and refuse duplicate local installs | PASS | Menu bar title and Settings title derive version from Info.plist; lifecycle script refuses installation while any same-bundle-ID copy runs and has an explicit path-bounded orderly quit for project artifact copies. 0.4.13 installed via ordinary path after closing duplicate. |
+| Native Release, regression and stable local install | PASS | 0.4.13 Release build, 43/43 unit tests, mutual designated requirements, strict signature, byte-identical bundled/source model manifest, one installed Aparté process at inspection. `docs/evidence/model-picker.json`. |
+| Owner sees Small and large-v3 turbo and can prepare them | BLOCKED | Native desktop UI pipe closed on two attempts; no live picker/Prepare interaction was observed. Owner can test in the installed 0.4.13 Settings window. |
+
+**M4 is not accepted**; model engine/benchmark evidence from 0.4.12 remains valid and unchanged.
