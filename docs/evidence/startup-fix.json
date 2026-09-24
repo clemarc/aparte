@@ -1,0 +1,45 @@
+{
+  "date": "2026-09-24",
+  "appVersion": "0.4.3",
+  "build": "4",
+  "decision": "D014",
+  "diagnosis": {
+    "oldVersion": "0.4.2",
+    "oldProcessRunning": true,
+    "signatureValid": true,
+    "sampleSeconds": 1,
+    "mainThread": "Normal AppKit event loop waiting for events; no sampled startup hang",
+    "crashReports": "No Apart\u00e9 report found in DiagnosticReports",
+    "sourceFinding": "Settings only shown if onboardingSeen false; no applicationShouldHandleReopen handler",
+    "limits": "Window visibility inferred from source and owner report, not observed through desktop UI"
+  },
+  "checks": {
+    "release": "PASS",
+    "unit": {
+      "count": 36,
+      "failures": 0,
+      "durationSeconds": 3.119
+    },
+    "installation": "PASS: strict/deep signature check, local ad-hoc signature, stable existing app path",
+    "restart": "PASS: orderly NSRunningApplication termination of one old instance; Launch Services open returned success; new installed process observed alive 21 seconds later",
+    "binarySHA256": "09db1841944aecf9099d16d93b0be1bf0692dc5edeb8cdc81075f98fbb7a051e",
+    "visualReopenMinimizeAndLogin": "BLOCKED: unchanged native desktop helper failure; no login registration performed"
+  },
+  "commands": [
+    "./scripts/build-local.sh --configuration Release",
+    "./scripts/test-local.sh --suite unit",
+    "./scripts/install-local.sh",
+    "open ~/Applications/Aparte.app"
+  ],
+  "scope": "AppDelegate visibility fix only; D013 clipboard change retained, M0-M4 acceptance still pending",
+  "logs": {
+    "unit": {
+      "path": "artifacts/startup-fix-unit.log",
+      "sha256": "a65b7622c82b8af4739356b509c440ff7ffd6abe4fff928f74538fc4105bce15"
+    },
+    "release": {
+      "path": "artifacts/startup-fix-release.log",
+      "sha256": "c49e8662d4b09111ea452fe45b292993a64ce1b095d9f2aca8425ecde8bb1ad4"
+    }
+  }
+}

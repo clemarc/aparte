@@ -2,9 +2,9 @@
 
 ## Current status
 
-**0.4.2 clipboard fix complete; live validation pending.** Owner-approved D013 enables supported adapters independently of validation evidence and replaces blanket foreign clipboard refusal with bounded complete snapshot attempts. Recovery explains each refusal or single attempted paste. Debug/Release builds and all 36 final tests passed, including real separate-process rich/image/multi-item restoration, fast provider materialization, timeout/no-late-write and newer-copy protection. Real small-model integration passed with zero observed outbound requests. Installed 0.4.2 build 3 at the stable path, verified ad-hoc signature; evidence in `docs/evidence/clipboard-fix.json`.
+**0.4.3 launch visibility fix installed and running.** Owner reported app did not start. Installed 0.4.2 process was already running, signature valid, and a one-second sample showed a normal AppKit main event loop; no Aparté crash report was found. Source opened Settings only on first-ever onboarding and lacked a reopen handler. D014 makes ordinary launch/reopen show Settings, restores minimized windows, and keeps login/service startup quiet. Release build and all 36 regressions passed. Old instance terminated orderly through NSRunningApplication; 0.4.3 build 4 installed with verified ad-hoc signature, opened through Launch Services and observed running 21 seconds later. Evidence: `docs/evidence/startup-fix.json`.
 
-**Next step:** quit/reopen installed 0.4.2 and validate actual insertion in supported target apps using COMPATIBILITY's protocol. No implementation approval remains. The owner reports Setup tests working; the native UI helper still crashes (SkyComputerUseService SIGTRAP/Array.remove(at:), 2026-09-24), so actual target/UI validation remains BLOCKED. Do not repeatedly retry unchanged transport failures. M4 is not accepted; no M5 work.
+**Next step:** owner verifies the Settings window is visible and continues actual insertion checks. No further implementation approval needed. Clipboard D013 remains included. Visual/reopen/minimize/login and target checks remain BLOCKED by the existing desktop-tool failure; process survival is not visual evidence. M4 is not accepted; no M5 work.
 
 ## Previous M4 checkpoint (historical evidence)
 

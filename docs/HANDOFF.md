@@ -2,6 +2,10 @@
 
 **Implementation complete through the feasible M0–M4 scope; validation pending. M4 is not accepted.** Version 0.4.2 implements the owner-approved D013 clipboard/insertion change. No M5 work was started.
 
+## 0.4.3 launch visibility update
+
+The installed app was running but only showed Settings on first onboarding and ignored later reopen requests. Explicit launch/reopen now reveals Settings, restores a minimized window, and preserves quiet login/service startup (D014). Release and all 36 tests passed. Installed and restarted 0.4.3; the new process remained alive after 21 seconds. Actual window visibility still needs owner confirmation because native visual tooling remains unavailable. See startup-fix.json.
+
 ## 0.4.2 clipboard update
 
 Supported text fields in TextEdit, Terminal, VS Code, Chrome and Slack can now receive guarded insertion. Ordinary foreign clipboard data is saved/restored within the existing limits, including fast provider-backed data. Unsupported/slow/oversized content still uses Recovery, with a specific reason. A backup after an attempted paste does not mean the paste failed. See D013 and clipboard-fix.json; real target compatibility remains unverified.
@@ -10,7 +14,7 @@ Supported text fields in TextEdit, Terminal, VS Code, Chrome and Slack can now r
 
 The owner reported grants were already enabled but setup remained blocked, and shortcut capture was not displaying the chord. The updated app shows exact readiness blockers, recreates the listener on Recheck, and prepares an installed selected model. A native recorder previews modifiers and chords without competing with the global binding. Start/Stop microphone testing and an app-owned end-to-end text box both use the production audio/WhisperKit path. In-app versus global shortcut delivery is labelled. See D011–D012 and README's Test Setup section.
 
-The owner reports the Setup tests are working. Quit/reopen the installed 0.4.2 to load the clipboard change. Owner-reported grants are acknowledged; do not blindly request them again. If still blocked, the status card and permission summary identify what this running build actually sees. Physical UI/live testing remains unverified because the desktop tool connection failed closed. External adapter acceptance is unchanged.
+The owner reports the Setup tests are working. The installed 0.4.3 includes the clipboard change and has been restarted. Owner-reported grants are acknowledged; do not blindly request them again. If still blocked, the status card and permission summary identify what this running build actually sees. Physical UI/live testing remains unverified because the desktop tool connection failed closed. External adapter acceptance is unchanged.
 
 ## Delivered
 
@@ -39,11 +43,12 @@ File decode timings are not release-to-insertion latency. Synthetic speech quali
 4. **D003 — Local tokenizer protocol bridge.** It avoids upstream's remote fallback; bilingual and offline tests pass. Revisit when upstream offers a strict local-only public initializer. Replacement is localized but needs repeat offline/tokenizer/inference validation.
 5. **D006 — Recovery after attempted insertion.** Conservative “unconfirmed” labeling avoids duplicate retries. Easy UX change, but any automatic retry would require stronger acknowledgement than the OS generally provides.
 6. **D010 — Physical shortcut labels.** US physical key names are disclosed; test alternate layouts. Label improvements are inexpensive and do not require changing stored chords.
-7. **D001 / D004 — Toolchain and asset pins.** Xcode27 builds a macOS14 target, but minimum-OS runtime is missing. Asset updates require new immutable manifests and full real-engine checks. D005 only affects local author metadata, not product behavior.
+7. **D014 — Explicit launch visibility.** Low-cost UX change: explicit Open now reveals Settings. Verify minimized/reopened windows and quiet login startup; the actual UI connection remains unavailable.
+8. **D001 / D004 — Toolchain and asset pins.** Xcode27 builds a macOS14 target, but minimum-OS runtime is missing. Asset updates require new immutable manifests and full real-engine checks. D005 only affects local author metadata, not product behavior.
 
 ## Consolidated remaining human / external actions
 
-- [ ] Quit/reopen the stable 0.4.2 app, then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
+- [ ] Confirm the restarted 0.4.3 Settings window is visible (opening the app again should bring it forward), then try dictating into a disposable TextEdit document and a supported clipboard target. If text is absent, read the specific Recovery reason. Verify the already-granted Microphone and Accessibility status; only grant access if this build reports it missing; only follow Input Monitoring guidance if the actual event tap requires it. Recheck; quit/reopen if grants require it. Do not bypass security or reset TCC.
 - [ ] Provide a consented local microphone session: ten short English/French/quiet dictations, no retained recordings. Measure shortcut-to-live-capture p95 and release-to-dispatch/visible-text timings; test default input, startup release, 59/60-second boundary, device unplug/change, missed key-up, permissions revoked, Escape, busy holds, sleep/lock/logout and stale completion.
 - [ ] Run the ten-attempt matrix for TextEdit, Terminal/Claude Code, VS Code, Chrome textarea/contenteditable and Slack drafts as described in COMPATIBILITY. Use disposable/inert text, no submission. Validate exact insertion once, selection, Unicode, rich context, focus/caret invalidation, secure/read-only refusal, ambiguous writes, delayed consumers, concurrent clipboard copies and orderly quit. Add validated catalog entries only after evidence passes.
 - [ ] Visually review onboarding/status/Recovery, keyboard navigation, contrast and VoiceOver with an available desktop UI connection. Native UI tool failure prevented these checks.

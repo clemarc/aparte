@@ -139,3 +139,17 @@ Evidence for this patch is `docs/evidence/setup-fix.json`; the earlier verificat
 | Release 0.4.2, build 3 | PASS | Native Release build succeeded; install/signature evidence in clipboard-fix.json |
 
 Owner reports the Setup tests work; no private recording or transcript was collected. The earlier setup-fix.json and verification.json remain historical checkpoints. Current patch evidence is `docs/evidence/clipboard-fix.json`. Full M4 acceptance remains pending.
+
+
+## 0.4.3 explicit launch/reopen follow-up
+
+| Requirement / reported problem | Status | Evidence |
+|---|---|---|
+| Distinguish process launch failure from invisible menu-bar app | PASS | Installed 0.4.2 already running; signature valid; native one-second sample main thread waits normally in AppKit event loop; no matching crash report found |
+| Explicit Open reveals Settings after prior onboarding | PASS | AppDelegate ordinary-launch and reopen handlers implemented; retained window deminiaturized; Release compilation passed. Actual visual behavior tracked separately |
+| Preserve quiet login/service startup and no normal Dock icon | PASS | Public Apple event markers guard initial window; existing accessory/LSUIElement behavior preserved. Actual login cycle remains BLOCKED |
+| Release 0.4.3 build 4 installs and launches | PASS | Orderly quit of old process; install strict/deep signature verification; Launch Services open succeeded; installed process alive after 21 seconds |
+| Existing regression suite | PASS | 36 tests, zero failures; no tests removed; clipboard change retained |
+| User-visible window, minimize/reopen and login-cycle validation | BLOCKED | Existing native desktop-tool crash; process check and source inspection do not establish visual correctness |
+
+See `docs/evidence/startup-fix.json`. No microphone input, permission changes or private transcript collection occurred during this check.

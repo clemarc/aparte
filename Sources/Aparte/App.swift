@@ -3,6 +3,7 @@ import SwiftUI
 import AparteCore
 import ServiceManagement
 import AVFoundation
+import Carbon
 
 @main struct AparteApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -14,6 +15,16 @@ import AVFoundation
     private var settingsWindow: NSWindow?
     private var recoveryWindow: NSWindow?
     private var indicator: NSPanel?
+    private var launchedInBackground = false
+    private var reopenRequested = false
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // Preserve quiet login/service startup, but make an explicit Open visible.
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        let reason = event?.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue
+        launchedInBackground = reason == keyAELaunchedAsLogInItem || reason == keyAELaunchedAsServiceItem
+            || event?.paramDescriptor(forKeyword: keyAELaunchedAsLogInItem) != nil
+            || event?.paramDescriptor(forKeyword: keyAELaunchedAsServiceItem) != nil
+    }
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         coordinator = Coordinator()
@@ -21,7 +32,14 @@ import AVFoundation
         item.button?.target = self; item.button?.action = #selector(showMenu)
         coordinator.onStatus = { [weak self] in self?.updateStatus() }
         updateStatus()
-        if !UserDefaults.standard.bool(forKey: "onboardingSeen") { showSettings(); UserDefaults.standard.set(true, forKey: "onboardingSeen") }
+        if !launchedInBackground || reopenRequested {
+            showSettings()
+        }
+    }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        reopenRequested = true
+        if coordinator != nil { showSettings() }
+        return false // We restore the retained Settings window ourselves.
     }
     private func updateStatus() {
         guard item != nil else { return }
@@ -56,6 +74,7 @@ import AVFoundation
             settingsWindow = makeWindow("Aparté — Settings & Setup", size: NSSize(width: 630, height: 720), root: SettingsView(model: coordinator))
         }
         settingsWindow?.delegate = self
+        if settingsWindow?.isMiniaturized == true { settingsWindow?.deminiaturize(nil) }
         settingsWindow?.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true)
     }
     @objc private func showRecovery() {
@@ -182,7 +201,7 @@ struct SettingsView: View {
                     }.padding(6)
                 }
                 GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. Your target app and the system clipboard (including Universal Clipboard) may process or sync inserted text. Clipboard restoration cannot undo another app’s reads. Supported text fields can receive automatic insertion. Other contexts use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté 0.4.2 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                Text("Diagnostics: Aparté 0.4.3 · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }
