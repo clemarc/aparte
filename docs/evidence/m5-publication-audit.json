@@ -9,6 +9,7 @@
     "history": "publish audited existing history"
   },
   "historyCommits": 20,
+  "preexistingPublicRemoteCommit": "6fd8d6c0ffe45a2abc1c7a82dd968f65db87f4f7 (initial MIT LICENSE only; inspected and preserved by merge)",
   "uniqueBlobObjectsScanned": 289,
   "blobsOverTwoMiB": 0,
   "matches": {
