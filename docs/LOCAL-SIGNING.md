@@ -14,7 +14,7 @@ Owner-approved D016 replaces ad-hoc development app signatures so rebuilds can h
 open "$HOME/Applications/Aparte.app"
 ```
 
-Setup reuses the existing identity. It never silently replaces missing/partial signing material. Builds fail if it is unavailable; they do not fall back to ad-hoc signing. Use the build script for a signed app. Direct Xcode builds have automatic signing disabled and must be signed with `scripts/local-signing.py sign <app>` before installation. The installer rejects unsigned/ad-hoc or wrong-certificate bundles.
+Setup reuses the existing identity. It never silently replaces missing/partial signing material. Default builds fail if it is unavailable; they do not fall back to ad-hoc signing. The explicit `--signing adhoc` build mode is for clean source checkouts and CI only; it does not read or modify the local identity and its output is not eligible for the local installer. Use the default build script for an installable local development app. Direct Xcode builds have automatic signing disabled and must be signed with `scripts/local-signing.py sign <app>` before installation. The installer rejects unsigned/ad-hoc or wrong-certificate bundles.
 
 The one-time transition from an existing ad-hoc build requires:
 

@@ -285,3 +285,17 @@ External insertion, microphone timing/quality and macOS 14 runtime gates remain 
 | Full M4 PRD exit acceptance | BLOCKED | Actual cross-app insertion and clipboard consumption matrix, consented live microphone/timing, native visual/VoiceOver, Ready idle/login and macOS 14 runtime checks remain unverified. No status above was converted to PASS for closure. |
 
 The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL remain recorded; small is the selected quality-passing default and 0.4.13 addresses discoverability in source, with live visual verification still BLOCKED. Continue any future validation against the installed candidate and update this ledger with actual results before claiming M4 accepted.
+
+## M5A public source and hosted build
+
+| Requirement | Status | Actual evidence |
+|---|---|---|
+| Owner destination, visibility, licence and history choice | PASS | Owner chose personal `clemarc` public repository, MIT and audited existing history; Nearform excluded. D027. |
+| Publication audit and exclusion of local files | PASS | `docs/evidence/m5-publication-audit.json`; `output/`, `artifacts/`, weights, audio and signing material excluded. Scope is a pattern/path audit. |
+| Local ad-hoc Release build and unit tests | PASS | `./scripts/build-local.sh --configuration Release --signing adhoc` succeeded on Apple Silicon/Xcode 27; strict/deep code signature verified. `./scripts/test-local.sh --suite unit` passed 43/43. Existing local packages/build cache was present, so a clean hosted runner is a separate gate. |
+| Public repository exists under `clemarc` | BLOCKED | Verify actual owner and public visibility after creation; a local remote alone is insufficient. |
+| Default-branch and PR clean-runner workflow | BLOCKED | Verify real GitHub Actions results. Local checks cannot substitute. |
+| Deliberately failing test makes CI fail | BLOCKED | Verify with an actual failure run, not workflow inspection alone. |
+| Development artifact and logs retained seven days | BLOCKED | Verify in a completed hosted run; artifact must be labelled NOT NOTARISED. |
+| Branch protection | BLOCKED | Configure after the real CI status check name exists; verify on GitHub. |
+| M4 real-device acceptance | BLOCKED | Existing microphone, target-app, UI, Ready/login and macOS 14 gates remain pending above. |

@@ -106,6 +106,6 @@ File decode timings are not release-to-insertion latency. Synthetic speech quali
 
 No M4 implementation work or routine approval is pending. All future check results must update ACCEPTANCE with evidence; do not call M4 accepted until the blocked gates pass. The untracked `output/pdf/Aparte-UX-options.pdf` was present at closure and left untouched/uncommitted; decide whether it belongs in the public-source scope during the M5 audit.
 
-## M5 readiness only — not begun
+## M5A status
 
-The owner plans to start M5 in a fresh session; no M5 work was performed here. That session must resolve public repository destination, visibility, licence/copyright and approved contents. Before publication, audit tracked files/history and untracked `output/` for private metadata, credentials and weights; review third-party/model notices. Any history rewrite needs an explicit decision. Only then configure a current pinned macOS/Xcode hosted build reusing local scripts, least privileges and no secrets in PR jobs. Optional public binaries require a separate authorization and Developer ID/notarisation credentials; do not weaken Gatekeeper or present this local build as a notarised release.
+In the separate M5A session, the owner authorised public source under `clemarc`, MIT licensing and publication of the audited history. The local CI and publication status is in `docs/PROGRESS.md`, `docs/ACCEPTANCE.md` and `docs/evidence/m5-publication-audit.json`. The untracked `output/` PDF remains excluded. Optional public binaries require separate authorization and Developer ID/notarisation credentials; the CI artifact is ad-hoc signed and not a public release.

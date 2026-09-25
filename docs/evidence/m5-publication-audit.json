@@ -1,0 +1,25 @@
+{
+  "date": "2026-09-25",
+  "scope": "All Git objects reachable from local refs through 49904c9, plus the 96 tracked paths at that commit and untracked output inventory",
+  "ownerDecision": {
+    "account": "clemarc",
+    "organisationExcluded": "nearform",
+    "visibility": "public",
+    "licence": "MIT",
+    "history": "publish audited existing history"
+  },
+  "historyCommits": 20,
+  "uniqueBlobObjectsScanned": 289,
+  "blobsOverTwoMiB": 0,
+  "matches": {
+    "privateKeyBlocks": 0,
+    "commonGitHubTokenPrefixes": 0,
+    "commonServiceTokenPrefixes": 0,
+    "personalHomePaths": 0,
+    "nearformReferences": 0
+  },
+  "commitAuthor": "Aparte Local Build Agent <aparte-agent@localhost.invalid> on all historical commits",
+  "trackedRecordingWeightBuildCredentialPaths": 0,
+  "untrackedExcluded": ["output/pdf/Aparte-UX-options.pdf"],
+  "limitations": "Pattern and path audit, not a proof against every possible secret format or private fact. Existing synthetic evaluation references and evidence remain public. Model weights, generated audio, local signing material and build outputs are excluded."
+}

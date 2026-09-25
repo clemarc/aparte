@@ -1,6 +1,6 @@
 # Third-party provenance
 
-The app's public licence/copyright owner is intentionally undecided until M5. No public repository/release is authorized by this build.
+The Aparté source is MIT licensed, copyright (c) 2026 clemarc. See the repository `LICENSE`. Publication of source and CI was authorised for M5A; public binary distribution remains deferred.
 
 - Argmax open-source Swift SDK / WhisperKit **1.1.0**, commit `1e2a163736dfa5a198e637ae44c114e1c6d5cc2d`: MIT; copied licence and vendored-source notices in `docs/third-party/`. Only the WhisperKit product (and its ArgmaxCore dependency) is linked. [Pinned source](https://github.com/argmaxinc/argmax-oss-swift/tree/1e2a163736dfa5a198e637ae44c114e1c6d5cc2d).
 - Swift Argument Parser **1.8.2**, commit `6a52f3251125d74daf04fcbd5e6f08a75d074382`: Apache 2.0, upstream CLI dependency resolved by SPM; not linked into Aparté. Licence included.
@@ -11,4 +11,4 @@ The app's public licence/copyright owner is intentionally undecided until M5. No
 - Manifest hashes were computed locally from downloaded immutable assets; they establish integrity against this manifest, not independent proof of upstream authenticity. Model weights are not committed or distributed.
 - Evaluation reference sentences, deterministic noise generator and manifest are original synthetic material made available under CC0-1.0 for reproducibility. Local macOS synthesized audio is not redistributed. Four voices/OS affect waveform reproducibility; the manifest is frozen. The M0 JFK feasibility fixture came from the pinned upstream test resources; it is not copied into this repository or the app.
 
-Before any separately authorized M5 publication, review all upstream notices and model provenance, choose the app licence/owner, and audit tracked history. No hosted workflow or release asset is prepared here.
+The upstream notices and model provenance above were reviewed for M5A. The model weights are downloaded separately and are not part of the public source or CI development artifact. New model/dependency pins require a provenance review before merging.

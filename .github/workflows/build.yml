@@ -1,0 +1,97 @@
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      run_integration:
+        description: 'Download the public small model and run a real offline inference smoke check'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: arm64 Xcode 27 build and unit tests
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Check toolchain
+        run: |
+          test "$(uname -m)" = arm64
+          xcodebuild -version
+          test "$(xcodebuild -version | head -n 1)" = 'Xcode 27.0'
+          xcrun swift --version
+          xcrun --sdk macosx --show-sdk-version
+
+      - name: Cache locked package sources
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            .build/repositories
+            .build/checkouts
+            artifacts/Packages
+          key: macos-arm64-xcode-27-spm-${{ hashFiles('Package.resolved', 'Aparte.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+
+      - name: Resolve locked dependencies
+        run: |
+          swift package resolve
+          git diff --exit-code -- Package.resolved Aparte.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+      - name: Build development app
+        run: ./scripts/build-local.sh --configuration Release --signing adhoc
+
+      - name: Run unit tests
+        run: ./scripts/test-local.sh --suite unit
+
+      - name: Package development build
+        run: |
+          mkdir -p artifacts/ci-package
+          ditto artifacts/DerivedData/Build/Products/Release/Aparte.app artifacts/ci-package/Aparte.app
+          printf '%s\n' 'Development build only. Ad-hoc signed; NOT NOTARISED; not a public release.' > artifacts/ci-package/DEVELOPMENT-ONLY.txt
+          ditto -c -k --sequesterRsrc --keepParent artifacts/ci-package artifacts/Aparte-adhoc-NOT-NOTARISED.zip
+          shasum -a 256 artifacts/Aparte-adhoc-NOT-NOTARISED.zip > artifacts/development-sha256.txt
+
+      - name: Upload development build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Aparte-development-adhoc-NOT-NOTARISED
+          path: |
+            artifacts/Aparte-adhoc-NOT-NOTARISED.zip
+            artifacts/development-sha256.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Run optional real-model smoke check
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_integration }}
+        run: |
+          ./scripts/install-model.sh small
+          ./scripts/make-ci-fixture.py
+          APARTE_FIXTURE=artifacts/fixtures/ci-silence.wav ./scripts/test-local.sh --suite integration
+          python3 -c 'import json; from pathlib import Path; result=json.loads(Path("artifacts/integration.log").read_text().splitlines()[-1]); assert result["noSpeech"] is True and result["outboundURLRequests"] == 0, result'
+
+      - name: Upload build and test logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: Aparte-build-and-test-logs
+          path: |
+            artifacts/toolchain.txt
+            artifacts/build-Release.log
+            artifacts/unit-tests.log
+            artifacts/integration.log
+          if-no-files-found: warn
+          retention-days: 7
