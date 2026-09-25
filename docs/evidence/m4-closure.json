@@ -1,0 +1,17 @@
+{
+  "date": "2026-09-25",
+  "decision": "D026",
+  "status": "M4 implementation checkpoint closed; formal acceptance pending",
+  "sourceHeadBeforeClosure": "1167994",
+  "installedCandidate": "Aparté 0.4.13, stable local development signature",
+  "existingVerification": {
+    "nativeReleaseBuild": "PASS, recorded in docs/evidence/model-picker.json",
+    "unitTests": "43 passed, 0 failed, recorded in docs/evidence/model-picker.json",
+    "offlineWhisperKitAndModelBenchmarks": "PASS for selected small and optional medium/turbo within their documented synthetic scope",
+    "signedLocalInstall": "PASS, recorded in docs/evidence/model-picker.json"
+  },
+  "closureTurnChecks": "Documentation and repository state review only; no new app build, model benchmark or live device check was performed.",
+  "acceptanceLimit": "M4 full acceptance remains BLOCKED; see docs/ACCEPTANCE.md and docs/HANDOFF.md. No blocked gate was waived or relabelled.",
+  "untrackedPreserved": "output/pdf/Aparte-UX-options.pdf exists outside Git and was neither inspected for content nor committed; review before M5 publication.",
+  "m5": "Not started in this session; owner plans a fresh session."
+}

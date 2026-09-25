@@ -1,6 +1,6 @@
 # Acceptance ledger — M0–M4
 
-**M4 NOT ACCEPTED.** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and evidence/verification.json. Real-device/target gates are blocked; owner-approved D013 replaces D008's operational clipboard restriction in 0.4.2. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
+**M4 IMPLEMENTATION CLOSED on 25 September 2026; FORMAL ACCEPTANCE PENDING (D026).** Feasible implementation and local checks are complete; final reproducibility evidence is recorded in PROGRESS and the evidence bundle. Real-device/target gates remain BLOCKED; the owner requested milestone closure, not a waiver of acceptance criteria. A PASS below applies only to its described evidence scope; source review or a unit test is not a pass for real OS behavior. Base's technical-term failure is retained; the selected small model passes the frozen synthetic quality gates.
 
 Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266a), Swift 6.4, SDK 27.0. Target is arm64 macOS 14+. Initial-build CLI preflight: microphone notDetermined; Accessibility/listening/posting false. During 0.4.1 testing the owner reports Microphone and Accessibility granted; the running app state remains unobserved because native inspection fails. Original absent-grant rows below describe the initial evidence, not a new claim that the owner has not granted access. No grants or security settings were changed. Native UI inspection failed (closed pipe; after restart, timeoutReached).
 
@@ -10,7 +10,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 |---|---|---|
 | §1 complete PRD/environment before implementation | PASS | Full PRD read; native toolchain/chip/RAM recorded before app work |
 | §1 local Git, preservation, sequential milestones | PASS | Original PRD preserved; local M0/M1/M2/M3/M4 commits; progress/decisions maintained after restart |
-| §1 no remote/CI/publication/credentials/M5 | PASS | No Git remote/workflow; ad-hoc local signature only; repository/history audit in final evidence |
+| §1 no remote/CI/publication/release credentials/M5 | PASS | No Git remote/workflow; D016's dedicated local-only development signing identity, no release credentials; repository/history audit in final evidence |
 | §1.3 source, documentation, evidence bundle | PASS | README and all required docs, frozen fixtures, raw synthetic benchmark evidence |
 | §2 native menu bar, Swift/AppKit/SwiftUI, arm64 macOS14 | PASS | Xcode target/shared scheme; Debug and Release builds; arm64 binary and plist target 14.0 |
 | §2 normal operation no Dock icon | PASS | LSUIElement/accessory policy; visual verification separately BLOCKED |
@@ -19,7 +19,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | §3 pinned OSS WhisperKit only | PASS | Exact revision/lockfiles; WhisperKit/ArgmaxCore only app engine, no Pro SDK |
 | §3 testable modules and reproducible entry points | PASS | build/test/benchmark scripts; generated project committed; clean final-source Debug build and 29 tests, actual small integration and Release runs (evidence/verification.json) |
 | §3 scripts fail rather than skip | PASS | Missing prereq exits 2; actual compile/test failures and base benchmark gate returned nonzero during development |
-| §3 local ad-hoc signing | PASS | codesign verify strict/deep; Signature=adhoc, no TeamIdentifier |
+| §3 local signing (D016 supersedes ad-hoc) | PASS | Certificate-backed local development signature, strict/deep verification and cross-version designated-requirement continuity; no Developer ID or release credential |
 | M0 real production engine spike | PASS | Public 11 s JFK fixture actual transcription, M0 timings recorded |
 | M0 cold offline reload | PASS | Fresh process under network denial; actual text result and preparation/decode timings |
 | macOS14 minimum runtime coverage | BLOCKED | No macOS14 device/runtime supplied; deployment target is not runtime evidence |
@@ -106,7 +106,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | Ambiguous AX/delayed paste/concurrent copy/rich/lazy/quit/crash | BLOCKED | Real clipboard ownership/materialization/timeout tests PASS; AX/target/quit tests blocked |
 | Stereo/rates/silence/quiet/59/60/unplug/change | BLOCKED | File conversion and synthetic audio tests PASS; live route/unplug/capture boundaries need device |
 | Interrupted/corrupt/space/offline-tokenizer/bad selection/switch/revoke | BLOCKED | Store/engine tests PASS; actual permission revocation and visual model-failure UI remain unexercised; real post-verification Core ML rollback passed |
-| Local Release app | PASS | Native Release build, ad-hoc signature verified, stable install path and public small assets present |
+| Local Release app | PASS | Native 0.4.13 Release build, stable local development signature verified, stable install path and verified small/medium/turbo assets present; historical first ad-hoc build retained in earlier evidence |
 | Native visual/accessibility onboarding and indicators | BLOCKED | Computer-use connection closed/timeout; code-based accessible labels are not visual/VoiceOver evidence |
 | M0–M4 full acceptance | BLOCKED | Above device/runtime/target/paste-consumption gates; do not label M4 accepted |
 
@@ -276,3 +276,12 @@ External insertion, microphone timing/quality and macOS 14 runtime gates remain 
 | Owner sees Small and large-v3 turbo and can prepare them | BLOCKED | Native desktop UI pipe closed on two attempts; no live picker/Prepare interaction was observed. Owner can test in the installed 0.4.13 Settings window. |
 
 **M4 is not accepted**; model engine/benchmark evidence from 0.4.12 remains valid and unchanged.
+
+## 25 September 2026 closure checkpoint
+
+| Requirement | Status | Actual evidence |
+|---|---|---|
+| Feasible M0–M4 implementation and local handoff closed | PASS | Owner requested closure after 0.4.13 signed local install; Release/43-unit-test, offline inference/benchmark and documentation evidence already recorded. D026 marks implementation complete without rerunning unchanged checks. |
+| Full M4 PRD exit acceptance | BLOCKED | Actual cross-app insertion and clipboard consumption matrix, consented live microphone/timing, native visual/VoiceOver, Ready idle/login and macOS 14 runtime checks remain unverified. No status above was converted to PASS for closure. |
+
+The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL remain recorded; small is the selected quality-passing default and 0.4.13 addresses discoverability in source, with live visual verification still BLOCKED. Continue any future validation against the installed candidate and update this ledger with actual results before claiming M4 accepted.
