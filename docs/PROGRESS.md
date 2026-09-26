@@ -8,6 +8,8 @@ The public `clemarc/aparte` repository now exists and includes the audited histo
 
 M5A [PR #1](https://github.com/clemarc/aparte/pull/1) passed its clean arm64 Xcode 27 check with Node 24 action releases and both artifacts. An isolated hosted run with one deliberately failing unit test failed as expected with exit 1; the temporary remote branch was deleted, and the evidence is in `docs/evidence/m5-ci-run2.json`. The [M5A milestone](https://github.com/clemarc/aparte/milestone/1) tracks public-source/CI completion. GitHub requested owner passkey reauthentication while saving the `main` protection rule; verify actual protection before marking that gate complete. M4 real-device checks remain pending.
 
+On 26 September 2026, the owner completed GitHub reauthentication and the saved `main` protection rule was verified in its edit form (`docs/evidence/m5-branch-protection.json`). [PR #1](https://github.com/clemarc/aparte/pull/1) merged with a passing final PR check; the resulting [main run #5](https://github.com/clemarc/aparte/actions/runs/36230390441) also passed. **M5A public-source and hosted-build implementation is complete.** This does not claim M4 real-device acceptance or a public app release. No release publishing workflow has been added.
+
 ## Historical M4 status
 
 ## Current status
