@@ -228,3 +228,8 @@
 - Status: adopted for the M5A pull-request check. The first hosted `main` build passed but GitHub warned that its pinned checkout, cache and upload-artifact releases used deprecated Node 20 and were being forced onto Node 24.
 - Chosen: pin official Node 24 releases of `actions/checkout` v5.0.1, `actions/cache` v5.0.0 and `actions/upload-artifact` v6.0.0 to their verified tag commit SHAs. Preserve the existing read-only PR token, locked dependency cache key, ad-hoc development artifact label and seven-day retention.
 - Evidence/uncertainty: the initial hosted run is recorded in `docs/evidence/m5-ci-run1.json`; the new tag SHAs were checked against the upstream Git refs. A passing hosted pull-request run must still verify the new pins on `xcode-27` before this change is accepted. This affects CI only and is easy to revert.
+
+## D029 — Protect public main after hosted checks
+- Status: adopted and verified on 26 September 2026 after owner GitHub passkey reauthentication. The rule applies to `main` in the personal `clemarc/aparte` repository.
+- Chosen: require a pull request, the `arm64 Xcode 27 build and unit tests` status from GitHub Actions, an up-to-date branch and resolved review conversations. Apply these rules to administrators, and disallow force pushes and branch deletion. Do not require an approval count because this is a solo-maintainer repository and the author cannot approve their own PR.
+- Evidence: GitHub displayed the rule-created confirmation and the saved edit form was reopened; each selected option is recorded in `docs/evidence/m5-branch-protection.json`. This is an observed configuration, not a force-push/deletion trial. A future collaborator or changed CI job name would require re-review of the rule.

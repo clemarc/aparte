@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-26",
+  "repository": "https://github.com/clemarc/aparte",
+  "settingsPage": "https://github.com/clemarc/aparte/settings/branches",
+  "status": "PASS",
+  "observed": "GitHub showed 'Branch protection rule created' and 'main Currently applies to 1 branch'; the saved edit form was reopened and inspected.",
+  "branchPattern": "main",
+  "requirePullRequest": true,
+  "requireApprovals": false,
+  "requireStatusChecks": true,
+  "requiredCheck": "arm64 Xcode 27 build and unit tests",
+  "checkSource": "GitHub Actions",
+  "requireUpToDateBranch": true,
+  "requireConversationResolution": true,
+  "applyToAdministrators": true,
+  "allowForcePushes": false,
+  "allowDeletions": false,
+  "limitations": "This is a UI inspection of the saved rule, not a destructive attempt to force-push or delete main. M4 real-device acceptance remains separate."
+}
