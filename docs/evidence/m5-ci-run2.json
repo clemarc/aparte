@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-26",
+  "repository": "https://github.com/clemarc/aparte",
+  "pullRequest": "https://github.com/clemarc/aparte/pull/1",
+  "pullRequestCommit": "da24efd5965e9bd1c1c46027d97bcca5a994b757",
+  "pullRequestWorkflowRun": "https://github.com/clemarc/aparte/actions/runs/36228760698",
+  "pullRequestStatus": "PASS",
+  "pullRequestDuration": "2m 53s",
+  "pullRequestArtifacts": [
+    "Aparte-build-and-test-logs",
+    "Aparte-development-adhoc-NOT-NOTARISED"
+  ],
+  "pullRequestAnnotations": "No deprecation warning was shown after moving to Node 24 action releases.",
+  "failureProbeCommit": "7faabb4206f7f62832e204c368a8821a1f50e905",
+  "failureProbeWorkflowRun": "https://github.com/clemarc/aparte/actions/runs/36228904837",
+  "failureProbeStatus": "EXPECTED FAILURE",
+  "failureProbeDuration": "3m 3s",
+  "failureProbeObserved": "PolicyTests.testSanitization reported the intentional XCTFail at line 6; 43 tests executed with exactly one failure; job exited 1; build and test logs artifact uploaded. The temporary remote probe branch was deleted after verification and was never merged.",
+  "limitations": "Hosted checks do not exercise the real microphone, macOS permissions, cross-app insertion, visual accessibility or macOS 14 runtime. The ad-hoc artifact is not a public binary release."
+}
