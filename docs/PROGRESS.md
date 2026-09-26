@@ -6,6 +6,8 @@ The owner authorised a public repository under personal account `clemarc` (not N
 
 The public `clemarc/aparte` repository now exists and includes the audited history plus the owner's initial MIT commit, merged without a force push. Its first clean `main` GitHub Actions run passed in 3m 28s and uploaded labelled development-build and log artifacts (`docs/evidence/m5-ci-run1.json`). The run warned that the pinned helper actions use deprecated Node 20; a follow-up PR updates them to verified Node 24 releases. PR validation, a hosted intentional failure, and branch protection remain separate M5A gates. No public binary release has been made.
 
+M5A [PR #1](https://github.com/clemarc/aparte/pull/1) passed its clean arm64 Xcode 27 check with Node 24 action releases and both artifacts. An isolated hosted run with one deliberately failing unit test failed as expected with exit 1; the temporary remote branch was deleted, and the evidence is in `docs/evidence/m5-ci-run2.json`. The [M5A milestone](https://github.com/clemarc/aparte/milestone/1) tracks public-source/CI completion. GitHub requested owner passkey reauthentication while saving the `main` protection rule; verify actual protection before marking that gate complete. M4 real-device checks remain pending.
+
 ## Historical M4 status
 
 ## Current status
