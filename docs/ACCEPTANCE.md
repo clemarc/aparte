@@ -294,9 +294,10 @@ The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL re
 | Publication audit and exclusion of local files | PASS | `docs/evidence/m5-publication-audit.json`; `output/`, `artifacts/`, weights, audio and signing material excluded. Scope is a pattern/path audit. |
 | Local ad-hoc Release build and unit tests | PASS | `./scripts/build-local.sh --configuration Release --signing adhoc` succeeded on Apple Silicon/Xcode 27; strict/deep code signature verified. `./scripts/test-local.sh --suite unit` passed 43/43. Existing local packages/build cache was present, so a clean hosted runner is a separate gate. |
 | Local test-command failure propagation | PASS | A temporary `XCTFail("intentional CI failure probe")` in `PolicyTests.testSanitization` made `./scripts/test-local.sh --suite unit` exit nonzero with 1/43 failures. The test file was restored byte-for-byte and the working tree rechecked clean. Hosted CI failure propagation remains a separate gate. |
-| Public repository exists under `clemarc` | BLOCKED | Verify actual owner and public visibility after creation; a local remote alone is insufficient. |
-| Default-branch and PR clean-runner workflow | BLOCKED | Verify real GitHub Actions results. Local checks cannot substitute. |
+| Public repository exists under `clemarc` | PASS | GitHub reported `full_name=clemarc/aparte`, `private=false`, default branch `main`; UI showed the public badge and 24 commits after the no-force push. The owner's initial MIT commit remains in the merge ancestry. |
+| Default-branch clean-runner workflow | PASS | [Build and test run #1](https://github.com/clemarc/aparte/actions/runs/36150432825) passed on `main` at `675d580` in 3m 28s; arm64 Xcode 27 build and unit job succeeded. `docs/evidence/m5-ci-run1.json`. |
+| Pull-request clean-runner workflow | BLOCKED | A PR check must pass before this is claimed. |
 | Deliberately failing test makes CI fail | BLOCKED | Verify with an actual failure run, not workflow inspection alone. |
-| Development artifact and logs retained seven days | BLOCKED | Verify in a completed hosted run; artifact must be labelled NOT NOTARISED. |
+| Development artifact and logs retained seven days | PASS | Successful run #1 exposed `Aparte-development-adhoc-NOT-NOTARISED` and `Aparte-build-and-test-logs`; workflow sets `retention-days: 7`. Actual seven-day expiration was not observed. |
 | Branch protection | BLOCKED | Configure after the real CI status check name exists; verify on GitHub. |
 | M4 real-device acceptance | BLOCKED | Existing microphone, target-app, UI, Ready/login and macOS 14 gates remain pending above. |

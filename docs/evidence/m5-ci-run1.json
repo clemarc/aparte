@@ -1,0 +1,18 @@
+{
+  "date": "2026-09-25",
+  "repository": "https://github.com/clemarc/aparte",
+  "commit": "675d5805e5ec87436f6660462bdf82b1f864838d",
+  "workflowRun": "https://github.com/clemarc/aparte/actions/runs/36150432825",
+  "event": "push",
+  "branch": "main",
+  "status": "PASS",
+  "job": "arm64 Xcode 27 build and unit tests",
+  "duration": "3m 28s",
+  "artifacts": [
+    "Aparte-build-and-test-logs",
+    "Aparte-development-adhoc-NOT-NOTARISED"
+  ],
+  "artifactRetentionDaysConfigured": 7,
+  "warning": "GitHub forced Node 20-based checkout/cache/upload actions onto Node 24; follow-up PR pins their official Node 24 releases.",
+  "limitations": "Hosted build and unit tests do not validate microphone, permissions, cross-app insertion, macOS 14 runtime, or public binary distribution. PR-runner and intentional hosted failure checks remain separate."
+}

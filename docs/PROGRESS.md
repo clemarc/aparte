@@ -4,6 +4,8 @@
 
 The owner authorised a public repository under personal account `clemarc` (not Nearform), chose the MIT licence and chose to publish the audited existing history. M5A preparation adds the licence, changelog, contribution/release guidance, arm64 Xcode 27 build/test workflow and an explicit ad-hoc CI build mode. The changed ad-hoc Release build passed with a strict/deep signature check; all 43 unit tests passed. A temporarily failing assertion made the local test script exit nonzero; the test file was restored. The untracked `output/pdf/Aparte-UX-options.pdf` is excluded through `.gitignore` and is not part of public source. `docs/evidence/m5-publication-audit.json` records the scoped history scan. Public repository creation, clean hosted results and branch protection are tracked separately in `docs/ACCEPTANCE.md`; do not infer them from a local build. M4 real-device acceptance remains pending.
 
+The public `clemarc/aparte` repository now exists and includes the audited history plus the owner's initial MIT commit, merged without a force push. Its first clean `main` GitHub Actions run passed in 3m 28s and uploaded labelled development-build and log artifacts (`docs/evidence/m5-ci-run1.json`). The run warned that the pinned helper actions use deprecated Node 20; a follow-up PR updates them to verified Node 24 releases. PR validation, a hosted intentional failure, and branch protection remain separate M5A gates. No public binary release has been made.
+
 ## Historical M4 status
 
 ## Current status
