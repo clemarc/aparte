@@ -102,5 +102,17 @@
     "sourceCommit": "f057fa85ffd26a918d153b639e11713817b336dc"
   },
   "earlyDraftAttempt": "BLOCKED as expected before exact-main CI succeeded; no upload on that attempt",
-  "realMacValidationIssue": "https://github.com/clemarc/aparte/issues/5"
+  "realMacValidationIssue": "https://github.com/clemarc/aparte/issues/5",
+  "ownerReports": [
+    {
+      "date": "2026-09-28",
+      "tag": "v0.4.13-beta.1",
+      "report": "Ok it works",
+      "context": "Response to request to download and run the draft beta",
+      "scope": "Owner-reported first-beta smoke usability; not an agent-observed device test",
+      "environment": "Unspecified; existing versus fresh Mac/account clarification requested",
+      "twoVersionPermissionPersistence": "Not tested in this report",
+      "publicationAuthorisation": false
+    }
+  ]
 }
