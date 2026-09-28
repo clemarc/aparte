@@ -1,4 +1,10 @@
-# Aparté progress — M0–M5A
+# Aparté progress — M0–M5 beta tooling
+
+## Stable beta signing implementation — 28 September 2026
+
+Full local preparation of `v0.4.13-beta.1` at `86bff05` passed: native Release build, 43 unit tests, beta signing, ZIP extraction and signed-provenance verification. Real negative checks reject both corrupted archives and forged external source metadata with recomputed checksums. Package evidence is recorded in `docs/evidence/beta-signing.json`. This is an internal review candidate, not a published release/tag; the final release command requires a fresh package from exact protected main. Hosted PR verification and a real draft upload remain separate checks. Fresh-Mac launch and grant persistence remain BLOCKED.
+
+Owner approved D030: a dedicated persistent self-signed beta identity, local packaging and manual GitHub draft prereleases; Developer ID/notarisation/hosted signing secrets/automatic publication remain deferred. The explicit beta profile uses a separate owner-only keychain and committed public pin. Real different Debug/Release executables have compatible beta requirements; tampered/ad-hoc copies and development/beta cross-profile signatures are rejected. The development identity remains the default. Packaging builds/tests committed source, embeds signed source/tag provenance and verifies the extracted ZIP; the draft command requires exact current main, annotated remote tag and passing hosted CI. Releases are chosen on demand and notes accumulate since the last published release, not each version bump. Full packaging and hosted PR validation are the next checks in this checkpoint. No app installation, trust-rule change, real grant/update validation or public binary publication is claimed. M4 acceptance and fresh-Mac beta launch/permission checks remain pending.
 
 ## M5A public-source and CI checkpoint — 25 September 2026
 

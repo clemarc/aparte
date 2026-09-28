@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "profile": "beta",
+  "bundleIdentifier": "dev.aparte.Aparte",
+  "certificateSHA1": "F4816E62A76EA46301C73BE830323C2B38C54BD0",
+  "certificateSHA256": "0F630BF0934879160F880ECB8839E02018E0C11BC16E5D44EEB616EEFCB0BA9D",
+  "designatedRequirement": "identifier \"dev.aparte.Aparte\" and anchor H\"F4816E62A76EA46301C73BE830323C2B38C54BD0\"",
+  "notarised": false
+}

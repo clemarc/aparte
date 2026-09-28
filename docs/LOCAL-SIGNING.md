@@ -36,6 +36,8 @@ Do not delete/recreate this directory between builds or copy it into the reposit
 
 ## Evidence and limits
 
+The signer now also accepts `--profile beta` under D030. Omitting this option preserves the development identity and existing commands. The beta profile uses a different keychain, certificate and public pin; it does not migrate the installed development app. See [release tracking](RELEASING.md). The development key remains local-only.
+
 `test-signing-local.py` compares Debug and Release binaries with different hashes, verifies both against each other's actual designated requirement, and rejects tampered resources and ad-hoc replacements. It never opens the microphone or changes grants. Evidence is in `docs/evidence/stable-signing.json`; live permission persistence remains separate.
 
 Apple describes permission checks across updates in [TN3127](https://developer.apple.com/documentation/technotes/tn3127-inside-code-signing-requirements) and local self-signed identities in its [Code Signing Guide](https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html). This locally signed app is not a notarised distributable release.

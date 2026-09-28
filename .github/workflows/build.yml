@@ -46,6 +46,9 @@ jobs:
             artifacts/Packages
           key: macos-arm64-xcode-27-spm-${{ hashFiles('Package.resolved', 'Aparte.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
 
+      - name: Check Python tooling syntax without accessing signing identities
+        run: python3 -c 'from pathlib import Path; [compile(p.read_text(), str(p), "exec") for p in Path("scripts").glob("*.py")]'
+
       - name: Resolve locked dependencies
         run: |
           swift package resolve
