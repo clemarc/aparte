@@ -40,6 +40,8 @@ def main():
                for r in runs.get('workflow_runs', [])):
         raise RuntimeError('No successful main build/test run exists for this source commit.')
     pages = json.loads(beta.run(['gh', 'api', '--paginate', '--slurp', f'repos/{beta.REPOSITORY}/releases?per_page=100']))
+    if any(release.get('tag_name') == tag for page in pages for release in page):
+        raise RuntimeError('A release/draft already exists for this tag. Inspect it rather than overwriting assets.')
     published = [release for page in pages for release in page if not release.get('draft') and release.get('published_at')]
     notes_flags = ['--generate-notes']
     if published:

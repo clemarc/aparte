@@ -72,6 +72,8 @@ def validate_package(directory):
     metadata = json.loads((directory / 'release.json').read_text())
     version = beta_version(metadata['tag'])
     expected = signing_info()
+    if metadata.get('schema') != 1 or metadata.get('architecture') != 'arm64' or metadata.get('appVersion') != version:
+        raise RuntimeError('Unsupported or inconsistent release metadata.')
     if metadata.get('signing') != expected or metadata.get('repository') != REPOSITORY:
         raise RuntimeError('Archive metadata has the wrong repository/signing identity.')
     if not re.fullmatch(r'[0-9a-f]{40}', metadata.get('sourceCommit', '')):
@@ -93,6 +95,8 @@ def validate_package(directory):
                 raise RuntimeError('Unexpected archive member.')
             if stat.S_ISLNK(member.external_attr >> 16):
                 raise RuntimeError('Beta archive must not contain symlinks.')
+            if path.parts[0] == '__MACOSX' and not member.is_dir() and not path.name.startswith('._'):
+                raise RuntimeError('Unexpected resource-fork metadata member.')
     with tempfile.TemporaryDirectory(prefix='beta-roundtrip-', dir=ROOT / 'artifacts') as temporary:
         run(['/usr/bin/ditto', '-x', '-k', archive, temporary])
         app = Path(temporary) / 'Aparte Beta/Aparte.app'
@@ -102,6 +106,19 @@ def validate_package(directory):
             raise RuntimeError('Signed app provenance does not match release metadata.')
         if metadata.get('appBuild') != info['CFBundleVersion'] or metadata.get('minimumMacOS') != info['LSMinimumSystemVersion']:
             raise RuntimeError('Release metadata does not match the app.')
+        payload = app.parent
+        if {p.name for p in payload.iterdir()} != {'Aparte.app', 'INSTALL.md', 'LICENSE', 'THIRD_PARTY.md', 'third-party'}:
+            raise RuntimeError('Unexpected beta payload files.')
+        notices = {'INSTALL.md': 'docs/BETA-INSTALL.md', 'LICENSE': 'LICENSE', 'THIRD_PARTY.md': 'docs/THIRD_PARTY.md'}
+        for source in run(['git', 'ls-tree', '-r', '--name-only', metadata['sourceCommit'], 'docs/third-party']).splitlines():
+            notices[source.removeprefix('docs/')] = source
+        actual_notices = {str(p.relative_to(payload)) for p in (payload / 'third-party').rglob('*') if p.is_file()}
+        if actual_notices != {p for p in notices if p.startswith('third-party/')}:
+            raise RuntimeError('Unexpected beta licence files.')
+        for name, source in notices.items():
+            blob = subprocess.run(['git', 'show', f'{metadata["sourceCommit"]}:{source}'], cwd=ROOT, capture_output=True)
+            if blob.returncode or (payload / name).read_bytes() != blob.stdout:
+                raise RuntimeError('Packaged notices differ from the signed source commit.')
     return metadata
 
 

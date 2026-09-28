@@ -44,5 +44,16 @@ with tempfile.TemporaryDirectory(prefix='beta-package-negative-', dir=beta.ROOT 
         stream.write(b'corruption-probe')
     must_reject(directory, 'Archive checksum')
     report['corruptedArchiveRejected'] = 'PASS'
+    shutil.rmtree(directory)
+    shutil.copytree(args.directory, directory)
+    import zipfile
+    archive = directory / metadata['archive']
+    with zipfile.ZipFile(archive, 'a') as stream:
+        stream.writestr('Aparte Beta/Unexpected.command', 'echo unwanted-extra-file\n')
+    modified = dict(metadata, archiveSHA256=beta.digest(archive))
+    (directory / 'release.json').write_text(json.dumps(modified, indent=2) + '\n')
+    (directory / 'SHA256SUMS').write_text(f'{beta.digest(archive)}  {archive.name}\n{beta.digest(directory / "release.json")}  release.json\n')
+    must_reject(directory, 'Unexpected beta payload')
+    report['extraPayloadWithRecomputedChecksumsRejected'] = 'PASS'
 (beta.ROOT / 'artifacts/beta-package-checks.json').write_text(json.dumps(report, indent=2) + '\n')
 print(json.dumps(report, indent=2))

@@ -23,7 +23,8 @@
     "sourceCommit": "86bff0513d1b91d878d46365f96f4cf925364519",
     "archiveSHA256": "ac050d83d9f88c14defe90e72b1bbadcc1e1b6cab00e95216119f839a70147bc",
     "forgedSourceWithRecomputedChecksumsRejected": "PASS",
-    "corruptedArchiveRejected": "PASS"
+    "corruptedArchiveRejected": "PASS",
+    "extraPayloadWithRecomputedChecksumsRejected": "PASS"
   },
   "releaseBuild": "PASS",
   "unitTests": {
