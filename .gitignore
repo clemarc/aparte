@@ -15,8 +15,12 @@ xcuserdata/
 
 # Local signing private material must never enter the repository.
 *.key
+*.pem
 *.p12
 *.pfx
 *.keychain
 *.keychain-db
+keychain-password
+**/DevelopmentSigning/
+**/BetaSigning/
 __pycache__/

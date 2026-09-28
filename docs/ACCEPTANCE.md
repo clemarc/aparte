@@ -308,7 +308,7 @@ The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL re
 |---|---|---|
 | Distinct persistent beta identity; development remains default | PASS | Explicit profile selects a separate owner-only keychain. Setup rerun reused the public fingerprint; development fingerprint matches D016. `docs/BETA-SIGNING.json`. |
 | Real signature continuity and negative checks | PASS | Different compiled Debug/Release executables signed as beta mutually satisfy their actual requirements. Tampered resources, ad-hoc replacement and development/beta cross-profile signatures are rejected. `docs/evidence/beta-signing.json`. |
-| Local beta archive build/test/sign/extraction | BLOCKED | Full prepare command is the next implementation check; do not infer ZIP reproduction from signature tests. |
+| Local beta archive build/test/sign/extraction | PASS | Actual `v0.4.13-beta.1` candidate from committed `86bff05`: Release build, 43/43 unit tests, self-signed ZIP extraction/signature/provenance verification. Corrupted ZIP and forged source metadata with recomputed checksums rejected. `docs/evidence/beta-signing.json`. |
 | Protected main and exact-tag draft prerelease | BLOCKED | Command implemented; real draft upload has not been performed. Never automatically publishes. |
 | Downloaded fresh-Mac launch with quarantine intact | BLOCKED | Requires real downloaded launch using normal per-app Open Anyway UI; signature validity is not Gatekeeper acceptance. |
 | Microphone/Accessibility remain usable across two beta versions | BLOCKED | Requires real grant, update and capability checks on a fresh Mac; certificate compatibility is insufficient. |

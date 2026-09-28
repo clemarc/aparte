@@ -17,5 +17,18 @@
   "permissionPersistence": "BLOCKED: no fresh-Mac grant/update capability test",
   "gatekeeperDownloadedLaunch": "BLOCKED: no fresh-Mac downloaded launch test",
   "date": "2026-09-28",
-  "decision": "D030"
+  "decision": "D030",
+  "package": {
+    "archiveRoundTrip": "PASS",
+    "sourceCommit": "86bff0513d1b91d878d46365f96f4cf925364519",
+    "archiveSHA256": "ac050d83d9f88c14defe90e72b1bbadcc1e1b6cab00e95216119f839a70147bc",
+    "forgedSourceWithRecomputedChecksumsRejected": "PASS",
+    "corruptedArchiveRejected": "PASS"
+  },
+  "releaseBuild": "PASS",
+  "unitTests": {
+    "count": 43,
+    "failures": 0
+  },
+  "privateMaterial": "Separate owner-only BetaSigning directory outside Git; development identity retained; no trust settings changed"
 }
