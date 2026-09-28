@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='beta-signing-check-', dir=ARTIFACTS) as
     apps, records = {}, {}
     for configuration in ['Debug', 'Release']:
         app = Path(temporary) / configuration / 'Aparte.app'
-        shutil.copytree(ARTIFACTS / f'DerivedData/Build/Products/{configuration}/Aparte.app', app)
+        shutil.copytree(ARTIFACTS / f'StandardDerivedData/Build/Products/{configuration}/Aparte.app', app)
         command([SIGNER, '--profile', 'beta', 'sign', app])
         output = command(['/usr/bin/codesign', '-d', '-r-', app])
         requirement = next(line.removeprefix('designated => ') for line in output.splitlines() if line.startswith('designated => '))
@@ -35,9 +35,9 @@ with tempfile.TemporaryDirectory(prefix='beta-signing-check-', dir=ARTIFACTS) as
     command([SIGNER, '--profile', 'beta', 'compare', apps['Debug'], apps['Release']])
     # Development and beta identities must be distinct, in both directions.
     command([SIGNER, 'verify', apps['Release']], succeeds=False)
-    installed = Path.home() / 'Applications/Aparte.app'
-    command([SIGNER, 'verify', installed])
-    command([SIGNER, '--profile', 'beta', 'verify', installed], succeeds=False)
+    development = ARTIFACTS / 'DerivedData/Build/Products/Release/Aparte Dew.app'
+    command([SIGNER, 'verify', development])
+    command([SIGNER, '--profile', 'beta', 'verify', development], succeeds=False)
     negative = Path(temporary) / 'negative/Aparte.app'
     shutil.copytree(apps['Release'], negative)
     resource = negative / 'Contents/Resources/Compatibility.json'

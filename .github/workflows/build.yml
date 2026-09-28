@@ -63,7 +63,7 @@ jobs:
       - name: Package development build
         run: |
           mkdir -p artifacts/ci-package
-          ditto artifacts/DerivedData/Build/Products/Release/Aparte.app artifacts/ci-package/Aparte.app
+          ditto 'artifacts/DerivedData/Build/Products/Release/Aparte Dew.app' 'artifacts/ci-package/Aparte Dew.app'
           printf '%s\n' 'Development build only. Ad-hoc signed; NOT NOTARISED; not a public release.' > artifacts/ci-package/DEVELOPMENT-ONLY.txt
           ditto -c -k --sequesterRsrc --keepParent artifacts/ci-package artifacts/Aparte-adhoc-NOT-NOTARISED.zip
           shasum -a 256 artifacts/Aparte-adhoc-NOT-NOTARISED.zip > artifacts/development-sha256.txt

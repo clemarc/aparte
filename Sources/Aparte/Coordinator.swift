@@ -8,6 +8,7 @@ import AparteSpeech
     @Published private(set) var state: SessionState = .needsSetup
     @Published var notice = "Install a model and review permissions to get started."
     @Published private(set) var permissionSummary = PermissionStatus().summary
+    @Published private(set) var microphonePermission = PermissionStatus().microphone
     @Published var preferences = Preferences.decode(UserDefaults.standard.data(forKey: "preferences.v1"))
     @Published private(set) var recoveryText: String?
     @Published private(set) var recoveryUncertain = false
@@ -21,6 +22,7 @@ import AparteSpeech
     @Published var bindingTest = false
     @Published var recordingBinding = false { didSet { hotkey.capturingBinding = recordingBinding } }
     @Published private(set) var readinessSummary = "Checking setup…"
+    @Published private(set) var setupReadiness = SetupReadiness(microphone: false, accessibility: false, model: false, shortcut: false)
     @Published private(set) var shortcutStatus = "Not checked"
     @Published private(set) var testStatus = "Choose a test below. Audio and results stay in memory."
     @Published private(set) var lastResultWasTest = false
@@ -60,7 +62,7 @@ import AparteSpeech
     private var watchdog: Timer?
     private var observers: [NSObjectProtocol] = []
     private var memoryPressure: DispatchSourceMemoryPressure?
-    let modelsRoot = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Aparte/Models", isDirectory: true)
+    let modelsRoot = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent(Bundle.main.bundleIdentifier == "dev.aparte.Aparte.dew" ? "Aparte Dew/Models" : "Aparte/Models", isDirectory: true)
     let catalog: ModelCatalog?
     var onStatus: (() -> Void)?
 
@@ -111,7 +113,9 @@ import AparteSpeech
     }
     private func refresh() {
         let permissions = PermissionStatus()
+        microphonePermission = permissions.microphone
         let readiness = SetupReadiness(microphone: permissions.microphone == .authorized, accessibility: permissions.accessibility, model: modelLoaded, shortcut: hotkey.isRunning && !tapFailed)
+        setupReadiness = readiness
         readinessSummary = readiness.canDictate ? "Ready. Dictation works across apps in accessible editable text fields; other contexts use Recovery." : readiness.blockers.joined(separator: " · ")
         if preparation != nil && !installing { readinessSummary = "Preparing \(preferences.model)… Wait for the model to finish loading." }
         shortcutStatus = hotkey.isRunning ? "Global shortcut listener active" : "Global listener unavailable. The test text box can still receive the shortcut inside Aparté."
@@ -245,6 +249,10 @@ import AparteSpeech
         }
     }
     private func release() {
+        if bindingTest, machine.id == nil {
+            testStatus = "\(hotkey.lastDelivery): shortcut pressed and released. No audio recorded."
+            notice = testStatus; onStatus?(); return
+        }
         guard let id = machine.id else { return }
         if machine.state == .startingCapture { cancel("Released before capture started; nothing recorded."); return }
         guard machine.release(id) else { return }

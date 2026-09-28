@@ -2,7 +2,7 @@
 """Persistent development or beta signing. Private material stays outside Git.
 
 No trust settings, TCC grants, system keychains or Apple accounts are modified.
-The default profile preserves the existing development identity. The beta profile
+The default profile reuses the existing development certificate for the Dew app identifier. The beta profile
 uses a separate owner-authorized self-signed identity. The key is non-exportable
 after import; only codesign receives
 access. The dedicated keychain and its unlock secret have owner-only permissions.
@@ -22,7 +22,7 @@ ROOT = Path.home() / 'Library/Application Support/Aparte/DevelopmentSigning'
 KEYCHAIN = ROOT / 'development.keychain-db'
 CONFIG = ROOT / 'identity.json'
 PASSWORD = ROOT / 'keychain-password'
-IDENTIFIER = 'dev.aparte.Aparte'
+IDENTIFIER = 'dev.aparte.Aparte.dew'
 PROFILE = 'development'
 PURPOSE = 'Aparté local development only'
 COMMON_NAME = 'Aparte Local Development'
@@ -120,7 +120,7 @@ authorityKeyIdentifier = keyid:always
 
 
 def main():
-    global ROOT, KEYCHAIN, CONFIG, PASSWORD, PROFILE, PURPOSE, COMMON_NAME
+    global ROOT, KEYCHAIN, CONFIG, PASSWORD, PROFILE, PURPOSE, COMMON_NAME, IDENTIFIER
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=['development', 'beta'], default='development')
     parser.add_argument('action', choices=['setup', 'sign', 'verify', 'requirement', 'compare', 'public-info'])
@@ -129,6 +129,7 @@ def main():
     args = parser.parse_args()
     PROFILE = args.profile
     if PROFILE == 'beta':
+        IDENTIFIER = 'dev.aparte.Aparte'
         ROOT = Path.home() / 'Library/Application Support/Aparte/BetaSigning'
         KEYCHAIN = ROOT / 'beta.keychain-db'
         CONFIG = ROOT / 'identity.json'

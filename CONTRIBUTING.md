@@ -10,7 +10,7 @@ swift package resolve
 ./scripts/test-local.sh --suite unit
 ```
 
-The ad-hoc app is a development artifact. It may need separate macOS privacy grants and is not a notarised download. The owner's stable local signing path remains `./scripts/local-signing.py setup` followed by the default build command. Do not commit signing material, model weights, build output, personal recordings or transcripts.
+Local and CI builds are named Aparte Dew / Aparte Dew.app. The ad-hoc app is a development artifact. It may need separate macOS privacy grants and is not a notarised download. The owner's stable local signing path remains `./scripts/local-signing.py setup` followed by the default build command. Do not commit signing material, model weights, build output, personal recordings or transcripts.
 
 Pull requests should explain the user-visible change, update [CHANGELOG.md](CHANGELOG.md) under Unreleased, and include relevant automated results. CI runs the build and unit tests without secrets. Model inference and macOS permission, microphone, accessibility and cross-app insertion checks require the real-Mac process in [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). A passing PR build does not imply those checks passed.
 

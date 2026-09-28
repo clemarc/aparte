@@ -319,3 +319,37 @@ The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL re
 The first [beta draft](https://github.com/clemarc/aparte/releases/tag/untagged-8b8502c8d609aca74d0c) is available to the owner for review; it is not published. Real-Mac beta checks are tracked in [issue #5](https://github.com/clemarc/aparte/issues/5). The draft contains the exact main commit reviewed at creation; later documentation commits do not change that signed artifact.
 
 The [second beta draft](https://github.com/clemarc/aparte/releases/tag/untagged-815d8d181f4df354b457), build 15, is ready for the owner to replace beta 1 at the same installed path and test Microphone/Accessibility before altering grants. It remains unpublished; no update gate is passed by the signature evidence alone.
+
+
+## D031 — Unified UX / separate development name
+
+These checks apply to the new UX candidate and do not close historical M4 or beta device gates. `docs/evidence/ux-workspace.json` records scoped final results.
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Workspace navigation/setup/Processing model preview | PASS | Actual native AppKit/SwiftUI window inspected; all four choices visible, preview Small while active Medium remains unchanged |
+| Shortcut candidate and Cancel preserve saved binding | PASS | Native candidate displayed Control–Option–Space while saved Control–Slash remained; Cancel retained saved chord |
+| Detection-only press/release | PASS | Native result reported in-app delivery and no audio; global listener unavailable remains truthfully identified |
+| Transient editor clearing on navigation | PASS | Disposable text entered, Processing visited, Try it revisited with an empty editor |
+| Missing-capability recording controls | PASS | Native Start and Stop disabled with unavailable Microphone; no grant or recording performed |
+| Live capture, external insertion, VoiceOver/macOS14 | BLOCKED | Existing real-device gates remain pending; workspace inspection is not capture/insertion acceptance |
+| Fresh-Mac beta launch and beta1→beta2 permission continuity | BLOCKED | Existing D030 gates unchanged; no installed beta replacement in this checkpoint |
+
+| Debug/Release Dev and standard variant builds | PASS | 0.5.0 build 16; actual native builds, icon/name inspection, separate output roots coexist |
+| Named Dev signature continuity / negatives | PASS | Final Debug/Release mutual requirements, strict verification, tamper/ad-hoc rejection; same development certificate |
+| Automated regression | PASS | 44 unit tests; shell/Python syntax and whitespace checks |
+| Recorder rejection persistence / explicit Save | PASS | Native Command-Q rejection survives release; Save exercised with the existing binding |
+| Companion visual and click verification | BLOCKED | System-menu inspection timed out; separate popover not exposed by workspace-scoped native tree; implemented with preferred-size tracking |
+| Installation at separate Dev path | BLOCKED | Installer source and naming guard updated; no local install performed, beta app preserved |
+
+
+## D032 — Aparte Dew identity isolation
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Exact Dew name and distinct development identifier | PASS | Actual Debug/Release metadata and native launch: Aparte Dew / dev.aparte.Aparte.dew |
+| Standard/beta name and identifier preserved | PASS | Standard native Release build: Aparté / dev.aparte.Aparte; beta public pin byte-identical to HEAD |
+| Reused development certificate, new Dew requirements | PASS | Actual different Debug/Release binaries, mutual Dew requirements, strict checks and negative signature tests; no old-app grant continuity claimed |
+| Separate preferences/login/model settings | PASS | Distinct UserDefaults/SMAppService identifier, separate production model root, fresh native setup without the prior prepared model; no data/grant migration |
+| Dew access status | PASS for status only | Native first reported unrequested/required access, later reported Microphone/Accessibility granted and global listener active; no agent grant action or recording |
+| Settings-row display, live capture/insertion, update persistence | BLOCKED | Native status is not full capability/update acceptance; original real-device gates remain pending |
