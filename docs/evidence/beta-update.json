@@ -1,0 +1,106 @@
+{
+  "date": "2026-09-28",
+  "decision": "D030",
+  "builds": {
+    "beta1": {
+      "tag": "v0.4.13-beta.1",
+      "sourceCommit": "f057fa85ffd26a918d153b639e11713817b336dc",
+      "appBuild": "14",
+      "binarySHA256": "29eaa16bc73defb127f8b719467146241913c2c6bd6781eced1712669262e9b4",
+      "archiveSHA256": "a6b55a9944890b02bc1eb02be161ad6680b2fc952cc9e30390344023d3174754",
+      "compiledTextSHA256": "232d29ea891720fb916251785bd2dc762b7dd9e601ca2a761b8cad84030d8ba8",
+      "cdHash": "f58ddf471d4d24b76d8bf80258a01f51101ac5a3"
+    },
+    "beta2": {
+      "tag": "v0.4.13-beta.2",
+      "sourceCommit": "ccf5a53c2f2948500a363893bb8993052d871b8c",
+      "appBuild": "15",
+      "binarySHA256": "f7098e1fd9d3d3a8dcebbae20e59e167bfa6fa2b1783e3aca84473ac91c6c076",
+      "archiveSHA256": "890b8c5a13d95a9f952edddaa5cac2c9425d24220ebf9d92e80ea16cad0e3719",
+      "compiledTextSHA256": "c5f403814cb0c3e3a97cd4ab057462177a00a80e8872fc35326bae40a67d1807",
+      "cdHash": "03c18e4839d130a89fc7d81b429287664f125923"
+    }
+  },
+  "compiledTextDiffers": "PASS: Mach-O __TEXT,__text bytes differ, excluding signing data and bundle resources",
+  "mutualActualDesignatedRequirements": "PASS",
+  "certificateSHA1": "F4816E62A76EA46301C73BE830323C2B38C54BD0",
+  "releaseBuild": "PASS",
+  "unitTests": {
+    "count": 43,
+    "failures": 0
+  },
+  "package": {
+    "schema": 1,
+    "tag": "v0.4.13-beta.2",
+    "repository": "clemarc/aparte",
+    "sourceCommit": "ccf5a53c2f2948500a363893bb8993052d871b8c",
+    "appVersion": "0.4.13",
+    "appBuild": "15",
+    "minimumMacOS": "14.0",
+    "architecture": "arm64",
+    "archive": "Aparte-v0.4.13-beta.2-arm64-self-signed-NOT-NOTARISED.zip",
+    "archiveSHA256": "890b8c5a13d95a9f952edddaa5cac2c9425d24220ebf9d92e80ea16cad0e3719",
+    "signing": {
+      "schema": 1,
+      "profile": "beta",
+      "bundleIdentifier": "dev.aparte.Aparte",
+      "certificateSHA1": "F4816E62A76EA46301C73BE830323C2B38C54BD0",
+      "certificateSHA256": "0F630BF0934879160F880ECB8839E02018E0C11BC16E5D44EEB616EEFCB0BA9D",
+      "designatedRequirement": "identifier \"dev.aparte.Aparte\" and anchor H\"F4816E62A76EA46301C73BE830323C2B38C54BD0\"",
+      "notarised": false
+    },
+    "validation": {
+      "build": "PASS",
+      "unitTests": "PASS",
+      "archiveSignature": "PASS",
+      "cleanMacGatekeeper": "BLOCKED",
+      "permissionPersistence": "BLOCKED",
+      "M4Acceptance": "BLOCKED"
+    }
+  },
+  "hostedPR": {
+    "url": "https://github.com/clemarc/aparte/pull/7",
+    "run": "https://github.com/clemarc/aparte/actions/runs/36415617476",
+    "status": "PASS and merged"
+  },
+  "hostedMain": {
+    "run": "https://github.com/clemarc/aparte/actions/runs/36416150638",
+    "sourceCommit": "ccf5a53c2f2948500a363893bb8993052d871b8c",
+    "status": "PASS"
+  },
+  "githubDraft": {
+    "assets": [
+      {
+        "digest": "sha256:890b8c5a13d95a9f952edddaa5cac2c9425d24220ebf9d92e80ea16cad0e3719",
+        "name": "Aparte-v0.4.13-beta.2-arm64-self-signed-NOT-NOTARISED.zip",
+        "size": 1241289,
+        "state": "uploaded"
+      },
+      {
+        "digest": "sha256:98f0f105a0e228e9d26a53702f120007204459fc87def3a5e21f733b118c0097",
+        "name": "release.json",
+        "size": 1019,
+        "state": "uploaded"
+      },
+      {
+        "digest": "sha256:d338424368eb9406bcb0e3034f172ef4b5e8cae201edb1a3be6d410cabd05862",
+        "name": "SHA256SUMS",
+        "size": 203,
+        "state": "uploaded"
+      }
+    ],
+    "draft": true,
+    "html_url": "https://github.com/clemarc/aparte/releases/tag/untagged-815d8d181f4df354b457",
+    "id": 398190142,
+    "prerelease": true,
+    "published_at": null,
+    "tag_name": "v0.4.13-beta.2"
+  },
+  "uploadedAssetDigests": "PASS: all three GitHub asset digests match local files",
+  "ownerUpdateTest": "BLOCKED: awaiting owner beta-1 to beta-2 capability report",
+  "freshMacDownloadedLaunch": "BLOCKED: environment unspecified in first-beta smoke report",
+  "realMacValidationIssue": "https://github.com/clemarc/aparte/issues/5",
+  "localAppInstalled": false,
+  "publicBinaryPublished": false,
+  "M4Acceptance": "BLOCKED: existing ledger unchanged"
+}
