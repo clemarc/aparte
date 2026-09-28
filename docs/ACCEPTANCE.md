@@ -363,3 +363,12 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Formal live capture / compatibility / update gates | BLOCKED | Report does not establish ten-attempt coverage, timing, clipboard behavior, safety cases, original-window return or beta permission continuity |
 
 `docs/evidence/owner-dictation-smoke.json` records the supplied report without private audio/transcripts. The cause of the earlier ChatGPT failure remains unconfirmed. No build, app mutation or privacy-setting change was performed for this follow-up; M4 formal acceptance remains pending.
+
+## Companion alignment follow-up — 28 September 2026
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Shared button edges, icon/text columns and readable labels | PASS for layout | Native preview of actual MenuCompanionView with synthetic Ready/expired state; both full-width buttons align and labels are untruncated. This is presentation evidence only |
+| Debug/Release development build and signing | PASS | `artifacts/companion-alignment-{debug,release}.log`; existing certificate-backed identity verified |
+| Updated real app launch | PASS | Idle app quit normally before rebuilding; relaunched Release reports Ready, medium and granted access. No recording/insertion performed |
+| Full live companion behavior | BLOCKED | App-menu invocation still captures the workspace rather than the separate popover; layout fixture does not validate real popover interaction or dictation |

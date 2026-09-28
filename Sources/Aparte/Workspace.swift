@@ -439,16 +439,26 @@ struct MenuCompanionView: View {
             HStack { Text(model.preferences.shortcut.displayLabel).font(.title3.weight(.semibold)); Spacer(); Text("Hold to talk").font(.caption).foregroundStyle(.secondary) }
             Text("\(model.preferences.model.capitalized) · \(languageLabel(model.preferences.language)) · On-device").font(.caption).foregroundStyle(.secondary)
             Divider()
-            Button("Try dictation / microphone check…") { open(.tryIt) }.frame(maxWidth: .infinity)
-            Button("Open workspace…") { open(nil) }.frame(maxWidth: .infinity)
-            if !model.setupReadiness.canDictate { Button("Review access…") { open(.settings) } }
-            if model.recoveryText != nil {
-                Button(model.recoveryUncertain ? "Recovery — check target first…" : "Open Recovery…") { recovery() }
+            VStack(alignment: .leading, spacing: 8) {
+                action("Try dictation…", icon: "mic") { open(.tryIt) }
+                action("Open workspace…", icon: "slider.horizontal.3") { open(nil) }
+                if !model.setupReadiness.canDictate { action("Review access…", icon: "lock.shield") { open(.settings) } }
+                if model.recoveryText != nil {
+                    action(model.recoveryUncertain ? "Recovery — check target first…" : "Open Recovery…", icon: "doc.text") { recovery() }
+                }
+                if model.sessionBusy { action("Cancel current dictation", icon: "xmark.circle") { model.cancel() } }
             }
-            if model.sessionBusy { Button("Cancel current dictation") { model.cancel() } }
             Divider()
             HStack { Text(AppVersion.detailed).font(.caption).foregroundStyle(.secondary); Spacer(); Button("Quit") { quit() }.buttonStyle(.link) }
         }.padding(20).frame(width: 320)
+    }
+    private func action(_ title: String, icon: String, perform: @escaping () -> Void) -> some View {
+        Button(action: perform) {
+            HStack(spacing: 10) {
+                Image(systemName: icon).frame(width: 18)
+                Text(title).frame(maxWidth: .infinity, alignment: .leading)
+            }.padding(.vertical, 4).frame(maxWidth: .infinity, alignment: .leading)
+        }.buttonStyle(.bordered).controlSize(.large)
     }
 }
 

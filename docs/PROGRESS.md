@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Companion action alignment — 28 September 2026
+
+Owner screenshot showed differently sized, centered action buttons and a truncated microphone-check label. Companion actions now share full-width button labels, leading alignment, fixed icon columns and 8-point spacing; the first label is shortened to “Try dictation…”. Debug/Release builds and stable development signing passed. Idle Dew was quit normally before the Release rebuild and relaunched; native status returned Ready with the existing medium model and access. A native layout-only preview using the actual companion view and synthetic Ready state visually confirmed matching button edges, aligned labels and no truncation. The preview performs no audio/ASR/insertion and does not pass live-device gates. Actual popover capture remains unavailable through the workspace-scoped tool. No beta/install/security changes or private transcript collection occurred.
+
 ## Owner dictation / ChatGPT smoke report — 28 September 2026
 
 After the Aparte Dew UX checkpoint, the owner reported: “Dictation works fine, somehow chatgpt now works”. Record successful dictation and ChatGPT usability as an owner-reported smoke result. The exact running build, ChatGPT version/interface, model, attempt count and automatic-versus-manual insertion route were not specified; the cause of the earlier failure is unconfirmed. No private recording or transcript was collected. `docs/evidence/owner-dictation-smoke.json` preserves this scope. The formal compatibility matrix, microphone timing/lifecycle, beta-update and other M4 gates remain pending; no app behavior change or rebuild is needed for this report.
