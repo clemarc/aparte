@@ -2,6 +2,18 @@ import XCTest
 @testable import AparteCore
 
 final class SetupTests: XCTestCase {
+    func testShortcutRejectionsExplainTheActualConstraint() {
+        XCTAssertNil(Shortcut.standard.validationMessage)
+        XCTAssertTrue(Shortcut(key: 49, modifiers: Shortcut.control).validationMessage!.contains("reserved"))
+        XCTAssertTrue(Shortcut(key: 12, modifiers: Shortcut.command).validationMessage!.contains("reserved"))
+        XCTAssertTrue(Shortcut(key: 0, modifiers: Shortcut.shift).validationMessage!.contains("Add Control"))
+        XCTAssertTrue(Shortcut(key: 36, modifiers: Shortcut.control).validationMessage!.contains("Function keys"))
+        let fn = Shortcut(key: 49, modifiers: Shortcut.control | Shortcut.option | (1 << 23))
+        XCTAssertFalse(fn.isValid)
+        XCTAssertTrue(fn.validationMessage!.contains("Fn / Globe"))
+        // Extra modifiers must not turn an unsupported Fn chord into the saved chord.
+        XCTAssertTrue(Shortcut(key: 0, modifiers: Shortcut.control | Shortcut.shift).isValid)
+    }
     func testMicrophoneTestDoesNotRequireCrossAppAccess() {
         let local = SetupReadiness(microphone: true, accessibility: false, model: true, shortcut: false)
         XCTAssertTrue(local.canTestMicrophone)

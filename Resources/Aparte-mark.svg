@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 108" role="img" aria-labelledby="title desc">
+  <title id="title">Aparté</title>
+  <desc id="desc">Three speech bars become two lines of text.</desc>
+  <g fill="none" stroke="#243b52" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 49V65 M39 37V77 M63 24V81 M63 40C63 58 72 65 87 65H132 M88 85H132"/>
+  </g>
+</svg>

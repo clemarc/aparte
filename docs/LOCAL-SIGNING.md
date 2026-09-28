@@ -2,6 +2,8 @@
 
 Owner-approved D016 replaces ad-hoc development app signatures so rebuilds can have a compatible identity for macOS privacy grants. This is local development only: no Apple account, paid service, Developer ID, release key, notarisation, publication or trust-root installation is involved.
 
+D032 separates the local app as **Aparte Dew**, bundle identifier `dev.aparte.Aparte.dew`, at `~/Applications/Aparte Dew.app`. The existing development certificate is reused. This deliberately changes the app requirement from the historical `dev.aparte.Aparte` development app: old privacy grants are not claimed to carry over. Dew has its own preferences and model directory. Beta retains its original name, identifier and certificate.
+
 ## Setup and normal updates
 
 ```sh
@@ -11,7 +13,7 @@ Owner-approved D016 replaces ad-hoc development app signatures so rebuilds can h
 ./scripts/test-signing-local.py
 # Quit Aparté through its menu, then:
 ./scripts/install-local.sh
-open "$HOME/Applications/Aparte.app"
+open "$HOME/Applications/Aparte Dew.app"
 ```
 
 Setup reuses the existing identity. It never silently replaces missing/partial signing material. Default builds fail if it is unavailable; they do not fall back to ad-hoc signing. The explicit `--signing adhoc` build mode is for clean source checkouts and CI only; it does not read or modify the local identity and its output is not eligible for the local installer. Use the default build script for an installable local development app. Direct Xcode builds have automatic signing disabled and must be signed with `scripts/local-signing.py sign <app>` before installation. The installer rejects unsigned/ad-hoc or wrong-certificate bundles.
@@ -24,7 +26,7 @@ The one-time transition from an existing ad-hoc build requires:
 
 This is an intentional identity change. After opening the updated installed app, grant its requested Microphone access and re-add this exact installed app in Accessibility if the old row no longer applies. If Microphone still shows an old enabled entry, quit Aparté, toggle that app's Microphone access off/on in System Settings and reopen; verify the actual app status. Input Monitoring is only relevant if the app reports its event tap cannot start. Do not automatically reset TCC, weaken Gatekeeper, or assume a checkbox proves the running app's access. Actual permissions surviving an update require an owner-granted test; matching signatures alone do not prove it.
 
-The app may also be quit explicitly with `xcrun swift scripts/app-lifecycle.swift --quit`. Installation refuses a running installed instance, verifies a staged copy before replacement, and keeps the old bundle until the new one verifies. An interrupted install leaving `~/Applications/.Aparte.previous.app` fails closed on the next attempt; inspect/restore that backup rather than deleting it blindly. This avoids copying changing executable files underneath a live process.
+The app may also be quit explicitly with `xcrun swift scripts/app-lifecycle.swift --quit`. Installation refuses a running installed instance, verifies a staged copy before replacement, and keeps the old bundle until the new one verifies. An interrupted install leaving `~/Applications/.Aparte-Dew.previous.app` fails closed on the next attempt; inspect/restore that backup rather than deleting it blindly. This avoids copying changing executable files underneath a live process.
 
 ## Local identity and private material
 

@@ -24,6 +24,7 @@ struct ShortcutRecorder: NSViewRepresentable {
     static func dismantleNSView(_ view: CaptureView, coordinator: ()) { view.stop() }
     final class CaptureView: NSView {
         private var monitor: Any?
+        private var pending: Shortcut?
         var preview: ((String) -> Void)?
         var accept: ((Shortcut?) -> Void)?
         override var acceptsFirstResponder: Bool { true }
@@ -33,9 +34,10 @@ struct ShortcutRecorder: NSViewRepresentable {
             if window != nil {
                 // Intercept before menu key-equivalent dispatch (e.g. reserved Cmd-Q).
                 // Unlike a SwiftUI value-owned monitor, this follows the real responder.
-                monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .flagsChanged]) { [weak self] event in
+                monitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged]) { [weak self] event in
                     guard let self, self.window?.isKeyWindow == true, self.window?.firstResponder === self else { return event }
                     if event.type == .flagsChanged { self.flagsChanged(with: event); return event }
+                    if event.type == .keyUp { self.keyUp(with: event); return nil }
                     self.keyDown(with: event); return nil
                 }
             }
@@ -48,15 +50,28 @@ struct ShortcutRecorder: NSViewRepresentable {
             ("Press a shortcut here · Esc cancels" as NSString).draw(at: NSPoint(x: 10, y: 12), withAttributes: [.font: NSFont.systemFont(ofSize: 13), .foregroundColor: NSColor.labelColor])
         }
         override func mouseDown(with event: NSEvent) { window?.makeFirstResponder(self) }
-        override func flagsChanged(with event: NSEvent) { preview?(Shortcut.modifierLabel(UInt64(event.modifierFlags.rawValue) & Shortcut.mask) + " …") }
+        override func flagsChanged(with event: NSEvent) {
+            guard pending == nil else { return }
+            if event.modifierFlags.contains(.function) { preview?("Fn / Globe cannot be used by this version. Try Control or Option plus a key."); return }
+            let modifiers = UInt64(event.modifierFlags.rawValue) & Shortcut.mask
+            // Keep a rejection readable after the user releases the chord.
+            guard modifiers != 0 else { return }
+            preview?(Shortcut.modifierLabel(modifiers) + " … add a letter, number or Space")
+        }
         override func keyDown(with event: NSEvent) {
             guard !event.isARepeat else { return }
             if event.keyCode == 53 { accept?(nil); return }
+            guard !event.modifierFlags.contains(.function) else {
+                preview?("Fn / Globe cannot be used by this version. Try Control or Option plus a key."); return
+            }
             let chord = Shortcut(key: event.keyCode, modifiers: UInt64(event.modifierFlags.rawValue) & Shortcut.mask)
-            preview?(chord.displayLabel + (chord.isValid ? "" : " — unsupported; try another chord"))
-            if chord.isValid { accept?(chord) }
+            if chord.isValid { pending = chord; preview?("\(chord.displayLabel) — release to review") }
+            else { preview?(chord.validationMessage ?? "Try another shortcut.") }
         }
-        override func keyUp(with event: NSEvent) {}
+        override func keyUp(with event: NSEvent) {
+            guard let chord = pending, event.keyCode == chord.key else { return }
+            pending = nil; accept?(chord)
+        }
         override func performKeyEquivalent(with event: NSEvent) -> Bool {
             guard window?.firstResponder === self else { return false }; keyDown(with: event); return true
         }

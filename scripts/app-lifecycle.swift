@@ -1,8 +1,8 @@
 import AppKit
 
 // Exact bundle/path matching; no AX, automation permissions or force-kill.
-let expected = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications/Aparte.app").standardizedFileURL
-let allApps = NSRunningApplication.runningApplications(withBundleIdentifier: "dev.aparte.Aparte")
+let expected = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications/Aparte Dew.app").standardizedFileURL
+let allApps = ["dev.aparte.Aparte", "dev.aparte.Aparte.dew"].flatMap { NSRunningApplication.runningApplications(withBundleIdentifier: $0) }
 let installedApps = allApps.filter { $0.bundleURL?.standardizedFileURL == expected }
 let projectArtifacts = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("artifacts", isDirectory: true).standardizedFileURL.path + "/"
 let projectCopies = allApps.filter { app in

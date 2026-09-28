@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-28",
+  "source": "owner report in task conversation",
+  "report": "Dictation works fine, somehow chatgpt now works",
+  "context": "Following the Aparte Dew 0.5.0 build 16 UX checkpoint; exact tested running bundle not confirmed",
+  "results": {
+    "dictation_usability": "PASS for owner-reported smoke",
+    "chatgpt_usability": "PASS for owner-reported smoke"
+  },
+  "unspecified": [
+    "running bundle and build",
+    "ChatGPT app/browser interface and version",
+    "model and language",
+    "attempt count and exact field",
+    "automatic versus manual insertion route",
+    "clipboard outcome and safety-case coverage"
+  ],
+  "earlier_failure_cause": "unconfirmed",
+  "formal_acceptance": "Existing M4 matrix, microphone timing/lifecycle, beta update and fresh-Mac gates remain pending",
+  "agent_actions": "Documentation only; no capture, transcript collection, app rebuild, permission change or publication"
+}

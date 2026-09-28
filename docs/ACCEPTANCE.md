@@ -310,9 +310,65 @@ The historical base technical-term FAIL and 0.4.12 model-discoverability FAIL re
 | Real signature continuity and negative checks | PASS | Different compiled Debug/Release executables signed as beta mutually satisfy their actual requirements. Tampered resources, ad-hoc replacement and development/beta cross-profile signatures are rejected. `docs/evidence/beta-signing.json`. |
 | Local beta archive build/test/sign/extraction | PASS | Actual `v0.4.13-beta.1` candidate from committed `86bff05`: Release build, 43/43 unit tests, self-signed ZIP extraction/signature/provenance verification. Corrupted ZIP and forged source metadata with recomputed checksums rejected. `docs/evidence/beta-signing.json`. |
 | Protected main and exact-tag draft prerelease | PASS | PR #4 merged after its required check; exact-main run passed at `f057fa8`. Annotated `v0.4.13-beta.1` points to that commit. Draft command refused an early attempt before main CI passed, then created an unpublished prerelease with all three assets and generated notes. GitHub digests match local files. `docs/evidence/beta-signing.json`. |
+| Second beta with a different compiled executable and matching identity | PASS | `v0.4.13-beta.2`, build 15 at `ccf5a53`, passed Release build, 43 tests, extracted ZIP/provenance checks and beta-1/beta-2 mutual actual requirements. Compiled `__text` hashes differ. PR #7 and exact-main CI passed; draft assets match local SHA-256 digests. `docs/evidence/beta-update.json`. Actual privacy grants remain a separate gate. |
 | Owner-reported first beta usability | PASS | Owner replied “Ok it works” after the download/run request. This is a scoped owner smoke report for beta.1; exact environment and separate launch/Microphone/Accessibility/insertion observations were not supplied. It does not pass the fresh-Mac, two-version or M4 gates below. |
 | Downloaded fresh-Mac launch with quarantine intact | BLOCKED | Requires real downloaded launch using normal per-app Open Anyway UI; signature validity is not Gatekeeper acceptance. |
 | Microphone/Accessibility remain usable across two beta versions | BLOCKED | Requires real grant, update and capability checks on a fresh Mac; certificate compatibility is insufficient. |
 | Existing M4 formal acceptance | BLOCKED | Prior live microphone, external target/clipboard, UI/login and macOS14 checks remain unverified. |
 
 The first [beta draft](https://github.com/clemarc/aparte/releases/tag/untagged-8b8502c8d609aca74d0c) is available to the owner for review; it is not published. Real-Mac beta checks are tracked in [issue #5](https://github.com/clemarc/aparte/issues/5). The draft contains the exact main commit reviewed at creation; later documentation commits do not change that signed artifact.
+
+The [second beta draft](https://github.com/clemarc/aparte/releases/tag/untagged-815d8d181f4df354b457), build 15, is ready for the owner to replace beta 1 at the same installed path and test Microphone/Accessibility before altering grants. It remains unpublished; no update gate is passed by the signature evidence alone.
+
+
+## D031 — Unified UX / separate development name
+
+These checks apply to the new UX candidate and do not close historical M4 or beta device gates. `docs/evidence/ux-workspace.json` records scoped final results.
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Workspace navigation/setup/Processing model preview | PASS | Actual native AppKit/SwiftUI window inspected; all four choices visible, preview Small while active Medium remains unchanged |
+| Shortcut candidate and Cancel preserve saved binding | PASS | Native candidate displayed Control–Option–Space while saved Control–Slash remained; Cancel retained saved chord |
+| Detection-only press/release | PASS | Native result reported in-app delivery and no audio; global listener unavailable remains truthfully identified |
+| Transient editor clearing on navigation | PASS | Disposable text entered, Processing visited, Try it revisited with an empty editor |
+| Missing-capability recording controls | PASS | Native Start and Stop disabled with unavailable Microphone; no grant or recording performed |
+| Live capture, external insertion, VoiceOver/macOS14 | BLOCKED | Existing real-device gates remain pending; workspace inspection is not capture/insertion acceptance |
+| Fresh-Mac beta launch and beta1→beta2 permission continuity | BLOCKED | Existing D030 gates unchanged; no installed beta replacement in this checkpoint |
+
+| Debug/Release Dev and standard variant builds | PASS | 0.5.0 build 16; actual native builds, icon/name inspection, separate output roots coexist |
+| Named Dev signature continuity / negatives | PASS | Final Debug/Release mutual requirements, strict verification, tamper/ad-hoc rejection; same development certificate |
+| Automated regression | PASS | 44 unit tests; shell/Python syntax and whitespace checks |
+| Recorder rejection persistence / explicit Save | PASS | Native Command-Q rejection survives release; Save exercised with the existing binding |
+| Companion visual and click verification | BLOCKED | System-menu inspection timed out; separate popover not exposed by workspace-scoped native tree; implemented with preferred-size tracking |
+| Installation at separate Dev path | BLOCKED | Installer source and naming guard updated; no local install performed, beta app preserved |
+
+
+## D032 — Aparte Dew identity isolation
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Exact Dew name and distinct development identifier | PASS | Actual Debug/Release metadata and native launch: Aparte Dew / dev.aparte.Aparte.dew |
+| Standard/beta name and identifier preserved | PASS | Standard native Release build: Aparté / dev.aparte.Aparte; beta public pin byte-identical to HEAD |
+| Reused development certificate, new Dew requirements | PASS | Actual different Debug/Release binaries, mutual Dew requirements, strict checks and negative signature tests; no old-app grant continuity claimed |
+| Separate preferences/login/model settings | PASS | Distinct UserDefaults/SMAppService identifier, separate production model root, fresh native setup without the prior prepared model; no data/grant migration |
+| Dew access status | PASS for status only | Native first reported unrequested/required access, later reported Microphone/Accessibility granted and global listener active; no agent grant action or recording |
+| Settings-row display, live capture/insertion, update persistence | BLOCKED | Native status is not full capability/update acceptance; original real-device gates remain pending |
+
+## Owner dictation / ChatGPT smoke report — 28 September 2026
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Owner-reported dictation usability | PASS for owner smoke | Owner: “Dictation works fine, somehow chatgpt now works”, following the Dew UX checkpoint. Exact running build, model and attempt count not supplied |
+| Owner-reported ChatGPT usability | PASS for owner smoke | ChatGPT now reported working; exact app/browser version, field and automatic-versus-manual insertion route unspecified. Earlier failed attempts remain historical evidence |
+| Formal live capture / compatibility / update gates | BLOCKED | Report does not establish ten-attempt coverage, timing, clipboard behavior, safety cases, original-window return or beta permission continuity |
+
+`docs/evidence/owner-dictation-smoke.json` records the supplied report without private audio/transcripts. The cause of the earlier ChatGPT failure remains unconfirmed. No build, app mutation or privacy-setting change was performed for this follow-up; M4 formal acceptance remains pending.
+
+## Companion alignment follow-up — 28 September 2026
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Shared button edges, icon/text columns and readable labels | PASS for layout | Native preview of actual MenuCompanionView with synthetic Ready/expired state; both full-width buttons align and labels are untruncated. This is presentation evidence only |
+| Debug/Release development build and signing | PASS | `artifacts/companion-alignment-{debug,release}.log`; existing certificate-backed identity verified |
+| Updated real app launch | PASS | Idle app quit normally before rebuilding; relaunched Release reports Ready, medium and granted access. No recording/insertion performed |
+| Full live companion behavior | BLOCKED | App-menu invocation still captures the workspace rather than the separate popover; layout fixture does not validate real popover interaction or dictation |

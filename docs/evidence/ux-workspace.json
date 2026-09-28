@@ -1,0 +1,129 @@
+{
+  "date": "2026-09-28",
+  "branch": "codex/unified-ux",
+  "developmentBuilds": {
+    "Debug": {
+      "path": "artifacts/DerivedData/Build/Products/Debug/Aparte Dew.app",
+      "displayName": "Aparte Dew",
+      "bundleName": "Aparte Dew",
+      "identifier": "dev.aparte.Aparte.dew",
+      "executable": "Aparte",
+      "version": "0.5.0",
+      "build": "16",
+      "binarySHA256": "a3f4d8999e7752ca3f8c58531ed701b3655b9bdb670ab05e59d29b6846e0e904",
+      "appIconPresent": true
+    },
+    "Release": {
+      "path": "artifacts/DerivedData/Build/Products/Release/Aparte Dew.app",
+      "displayName": "Aparte Dew",
+      "bundleName": "Aparte Dew",
+      "identifier": "dev.aparte.Aparte.dew",
+      "executable": "Aparte",
+      "version": "0.5.0",
+      "build": "16",
+      "binarySHA256": "8d71f5adefd3c443b87a5b25f59f0b16604c5c92a7f89ffbef37544cb45252ee",
+      "appIconPresent": true
+    }
+  },
+  "standardBuild": {
+    "path": "artifacts/StandardDerivedData/Build/Products/Release/Aparte.app",
+    "displayName": "Apart\u00e9",
+    "bundleName": "Aparte",
+    "identifier": "dev.aparte.Aparte",
+    "executable": "Aparte",
+    "version": "0.5.0",
+    "build": "16",
+    "binarySHA256": "06bf72d3add614c6ab578fd4ee84419d7d5e1dde990cb943146c6d93f2049885",
+    "appIconPresent": true
+  },
+  "automated": {
+    "debug": "PASS",
+    "release": "PASS",
+    "standardVariant": "PASS",
+    "unitTests": {
+      "status": "PASS",
+      "count": 44,
+      "failures": 0
+    },
+    "signatureContinuity": {
+      "status": "PASS",
+      "builds": {
+        "Debug": {
+          "requirement": "identifier \"dev.aparte.Aparte.dew\" and certificate root = H\"8abee9fa77fadad566c290b7f6a7baf2e8a02c8e\"",
+          "binarySHA256": "a3f4d8999e7752ca3f8c58531ed701b3655b9bdb670ab05e59d29b6846e0e904"
+        },
+        "Release": {
+          "requirement": "identifier \"dev.aparte.Aparte.dew\" and certificate root = H\"8abee9fa77fadad566c290b7f6a7baf2e8a02c8e\"",
+          "binarySHA256": "8d71f5adefd3c443b87a5b25f59f0b16604c5c92a7f89ffbef37544cb45252ee"
+        }
+      },
+      "mutualRequirementVerification": "PASS",
+      "tamperedResourceRejected": "PASS",
+      "adHocFallbackRejected": "PASS",
+      "privacyPermissionPersistence": "BLOCKED: requires owner grant and real post-update capability check; signatures alone do not establish TCC behavior"
+    },
+    "shellPythonSyntax": "PASS",
+    "whitespaceCheck": "PASS",
+    "variantsCoexist": "PASS",
+    "distinctDevelopmentAndStandardIdentifiers": "PASS",
+    "betaPublicPinUnchanged": "PASS"
+  },
+  "nativeWorkspace": {
+    "status": "PASS for the listed observations only",
+    "observations": [
+      "Settings and guided access reflect actual capabilities",
+      "All four model choices visible",
+      "Preview Small while active Medium remains unchanged",
+      "Candidate captured on release before Save",
+      "Cancel preserves saved Control-Slash",
+      "Reserved Command-Q explanation remains visible after release",
+      "Explicit Save exercised with the existing Control-Slash value",
+      "Detection reports in-app press/release without audio",
+      "Disposable editor text clears on navigation",
+      "Start/Stop disabled while Microphone unavailable in the initial Debug review",
+      "Release window and sidebar show Apart\u00e9 Dev 0.5.0 (build 16)",
+      "App menu exposes workspace and companion commands",
+      "Final Release was quit via native UI and freshly relaunched",
+      "Final native window, sidebar, guide and app menu show Aparte Dew 0.5.0 (build 16)",
+      "Fresh Dew first reported Microphone not requested, Accessibility required and missing model",
+      "Later native state reported Microphone/Accessibility granted and global listener active; the agent did not request or grant access",
+      "Dew retained a missing-model blocker rather than claiming Ready"
+    ],
+    "scope": "Initial unified workspace checks used the earlier Dev name; final Dew name and fresh setup were inspected after identifier isolation."
+  },
+  "pending": {
+    "menuCompanionVisualAndClick": "BLOCKED: system-menu inspection timed out; the workspace-scoped native tree did not expose the separate popover",
+    "liveCaptureAndExternalInsertion": "BLOCKED: no live capture or external compatibility test in this checkpoint",
+    "voiceOverAndMacOS14": "BLOCKED: existing real-device gates",
+    "betaFreshMacAndTwoVersionPermissions": "BLOCKED: existing D030 owner gates",
+    "dewSettingsRowsAndLiveCapabilities": "PARTIAL: native status reports grants/listener; actual macOS Settings row inspection and live capture/insertion remain untested"
+  },
+  "boundaries": {
+    "microphoneCapturePerformed": false,
+    "installedBetaReplaced": false,
+    "localInstallerRun": false,
+    "betaPackagedTaggedOrPublished": false,
+    "llmProcessingAdded": false,
+    "fnBindingAdded": false,
+    "privacyGrantsChangedByAgent": false
+  },
+  "resolvedDuringVerification": [
+    "Rejection text was being cleared by modifier release; fixed and confirmed natively",
+    "Global PRODUCT_NAME override affected dependencies; switched to target-scoped custom settings",
+    "Xcode product cleanup removed Dev output when switching variants; isolated DerivedData roots and verified both outputs exist"
+  ],
+  "decisions": [
+    "D031",
+    "D032"
+  ],
+  "isolation": {
+    "developmentIdentifier": "dev.aparte.Aparte.dew",
+    "standardIdentifier": "dev.aparte.Aparte",
+    "preferences": "Separate standard UserDefaults domains; no migration",
+    "modelStorage": "Dew: Aparte Dew/Models; standard: Aparte/Models",
+    "localInstallPath": "~/Applications/Aparte Dew.app",
+    "developmentCertificateReused": true,
+    "betaPinUnchanged": true,
+    "legacyDevelopmentPermissionContinuityClaimed": false
+  }
+}

@@ -62,6 +62,8 @@ def verify_app(app, version):
         info = plistlib.load(stream)
     if info.get('CFBundleIdentifier') != 'dev.aparte.Aparte' or info.get('CFBundleShortVersionString') != version:
         raise RuntimeError('Bundle identifier/version does not match the beta tag.')
+    if info.get('CFBundleDisplayName') != 'Aparté' or info.get('CFBundleName') != 'Aparte':
+        raise RuntimeError('Beta packaging requires the standard app name, not a development variant.')
     executable = app / 'Contents/MacOS' / info['CFBundleExecutable']
     if run(['/usr/bin/lipo', '-archs', executable]) != 'arm64':
         raise RuntimeError('Beta must contain the intended arm64 executable.')
@@ -136,7 +138,7 @@ def prepare(tag):
     if output.exists():
         raise RuntimeError('This candidate directory already exists. Preserve it; choose a new beta number.')
     # Run the same clean-source commands as CI. No development identity is used.
-    for command in [['./scripts/build-local.sh', '--configuration', 'Release', '--signing', 'adhoc'],
+    for command in [['./scripts/build-local.sh', '--configuration', 'Release', '--signing', 'adhoc', '--variant', 'standard'],
                     ['./scripts/test-local.sh', '--suite', 'unit']]:
         if subprocess.run(command, cwd=ROOT).returncode:
             raise RuntimeError('Build/test failed; no beta package prepared.')
@@ -147,7 +149,7 @@ def prepare(tag):
         payload = Path(temporary) / 'Aparte Beta'
         payload.mkdir()
         app = payload / 'Aparte.app'
-        run(['/usr/bin/ditto', ROOT / 'artifacts/DerivedData/Build/Products/Release/Aparte.app', app])
+        run(['/usr/bin/ditto', ROOT / 'artifacts/StandardDerivedData/Build/Products/Release/Aparte.app', app])
         (app / 'Contents/Resources/BetaRelease.json').write_text(json.dumps(
             {'tag': tag, 'sourceCommit': commit, 'appVersion': version, 'signing': signing}, indent=2) + '\n')
         run([SIGNER, '--profile', 'beta', 'sign', app])

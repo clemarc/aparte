@@ -9,7 +9,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 ARTIFACTS = ROOT / 'artifacts'
-APPS = {name: ARTIFACTS / f'DerivedData/Build/Products/{name}/Aparte.app' for name in ['Debug', 'Release']}
+APPS = {name: ARTIFACTS / f'DerivedData/Build/Products/{name}/Aparte Dew.app' for name in ['Debug', 'Release']}
 
 
 def command(args, succeeds=True):

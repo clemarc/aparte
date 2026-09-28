@@ -90,13 +90,18 @@ public struct Shortcut: Codable, Equatable, Sendable {
     public static let standard = Shortcut(key: 49, modifiers: control | option)
     public init(key: UInt16, modifiers: UInt64) { self.key = key; self.modifiers = modifiers }
     public var isValid: Bool {
-        guard modifiers & (Self.control | Self.option | Self.command) != 0, modifiers & ~Self.mask == 0 else { return false }
+        validationMessage == nil
+    }
+    /// A single policy supplies both persisted-binding validation and recorder guidance.
+    public var validationMessage: String? {
+        guard modifiers & ~Self.mask == 0 else { return "Fn / Globe and other extra modifiers are unsupported." }
+        guard modifiers & (Self.control | Self.option | Self.command) != 0 else { return "Add Control, Option or Command. Shift alone and bare keys cannot be used." }
         // Explicit keys only: letters, numbers, punctuation, space. No Fn, Return, Escape, Tab, deletion or modifier keys.
         let keys: Set<UInt16> = Set(0...35).union([37,38,39,40,41,42,43,44,45,46,47,49,50])
-        guard keys.contains(key) else { return false }
-        if modifiers == Self.command && [0,6,7,8,9,12,13,35,49].contains(key) { return false }
-        if key == 49 && (modifiers == Self.control || modifiers == Self.command || modifiers == Self.option | Self.command) { return false }
-        return true
+        guard keys.contains(key) else { return "Use a letter, number, punctuation key or Space. Function keys and modifier-only shortcuts are unsupported." }
+        if modifiers == Self.command && [0,6,7,8,9,12,13,35,49].contains(key) { return "That shortcut is reserved for a common app or macOS action. Add Control or Option, or choose another key." }
+        if key == 49 && (modifiers == Self.control || modifiers == Self.command || modifiers == Self.option | Self.command) { return "That Space shortcut is reserved by macOS. Try Control–Option–Space." }
+        return nil
     }
 }
 
