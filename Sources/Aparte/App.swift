@@ -7,6 +7,10 @@ import Carbon
 
 private enum AppVersion {
     static var current: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown" }
+    static var detailed: String {
+        guard let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else { return current }
+        return "\(current) (build \(build))"
+    }
 }
 
 @main struct AparteApp: App {
@@ -75,7 +79,7 @@ private enum AppVersion {
     private func add(_ menu: NSMenu, _ title: String, _ action: Selector, enabled: Bool = true) { let entry = NSMenuItem(title: title, action: action, keyEquivalent: ""); entry.target = self; entry.isEnabled = enabled; menu.addItem(entry) }
     @objc func showSettings() {
         if settingsWindow == nil {
-            settingsWindow = makeWindow("Aparté \(AppVersion.current) — Settings & Setup", size: NSSize(width: 630, height: 720), root: SettingsView(model: coordinator))
+            settingsWindow = makeWindow("Aparté \(AppVersion.detailed) — Settings & Setup", size: NSSize(width: 630, height: 720), root: SettingsView(model: coordinator))
         }
         settingsWindow?.delegate = self
         if settingsWindow?.isMiniaturized == true { settingsWindow?.deminiaturize(nil) }
@@ -248,7 +252,7 @@ struct SettingsView: View {
                     }.padding(6)
                 }
                 GroupBox("Privacy & compatibility") { Text("Transcription happens on this Mac. No audio or transcript history is saved. After a failed insertion, Recovery puts your transcript on the system clipboard for manual paste; it may remain there after Aparté's five-minute Recovery expires or sync through Universal Clipboard. An unconfirmed paste may already have inserted text, so check before pasting again. Editable text fields across apps can receive automatic insertion. Secure, read-only and inaccessible controls use Recovery. Clipboard preservation may request data from its owning app; see the supplied compatibility limits.").padding(6) }
-                Text("Diagnostics: Aparté \(AppVersion.current) · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
+                Text("Diagnostics: Aparté \(AppVersion.detailed) · WhisperKit 1.1.0 · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · model \(model.preferences.model). Diagnostics contain no transcript or audio.").font(.caption).foregroundStyle(.secondary)
             }.padding(24)
         }.onAppear { loginStatus = SMAppService.mainApp.status; model.recheck() }.onDisappear { model.closeSetupTests() }
     }
