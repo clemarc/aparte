@@ -10,7 +10,7 @@ Version 0.4.7 supports generic guarded clipboard insertion into standard editabl
 | VS Code 1.138.0 | Clipboard Cmd-V. AXTextArea/AXTextField | BLOCKED: live target interaction unavailable |
 | Chrome 153.0.8010.53 | Clipboard Cmd-V. AXTextArea/AXTextField | BLOCKED: textarea/contenteditable behavior unverified |
 | Slack 4.52.155 | Clipboard Cmd-V. AXTextArea/AXTextField | BLOCKED: draft composer/login and live target interaction unverified |
-| ChatGPT (owner-reported target) | Generic clipboard, standard editable controls; 0.4.10 Chromium web-tree request and recent-click fallback | BLOCKED: 0.4.8 exposed no uniquely focused editable descendant; 0.4.10 live validation pending |
+| ChatGPT (owner-reported target) | Generic clipboard, standard editable controls; 0.4.10 Chromium web-tree request and recent-click fallback | Owner smoke PASS on 28 September 2026: dictation/ChatGPT reported working. Exact build, interface/version and insertion route unspecified; formal matrix BLOCKED |
 | macOS 14 | Same scope | BLOCKED: host is macOS 26.6 |
 
 The owner reports Microphone/Accessibility granted and Setup tests working. Do not assume missing grants from historical CLI evidence. Native desktop testing remains blocked: SkyComputerUseService crashed with SIGTRAP in Array.remove(at:) on 2026-09-24, and its replacement still returned a closed pipe. No new grant or repeated unchanged tool retry is needed for implementation.

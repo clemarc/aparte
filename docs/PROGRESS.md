@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Owner dictation / ChatGPT smoke report — 28 September 2026
+
+After the Aparte Dew UX checkpoint, the owner reported: “Dictation works fine, somehow chatgpt now works”. Record successful dictation and ChatGPT usability as an owner-reported smoke result. The exact running build, ChatGPT version/interface, model, attempt count and automatic-versus-manual insertion route were not specified; the cause of the earlier failure is unconfirmed. No private recording or transcript was collected. `docs/evidence/owner-dictation-smoke.json` preserves this scope. The formal compatibility matrix, microphone timing/lifecycle, beta-update and other M4 gates remain pending; no app behavior change or rebuild is needed for this report.
+
 ## Aparte Dew isolation — 28 September 2026
 
 The owner refined the local name to exact **Aparte Dew** to avoid released-version clashes in Settings. D032 introduces development identifier `dev.aparte.Aparte.dew`, separate preferences/login/model storage and `~/Applications/Aparte Dew.app`. The existing development certificate is reused; beta remains Aparté / dev.aparte.Aparte with its original beta certificate and pin. Dew intentionally starts with its own setup and needs its own permission entries; old grants are not migrated or reset. The prior Dev checkpoint below is historical. Final Dew verification is recorded in `docs/evidence/ux-workspace.json`.

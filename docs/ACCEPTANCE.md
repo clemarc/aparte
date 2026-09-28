@@ -353,3 +353,13 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Separate preferences/login/model settings | PASS | Distinct UserDefaults/SMAppService identifier, separate production model root, fresh native setup without the prior prepared model; no data/grant migration |
 | Dew access status | PASS for status only | Native first reported unrequested/required access, later reported Microphone/Accessibility granted and global listener active; no agent grant action or recording |
 | Settings-row display, live capture/insertion, update persistence | BLOCKED | Native status is not full capability/update acceptance; original real-device gates remain pending |
+
+## Owner dictation / ChatGPT smoke report — 28 September 2026
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Owner-reported dictation usability | PASS for owner smoke | Owner: “Dictation works fine, somehow chatgpt now works”, following the Dew UX checkpoint. Exact running build, model and attempt count not supplied |
+| Owner-reported ChatGPT usability | PASS for owner smoke | ChatGPT now reported working; exact app/browser version, field and automatic-versus-manual insertion route unspecified. Earlier failed attempts remain historical evidence |
+| Formal live capture / compatibility / update gates | BLOCKED | Report does not establish ten-attempt coverage, timing, clipboard behavior, safety cases, original-window return or beta permission continuity |
+
+`docs/evidence/owner-dictation-smoke.json` records the supplied report without private audio/transcripts. The cause of the earlier ChatGPT failure remains unconfirmed. No build, app mutation or privacy-setting change was performed for this follow-up; M4 formal acceptance remains pending.
