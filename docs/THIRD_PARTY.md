@@ -1,6 +1,6 @@
 # Third-party provenance
 
-The Aparté source is MIT licensed, copyright (c) 2026 Clement Le Marc, matching the owner's initial public repository licence. See the repository `LICENSE`. Publication of source and CI was authorised for M5A; public binary distribution remains deferred.
+The Aparté source is MIT licensed, copyright (c) 2026 Clement Le Marc, matching the owner's initial public repository licence. See `LICENSE`. M5A authorises source/CI; D030 adds self-signed beta packaging. Every beta ZIP includes these notices and the copied upstream licences. Models download separately; no weights are packaged.
 
 - Argmax open-source Swift SDK / WhisperKit **1.1.0**, commit `1e2a163736dfa5a198e637ae44c114e1c6d5cc2d`: MIT; copied licence and vendored-source notices in `docs/third-party/`. Only the WhisperKit product (and its ArgmaxCore dependency) is linked. [Pinned source](https://github.com/argmaxinc/argmax-oss-swift/tree/1e2a163736dfa5a198e637ae44c114e1c6d5cc2d).
 - Swift Argument Parser **1.8.2**, commit `6a52f3251125d74daf04fcbd5e6f08a75d074382`: Apache 2.0, upstream CLI dependency resolved by SPM; not linked into Aparté. Licence included.

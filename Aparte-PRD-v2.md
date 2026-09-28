@@ -32,6 +32,10 @@ D023 adds an optional, verified large-v3-turbo Core ML choice and an in-app comp
 
 ## 1. Agent execution contract
 
+### Owner-approved beta distribution amendment — 28 September 2026
+
+The owner asked for stable signing for public beta builds, then instructed implementation. D030 narrowly supersedes §11 M5B's Developer ID prerequisite for this beta path: use a dedicated persistent self-signed beta certificate, local signing/packaging and manual GitHub draft prereleases under `clemarc/aparte`. No paid account, Developer ID, notarisation, certificate trust installation, hosted signing credential or automatic publication is authorized. Release only when deliberately selected; app version bumps and main merges do not publish. Keep M4 validation and fresh-Mac launch/permission-update checks visible and review the concrete artifact/notes before public publication. The original signed/notarised M5B option remains deferred.
+
 Implement M0-M4 in order, continuing without routine design approvals. Resolve implementation details using this specification and record consequential choices in `docs/DECISIONS.md`. Do not substitute a demo or mock implementation for the real audio, transcription or insertion paths.
 
 ### 1.1 Authority and boundaries

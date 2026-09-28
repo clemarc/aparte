@@ -1,6 +1,6 @@
 # Aparté implementation
 
-Authority: `Aparte-PRD-v2.md` (read completely), including the owner-approved amendments recorded in `docs/DECISIONS.md`. M0–M4 implementation is closed with acceptance pending. The owner authorised M5A public source under `clemarc`, MIT licensing, existing audited history and hosted build/test. M5B public binaries, Developer ID credentials, notarisation and automatic release publication remain outside this authorisation. Owner-approved D016 permits a dedicated local-only development signing identity for stable permissions; never commit its private material.
+Authority: `Aparte-PRD-v2.md` (read completely), including the owner-approved amendments recorded in `docs/DECISIONS.md`. M0–M4 implementation is closed with acceptance pending. The owner authorised M5A public source under `clemarc`, MIT licensing, existing audited history and hosted build/test. Owner-approved D030 adds a separate persistent self-signed beta identity, local packaging and manual GitHub draft prereleases; no release on each version bump. Developer ID credentials, notarisation, hosted signing secrets and automatic publication remain outside this authorisation. D016's development identity remains local-only. Never commit either identity's private material. Keep fresh-Mac downloaded launch and real two-version permission persistence as outstanding gates; signatures do not pass them.
 
 Commands:
 - `./scripts/build-local.sh --configuration Debug|Release`

@@ -8,6 +8,7 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 
 - MIT public-source licence, contribution guidance and source-only CI for arm64 macOS with Xcode 27.
 - An ad-hoc signed development build artifact from CI. It is not notarised or intended for distribution.
+- A separate persistent self-signed beta identity, verified local ZIP packaging and manual GitHub draft prereleases with accumulated release notes. Beta builds are not Apple-notarised; downloaded launch and permission persistence still need real-Mac validation.
 
 ## 0.4.13 — 2026-09-25 (local candidate)
 

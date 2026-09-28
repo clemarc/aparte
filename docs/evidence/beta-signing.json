@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "builds": {
+    "Debug": {
+      "requirement": "identifier \"dev.aparte.Aparte\" and certificate root = H\"f4816e62a76ea46301c73be830323c2b38c54bd0\"",
+      "binarySHA256": "b0adcd19c2e994f3e0abb8a28b6c3f67bc4f36e2cd1e0544200197e70da93d3d"
+    },
+    "Release": {
+      "requirement": "identifier \"dev.aparte.Aparte\" and certificate root = H\"f4816e62a76ea46301c73be830323c2b38c54bd0\"",
+      "binarySHA256": "1754bbaa5b72073105082b65f3eee7ef8fa41048032925be5e04ada74f15e656"
+    }
+  },
+  "mutualRequirementVerification": "PASS",
+  "tamperedResourceRejected": "PASS",
+  "adHocReplacementRejected": "PASS",
+  "separateDevelopmentIdentity": "PASS",
+  "permissionPersistence": "BLOCKED: no fresh-Mac grant/update capability test",
+  "gatekeeperDownloadedLaunch": "BLOCKED: no fresh-Mac downloaded launch test",
+  "date": "2026-09-28",
+  "decision": "D030"
+}
