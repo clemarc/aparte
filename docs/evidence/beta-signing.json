@@ -31,5 +31,76 @@
     "count": 43,
     "failures": 0
   },
-  "privateMaterial": "Separate owner-only BetaSigning directory outside Git; development identity retained; no trust settings changed"
+  "privateMaterial": "Separate owner-only BetaSigning directory outside Git; development identity retained; no trust settings changed",
+  "finalReviewCandidate": {
+    "schema": 1,
+    "tag": "v0.4.13-beta.1",
+    "repository": "clemarc/aparte",
+    "sourceCommit": "f057fa85ffd26a918d153b639e11713817b336dc",
+    "appVersion": "0.4.13",
+    "appBuild": "14",
+    "minimumMacOS": "14.0",
+    "architecture": "arm64",
+    "archive": "Aparte-v0.4.13-beta.1-arm64-self-signed-NOT-NOTARISED.zip",
+    "archiveSHA256": "a6b55a9944890b02bc1eb02be161ad6680b2fc952cc9e30390344023d3174754",
+    "signing": {
+      "schema": 1,
+      "profile": "beta",
+      "bundleIdentifier": "dev.aparte.Aparte",
+      "certificateSHA1": "F4816E62A76EA46301C73BE830323C2B38C54BD0",
+      "certificateSHA256": "0F630BF0934879160F880ECB8839E02018E0C11BC16E5D44EEB616EEFCB0BA9D",
+      "designatedRequirement": "identifier \"dev.aparte.Aparte\" and anchor H\"F4816E62A76EA46301C73BE830323C2B38C54BD0\"",
+      "notarised": false
+    },
+    "validation": {
+      "build": "PASS",
+      "unitTests": "PASS",
+      "archiveSignature": "PASS",
+      "cleanMacGatekeeper": "BLOCKED",
+      "permissionPersistence": "BLOCKED",
+      "M4Acceptance": "BLOCKED"
+    }
+  },
+  "githubDraft": {
+    "assets": [
+      {
+        "digest": "sha256:a6b55a9944890b02bc1eb02be161ad6680b2fc952cc9e30390344023d3174754",
+        "name": "Aparte-v0.4.13-beta.1-arm64-self-signed-NOT-NOTARISED.zip",
+        "size": 1241174,
+        "state": "uploaded"
+      },
+      {
+        "digest": "sha256:c733251de723fe8b70ccfb8ffeebd3fd8f036c149dd06ba577e0510a033ca0e9",
+        "name": "release.json",
+        "size": 1019,
+        "state": "uploaded"
+      },
+      {
+        "digest": "sha256:6db07dc08f51edf1aa381b681d9e859b34a5b4ccd51903366fcf6e04cec48ff2",
+        "name": "SHA256SUMS",
+        "size": 203,
+        "state": "uploaded"
+      }
+    ],
+    "draft": true,
+    "html_url": "https://github.com/clemarc/aparte/releases/tag/untagged-8b8502c8d609aca74d0c",
+    "id": 398073125,
+    "prerelease": true,
+    "published_at": null,
+    "tag_name": "v0.4.13-beta.1"
+  },
+  "uploadedAssetDigests": "PASS: all three GitHub asset SHA-256 digests match the local reviewed files",
+  "hostedPR": {
+    "url": "https://github.com/clemarc/aparte/pull/4",
+    "status": "MERGED",
+    "check": "PASS",
+    "run": "https://github.com/clemarc/aparte/actions/runs/36397594480"
+  },
+  "hostedMain": {
+    "status": "PASS",
+    "run": "https://github.com/clemarc/aparte/actions/runs/36398170996",
+    "sourceCommit": "f057fa85ffd26a918d153b639e11713817b336dc"
+  },
+  "earlyDraftAttempt": "BLOCKED as expected before exact-main CI succeeded; no upload on that attempt",
+  "realMacValidationIssue": "https://github.com/clemarc/aparte/issues/5"
 }
