@@ -10,11 +10,11 @@ A read-only hardware check reports **MacBook Pro, Apple M5 Pro, 48 GB unified me
 
 Start with **Qwen3-4B-Instruct-2507 at 4-bit** for formatting and short summaries. It is explicitly a non-thinking instruction model, so it avoids configuring a reasoning toggle. This is a deliberate compact baseline rather than a claim that it is the newest or best model. [Publisher model card](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507).
 
-For broader writing, translation, questions and small coding tasks, try **Qwen3.5-9B at 4-bit** next. If that leaves a quality gap for your general work, your 48 GB Mac has room to explore **Qwen3.5-35B-A3B at 4-bit** with a modest context and other large models unloaded. The dense **Qwen3.5-27B** is another quality-oriented comparison, not an additional required download. These are candidates to evaluate on your own tasks; published general benchmarks do not establish Aparté formatting or French-summary quality. [9B card](https://huggingface.co/Qwen/Qwen3.5-9B), [35B-A3B card](https://huggingface.co/Qwen/Qwen3.5-35B-A3B).
+For broader writing, translation, questions and small coding tasks, try **Qwen3.5-9B at 4-bit** next. For the larger MLX choices shown in the owner's Unsloth Desktop screenshot, start with **Qwen3.6-35B-A3B-UD-MLX-4bit**, with a modest context and other large models unloaded. The dense **Qwen3.6-27B-UD-MLX-4bit** is an alternative to compare on coding/quality tasks. The earlier Qwen3.5 GGUF choices below remain format-specific alternatives. These are candidates to evaluate on your own tasks; published general benchmarks do not establish Aparté formatting or French-summary quality. [9B card](https://huggingface.co/Qwen/Qwen3.5-9B), [35B MLX card](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit).
 
 For the initial Aparté design, select one LLM for both commands. A separate larger chat model can be used in the runtime outside Aparté; two command-specific providers are not part of the initial scope. Keep only the model you need loaded while comparing.
 
-## Memory planning
+## Memory planning: GGUF examples
 
 The file sizes below are publisher metadata for the named **GGUF Q4_K_M** files. The LLM working-memory ranges are **our conservative planning estimates**, not measured peaks or guaranteed limits. They assume one request, roughly 4K–8K context, short text output and no image/video processing. Runtime settings, caches and load-time peaks can push usage beyond them.
 
@@ -33,6 +33,28 @@ Watch **Activity Monitor → Memory** with the LLM, Aparté and your usual apps 
 
 Qwen3.5 also has vision components: an app may download/load a separate projector even for a text session. The linked repositories list these separately; the table counts the main language-model file only. Confirm the actual loaded total in your runtime.
 
+## MLX choices from Unsloth Desktop
+
+**MLX is Apple's machine-learning framework for Apple Silicon**, using shared CPU/GPU memory. An MLX model is a conversion/quantization prepared for that runtime; it does not denote a different task or automatically better answer quality than the equivalent model in GGUF. GGUF/llama.cpp can also use Apple's GPU. Compare compatible runtime/model combinations on the same tasks rather than assuming a universal MLX speed advantage. [Apple MLX documentation](https://ml-explore.github.io/mlx/build/html/index.html).
+
+The screenshot's **Size: 27B / 35B** column denotes parameter count. It is not download size or working memory. Here are the exact MLX repositories, checked on 29 September 2026. Published model-file sizes are separate from **unmeasured planning estimates** for one text request, 4K–8K context and short output; macOS, other apps and Aparté are additional.
+
+| Exact MLX variant | Published model files | Estimated LLM working-memory budget | Assessment for the 48 GB Mac |
+| --- | ---: | ---: | --- |
+| [Qwen3-4B-Instruct-2507-4bit](https://huggingface.co/mlx-community/Qwen3-4B-Instruct-2507-4bit) | 2.26 GB | 4–6 GB | First compact non-thinking formatting/summary trial |
+| [Qwen3.6-35B-A3B-UD-MLX-4bit](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit) | 21.6 GB | 26–32 GB | First larger MLX candidate; start with 4K context |
+| [Qwen3.6-27B-UD-MLX-4bit](https://huggingface.co/unsloth/Qwen3.6-27B-UD-MLX-4bit) | 26.2 GB | 30–36 GB | Plausible alternative with less headroom for other apps |
+| [Qwen3.6-27B-UD-MLX-6bit](https://huggingface.co/unsloth/Qwen3.6-27B-UD-MLX-6bit) | 30.5 GB | 35–41 GB | Tight with normal other apps; 64 GB preferable |
+| [Qwen3.6-35B-A3B-MLX-8bit](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MLX-8bit) | 37.7 GB | 42–48 GB | Not the first choice on 48 GB; 64 GB preferable |
+
+For the same 4-bit label, do not reuse the GGUF budgets above. Unsloth's published table also confirms that its 27B dynamic MLX 4-bit files are 26.2 GB, with different sizes for MXFP4/NVFP4/3-bit variants. Actual tensors and quantization choices determine size; total parameter count and a nominal bit label are insufficient to calculate it. [Unsloth MLX variants and sizes](https://unsloth.ai/docs/models/qwen3.6#mlx-dynamic-quants).
+
+For the owner's first comparison, select **regular UD-MLX-4bit**. MXFP4/NVFP4 are separate quantization formats; their name alone does not establish a speed benefit on the installed Mac runtime. Later tests can compare their compatibility, memory, quality and timing. NVIDIA NVFP4 throughput claims elsewhere in the guide are not Apple Silicon measurements.
+
+Unsloth documents running these MLX variants in its app and uses **mlx-vlm** in the direct command-line example because the models include vision. Do not assume every version of a plain text-only server can load the exact conversion. Verify loading, text generation and the model's actual API route independently; visibility in the model hub is not an integration pass. No server/model was installed or run for this update.
+
+Qwen3.6 supports a non-thinking mode through serving parameters and defaults to thinking in the publisher's API example. For formatting, confirm that the runtime disables it for the API request as well as Chat; `/nothink` is not an officially supported switch. [Qwen3.6 non-thinking instructions](https://huggingface.co/Qwen/Qwen3.6-27B#instruct-or-non-thinking-mode).
+
 ## What “35B-A3B” means
 
 It has **35 billion total parameters, around 3 billion activated per token**. The mixture-of-experts architecture reduces active computation, but the full quantized weights still need storage and memory. It does not have a 3B model's RAM requirement. [Publisher architecture](https://huggingface.co/Qwen/Qwen3.5-35B-A3B).
@@ -50,6 +72,7 @@ For **Qwen3.5**, the publisher documents a non-thinking mode controlled through 
 ## Which download in LM Studio or Unsloth Desktop?
 
 - **LM Studio / MLX baseline:** search [`mlx-community/Qwen3-4B-Instruct-2507-4bit`](https://huggingface.co/mlx-community/Qwen3-4B-Instruct-2507-4bit). Its model card identifies the conversion and about 2.26 GB of model files. MLX file sizes and memory behavior differ from the GGUF table.
+- **Unsloth Desktop / MLX:** search `unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit` for the larger candidate from the screenshot, or load the compact MLX baseline when supported. Use the MLX table above and verify the selected runtime/API path. Unsloth Desktop also supports GGUF; it is not limited to that format.
 - **Unsloth Desktop / GGUF:** search the linked `unsloth/…-GGUF` repository and select the single **Q4_K_M** variant for a reproducible starting point. **UD-Q4_K_XL** is another option with different sizes; for example the linked 35B repository lists about 22.2 GB. Match the selected filename to your notes rather than assuming all “4-bit” downloads are identical.
 - Start with 4-bit rather than downloading full-precision weights. A 5/6-bit comparison is optional if you observe a quality problem and have memory headroom; more bits are not a remedy for every model mistake.
 - Refresh the runtime's model API and use its exact model ID. Confirm that the chosen model family and its API path are supported by the installed runtime version; a downloadable card alone is not proof. Setup instructions remain in [LOCAL-LLM-SETUP.md](LOCAL-LLM-SETUP.md).
@@ -73,4 +96,4 @@ For a useful comparison after you set up the runtime:
 - Keep aggregate quality results, median/slow-tail completion time, first-token time where available, output token count, process memory and system memory pressure. Record runtime/version/model filename. Do not retain private text or recordings.
 - Repeat with the actual Aparté speech model and normal apps resident. Chat/API timing does not include speech decoding or guarded insertion, and cannot pass the deferred integration or existing acceptance gates.
 
-**First trial on the 48 GB Mac:** compare the non-thinking 4B model against 9B on these short tasks. Explore 35B-A3B for broader work only if there is a useful quality gain to seek. There is no need to load all four or keep a large reasoning model running for simple dictation cleanup.
+**First trial on the 48 GB Mac:** use the non-thinking 4B MLX model for short transformations. Compare 9B if you want a modest general-use model, or the screenshot's Qwen3.6-35B-A3B MLX 4-bit candidate for larger general/coding work. Load one LLM at a time. There is no need to download every variant or keep a large reasoning model running for simple dictation cleanup.
