@@ -60,6 +60,8 @@ The installer also refuses to proceed if another Aparté copy is running. A stal
 
 [Local LLM setup on Apple Silicon](docs/LOCAL-LLM-SETUP.md) walks a beginner through LM Studio with Apple's MLX runtime, model selection, a local API test and troubleshooting. This prepares a separate server; Aparté's formatting/summarization integration and LLM picker remain deferred in the [Post-M5 scope](docs/POST-M5-DICTATION.md). The guide does not use Ollama and does not claim live-provider validation.
 
+The same deferred scope records expansion of the speech-language picker to Auto plus every language supported by the active model. Auto already detects across the model's available languages; the current manual choices remain English/French. Additional selectable languages will not imply equal or measured quality across all of them.
+
 [Choosing a local LLM](docs/LOCAL-LLM-MODELS.md) adds a compact non-thinking baseline, larger general-use candidates, estimated memory budgets by RAM tier and a performance comparison procedure. LLM timing/quality remains unmeasured on the reference Mac.
 
 ## Logo

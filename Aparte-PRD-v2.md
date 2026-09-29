@@ -38,6 +38,8 @@ Processing preserves the four pinned models, active-versus-preview selection, la
 
 D032 supersedes local development naming only: default local/CI builds use **Aparte Dew / Aparte Dew.app**, identifier **dev.aparte.Aparte.dew**, install path **~/Applications/Aparte Dew.app**, and separate preferences, login registration and model storage. Beta standard builds retain **Aparté / Aparte.app / dev.aparte.Aparte** and their separate beta signing identity. Reuse the development certificate without migrating data or privacy grants; verify actual permissions independently. M4 acceptance, fresh-Mac beta launch and two-version permission persistence remain outstanding.
 
+D036 records the owner's clarified deferred speech-language expansion in [Post-M5 dictation UX](docs/POST-M5-DICTATION.md): retain Auto and offer every language supported by the active model's verified tokenizer/decoder, using a searchable picker, stable persisted codes and model-switch compatibility checks. Auto already detects across model-supported languages; explicit selection skips detection and supplies the language prompt. This is future recognition UX scope, not interface translation or a guarantee of equal quality across languages. The current Auto/English/French picker and acceptance status remain unchanged.
+
 ## 1. Agent execution contract
 
 ### Owner-approved beta distribution amendment — 28 September 2026

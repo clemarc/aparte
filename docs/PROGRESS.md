@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Speech-language scope clarification — 29 September 2026
+
+Owner clarified that more UI languages means expanding the Auto/English/French speech selector, not translating menus. D036 and [POST-M5-DICTATION.md](POST-M5-DICTATION.md) now specify Auto plus a searchable list of all verified active-model languages, stable persisted codes, explicit model/language compatibility and validation before decoder fallback. Source inspection confirms Auto already detects across tokenizer language tokens; explicit selection skips detection and supplies the language prompt. Read-only local checks found 100 unique engine codes, 99 language tokens for Base/Small/Medium and 100 for Turbo (Cantonese is Turbo-only). These observations establish token compatibility, not language quality. The uncommitted interface-translation draft was replaced. Local links/format and source/metadata checks only; no app changes, model download, build, live speech, provider traffic or publication. Implementation and additional-language quality remain deferred, with existing M4/beta gates pending.
+
 ## MLX model recommendation refinement — 29 September 2026
 
 Owner supplied Unsloth Desktop's Qwen3.6 MLX catalog screenshot and asked about MLX. [LOCAL-LLM-MODELS.md](LOCAL-LLM-MODELS.md) now gives a separate MLX table with exact repositories/published file sizes, unmeasured working-memory estimates and a first larger candidate for M5 Pro / 48 GB: Qwen3.6-35B-A3B-UD-MLX-4bit. The compact non-thinking 4B MLX baseline remains. Explicitly distinguish parameter counts, GGUF files, MLX dynamic variants and actual runtime/API support; source checks show the 27B MLX 4-bit files at 26.2 GB and the 35B MLX 4-bit files at 21.6 GB. Higher-bit variants leave less headroom. Official MLX/model documentation and static links/format were checked; no model download, runtime install, inference, latency result or acceptance change.
