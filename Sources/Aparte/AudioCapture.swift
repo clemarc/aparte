@@ -14,6 +14,7 @@ final class CaptureTicket: @unchecked Sendable {
 final class AudioCapture: @unchecked Sendable {
     private let queue = DispatchQueue(label: "dev.aparte.audio", qos: .userInitiated)
     private var engine: AVAudioEngine?
+    private var configurationObserver: CaptureConfigurationObserver?
     private var storage: AVAudioPCMBuffer?
     private let lock = NSLock()
     private var frames = 0
@@ -30,7 +31,8 @@ final class AudioCapture: @unchecked Sendable {
                 level > 0 ? max(0, min(1, (20 * log10(Double(level)) + 60) / 60)) : 0)
     }
 
-    func start(ticket: CaptureTicket, onLive: @escaping @Sendable () -> Void) async throws {
+    func start(ticket: CaptureTicket, onConfigurationChange: @escaping @Sendable () -> Void,
+               onLive: @escaping @Sendable () -> Void) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             queue.async {
                 do {
@@ -45,6 +47,7 @@ final class AudioCapture: @unchecked Sendable {
                     self.lock.lock(); self.frames = 0; self.first = false; self.reachedLimit = false
                     self.inputName = name; self.sampleRate = format.sampleRate; self.level = 0; self.lock.unlock()
                     self.storage = storage; self.engine = engine; self.ticket = ticket
+                    self.configurationObserver = CaptureConfigurationObserver(engine: engine, onChange: onConfigurationChange)
                     input.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
                         guard let self, !ticket.isCancelled, let source = buffer.floatChannelData, let dest = storage.floatChannelData else { return }
                         self.lock.lock()
@@ -77,6 +80,7 @@ final class AudioCapture: @unchecked Sendable {
     func stop(discard: Bool) async throws -> [Float] {
         try await withCheckedThrowingContinuation { continuation in
             queue.async {
+                self.configurationObserver?.invalidate(); self.configurationObserver = nil
                 self.engine?.inputNode.removeTap(onBus: 0); self.engine?.stop(); self.engine = nil
                 let storage = self.storage
                 self.lock.lock(); let count = self.frames; let limit = self.reachedLimit; self.frames = 0; self.lock.unlock()
@@ -89,6 +93,7 @@ final class AudioCapture: @unchecked Sendable {
         }
     }
     private func teardown() {
+        configurationObserver?.invalidate(); configurationObserver = nil
         engine?.inputNode.removeTap(onBus: 0); engine?.stop(); engine = nil; storage = nil; ticket = nil
     }
     private static func deviceName(_ input: AVAudioInputNode) -> String {

@@ -1,5 +1,11 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Microphone configuration cancellation — 29 September 2026
+
+Owner supplied the configuration-change error screenshot. Native Dew 0.5.0 build 16 inspection confirmed that status and zero received frames. Source observed all AVAudioEngine configuration notifications and cancelled any active transaction, including transcription/insertion. D035 scopes observation to the current capture engine, retires it before teardown and checks the session ID plus startup/recording phase. Genuine changes still cancel; a new attempt creates a fresh default-input engine. The owner's exact notification source was not traced.
+
+Dew 0.5.1 build 17 passed native Release, 47 unit tests (three new regressions) and mutual actual signing requirements against the prior Debug Dew build. Idle Dew was quit through its app menu before rebuilding, then the new Release artifact was reopened. During verification the owner independently operated one microphone check; native UI reported received audio and successful local transcription. No agent-started recording, retained audio/transcript evidence, privacy-setting change, beta replacement or publication occurred. `docs/evidence/capture-configuration.json` records scoped status/timing/build evidence. The real route/unplug matrix, M4 acceptance, fresh-Mac launch and beta-update gates remain pending.
+
 ## Local LLM onboarding documentation — 29 September 2026
 
 Owner requested a beginner macOS setup guide without Ollama and asked about local/remote model selection. D034 adds [LOCAL-LLM-SETUP.md](LOCAL-LLM-SETUP.md): LM Studio with Apple's MLX runtime, memory-based starting examples, manual model loading, loopback server setup, synthetic API checks, future Aparté fields, offline verification and troubleshooting. [POST-M5-DICTATION.md](POST-M5-DICTATION.md) now specifies a separate explicit LLM picker, discovery plus manual API IDs, base-URL semantics, selection persistence and stale-readiness checks. README and PRD link the guide. Official runtime/model sources, sample syntax and local Markdown links were reviewed. This is documentation only; no server installation, weights, live API call, performance result, feature implementation or publication. A clean-Mac walkthrough and combined ASR/LLM live validation remain future checks; existing M4 and beta gates remain pending.

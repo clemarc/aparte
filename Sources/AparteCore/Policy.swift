@@ -68,6 +68,9 @@ public struct SessionMachine: Sendable {
         let next = UUID(); id = next; invalidatedTarget = false; state = .startingCapture; return next
     }
     public mutating func started(_ token: UUID) -> Bool { guard id == token, state == .startingCapture else { return false }; state = .recording; return true }
+    public func isCapturing(_ token: UUID) -> Bool {
+        id == token && (state == .startingCapture || state == .recording)
+    }
     public mutating func release(_ token: UUID) -> Bool {
         guard id == token else { return false }
         if state == .startingCapture { cancel(); return false }

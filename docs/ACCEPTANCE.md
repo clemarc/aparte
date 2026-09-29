@@ -372,3 +372,16 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Debug/Release development build and signing | PASS | `artifacts/companion-alignment-{debug,release}.log`; existing certificate-backed identity verified |
 | Updated real app launch | PASS | Idle app quit normally before rebuilding; relaunched Release reports Ready, medium and granted access. No recording/insertion performed |
 | Full live companion behavior | BLOCKED | App-menu invocation still captures the workspace rather than the separate popover; layout fixture does not validate real popover interaction or dictation |
+
+## 0.5.1 — Capture configuration cancellation
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Owner's configuration error observed | PASS | Native 0.5.0 build 16 showed the matching error and 0.0 seconds received; exact notification source was not traced |
+| Engine and capture-phase cancellation | PASS | Three regressions: unrelated/nil/retired engines ignored, current-engine change delivered once, startup/recording accepted, frozen-audio/insertion/stale session callbacks refused. Synthetic events, no recording |
+| Native Release and regression | PASS | 0.5.1 build 17; 47 tests, zero failures; `artifacts/capture-configuration-{release,unit}.log` |
+| Development signing continuity | PASS | Prior Debug Dew and new Release satisfy each other's actual requirements; `artifacts/capture-configuration-signing.log` |
+| Updated launch and owner-operated microphone check | PASS for one smoke attempt | Native 0.5.1 reports captured audio and locally completed transcription after owner interaction. Agent did not start capture; no audio/transcript in evidence |
+| Actual device-route/unplug and repeated capture | BLOCKED | One microphone check does not exercise route changes, cancellation/retry, timing distribution or the full M4 matrix |
+
+`docs/evidence/capture-configuration.json` records scoped evidence. M4 acceptance, fresh-Mac beta launch and two-beta permission persistence remain pending.

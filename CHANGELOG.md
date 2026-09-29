@@ -10,6 +10,13 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 - An ad-hoc signed development build artifact from CI. It is not notarised or intended for distribution.
 - A separate persistent self-signed beta identity, verified local ZIP packaging and manual GitHub draft prereleases with accumulated release notes. Beta builds are not Apple-notarised; downloaded launch and permission persistence still need real-Mac validation.
 
+## 0.5.1 — 2026-09-29 (local candidate)
+
+### Fixed
+
+- Microphone configuration changes are observed only for the current capture engine. Notifications from other or retired engines cannot cancel a new hold or frozen audio during transcription/insertion.
+- Capture observers are removed before engine teardown; genuine changes during startup/recording still cancel safely and use the current default input on the next attempt.
+
 ## 0.5.0 — 2026-09-28 (local UX candidate)
 
 ### Added

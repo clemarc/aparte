@@ -84,7 +84,6 @@ import AparteSpeech
         }
         observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.activatedApplication(); self?.targetService.prepareCurrentApplication() } })
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.recheck() } })
-        observers.append(NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { if self?.machine.id != nil { self?.cancel("Microphone configuration changed. Retry with the current default input.") } } })
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
         memoryPressure = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
         memoryPressure?.setEventHandler { [weak self] in Task { @MainActor in self?.unloadIfIdle() } }; memoryPressure?.resume()
@@ -238,7 +237,12 @@ import AparteSpeech
         refresh()
         startup = Task {
             do {
-                try await audio.start(ticket: newTicket) { [weak self] in Task { @MainActor in
+                try await audio.start(ticket: newTicket, onConfigurationChange: { [weak self] in
+                    Task { @MainActor in
+                        guard let self, self.machine.isCapturing(id) else { return }
+                        self.cancel("Audio input changed during recording. Try again with the current default microphone.")
+                    }
+                }) { [weak self] in Task { @MainActor in
                     guard let self, self.machine.started(id) else { return }
                     self.startedAt = Date(); self.notice = self.destination == .microphoneTest ? "Recording — press Stop to transcribe, Escape to cancel." : "Recording — release to transcribe, Escape to cancel."
                     if self.destination != .external { self.testStatus = self.notice }; self.refresh()

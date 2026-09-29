@@ -1,0 +1,44 @@
+{
+  "date": "2026-09-29",
+  "version": "0.5.1",
+  "build": 17,
+  "previousNativeObservation": {
+    "version": "0.5.0",
+    "build": 16,
+    "configurationChangeError": true,
+    "receivedSeconds": 0.0,
+    "exactNotificationSource": "UNCONFIRMED"
+  },
+  "regression": {
+    "status": "PASS",
+    "tests": 47,
+    "failures": 0,
+    "newConfigurationTests": 3,
+    "scope": "Synthetic notifications on unstarted real AVAudioEngine instances and transaction lifecycle guards; no microphone recording",
+    "log": "artifacts/capture-configuration-unit.log"
+  },
+  "releaseBuild": {
+    "status": "PASS",
+    "variant": "development",
+    "bundleIdentifier": "dev.aparte.Aparte.dew",
+    "binarySHA256": "83cc470d0ffd819c28dbf725d741f1626238b1685a57853167a27a95968b36bd",
+    "log": "artifacts/capture-configuration-release.log"
+  },
+  "signing": {
+    "status": "PASS",
+    "scope": "Prior Debug Dew and corrected Release mutually satisfy actual designated requirements using the existing development certificate",
+    "log": "artifacts/capture-configuration-signing.log"
+  },
+  "nativeLaunch": "PASS: 0.5.1 build 17 reopened after orderly quit of idle prior build",
+  "ownerOperatedMicrophoneSmoke": {
+    "status": "PASS for one observed attempt",
+    "initiatedByAgent": false,
+    "capturedSeconds": 1.3,
+    "decodeSeconds": 0.72,
+    "observation": "Native UI reported microphone test complete with locally transcribed result",
+    "audioOrTranscriptInEvidence": false
+  },
+  "actualRouteChangeAndUnplug": "BLOCKED: not exercised",
+  "formalM4Acceptance": "PENDING",
+  "freshMacBetaLaunchAndTwoVersionPermissions": "BLOCKED: unchanged outstanding gates"
+}
