@@ -278,6 +278,10 @@
 - Alternatives: endpoint/key alone cannot express the requested model; a hard-coded catalog would age and exclude custom aliases; discovery-only would block compatible endpoints with unsupported/restricted listing. These choices are saved in [POST-M5-DICTATION.md](POST-M5-DICTATION.md), not implemented in the current placeholder.
 - Evidence/limitations: source-reviewed instructions, static sample/link checks only. No live LM Studio/provider/ASR+LLM benchmark, clean-Mac walkthrough or new acceptance pass is claimed. Remote tests remain explicit/consented; no real transcript transmission, paid API request, app build, installation, release or publication occurs. Recheck runtime/API contracts and run the guide before shipping the integration.
 
+### D034 follow-up — advisory model and memory guide
+
+- Owner asked for personal and RAM-tier recommendations on 29 September 2026. [LOCAL-LLM-MODELS.md](LOCAL-LLM-MODELS.md) records the verified M5 Pro / 48 GB hardware class, a compact non-thinking 4B starting candidate and optional 9B/27B/35B-A3B general-use comparisons. Publisher file sizes are separate from estimated runtime budgets; no LLM performance or quality measurement is claimed. These are advisory choices, not a shipping catalog, speech-default change or feature implementation. The setup guide replaces its 16 GB+ first-trial example with the 4B MLX conversion and retains the earlier models as alternatives. A later controlled synthetic/live-runtime comparison is needed to select a product recommendation.
+
 ## D035 — Scope configuration cancellation to one live capture
 
 - Status: adopted on 29 September 2026 after the owner's error screenshot. Native Dew 0.5.0 showed the same error and zero received frames; exact hardware/engine trigger remains unconfirmed.

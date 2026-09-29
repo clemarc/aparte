@@ -28,9 +28,11 @@ These are starting points for testing, not Aparté performance or quality guaran
 | Memory | First model to try | Approximate model files |
 | --- | --- | --- |
 | 8 GB, or a lightweight first test | [`mlx-community/Qwen2.5-1.5B-Instruct-4bit`](https://huggingface.co/mlx-community/Qwen2.5-1.5B-Instruct-4bit) | 0.9 GB |
-| 16 GB or more, with memory available | [`mlx-community/Qwen2.5-7B-Instruct-4bit`](https://huggingface.co/mlx-community/Qwen2.5-7B-Instruct-4bit) | 4.3 GB |
+| 16 GB or more, formatting/short summaries | [`mlx-community/Qwen3-4B-Instruct-2507-4bit`](https://huggingface.co/mlx-community/Qwen3-4B-Instruct-2507-4bit) | 2.3 GB |
 
-Both linked conversions identify MLX format and Apache-2.0 licensing. They are examples, not bundled models or a permanent approved catalog. The upstream 7B model documents English and French support; evaluate actual formatting and summary quality yourself. [Qwen model card](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct).
+Both linked conversions identify MLX format and Apache-2.0 licensing. They are examples, not bundled models or a permanent approved catalog. The exact Qwen3-4B-Instruct-2507 variant uses non-thinking mode, which simplifies a first formatting test. [Publisher model card](https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507). The earlier [Qwen2.5-7B MLX example](https://huggingface.co/mlx-community/Qwen2.5-7B-Instruct-4bit) remains an optional comparison.
+
+[Model and memory recommendations](LOCAL-LLM-MODELS.md) cover the reference M5 Pro / 48 GB Mac, other RAM tiers, Unsloth GGUF choices, thinking controls and a timing/quality comparison procedure. Working-memory ranges there are estimates, not local LLM benchmarks.
 
 Leave disk space beyond the displayed download size for the app/runtime and downloads. File size is not total working memory: macOS, other apps, Aparté's active speech model, the LLM and its context all share memory. Start with the smaller option if uncertain. In **Activity Monitor → Memory**, watch memory pressure while both apps are running.
 

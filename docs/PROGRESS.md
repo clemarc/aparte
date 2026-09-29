@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Local LLM recommendations — 29 September 2026
+
+Owner asked which models to try on their Mac, including lightweight non-reasoning formatting/summaries and broader uses, with RAM/performance guidance. A filtered read-only hardware query confirmed Apple M5 Pro / 48 GB memory without retaining device identifiers. [LOCAL-LLM-MODELS.md](LOCAL-LLM-MODELS.md) recommends Qwen3-4B-Instruct-2507 4-bit as the first compact non-thinking trial, 9B for general-use comparison and optional 35B-A3B/27B exploration. Named GGUF sizes come from publisher file metadata; working-memory ranges and comfortable RAM tiers are explicitly planning estimates. Source checks verified the exact non-thinking variant, Qwen3.5's runtime-dependent thinking control and MoE total-versus-active parameters. The setup guide now links the recommendations and uses the 4B MLX baseline for 16 GB+; its 1.5B fallback remains. Static documentation/link checks passed. No LLM weights, runtime installation, live API request or new throughput/quality evidence; implementation and real acceptance remain deferred.
+
 ## Microphone configuration cancellation — 29 September 2026
 
 Owner supplied the configuration-change error screenshot. Native Dew 0.5.0 build 16 inspection confirmed that status and zero received frames. Source observed all AVAudioEngine configuration notifications and cancelled any active transaction, including transcription/insertion. D035 scopes observation to the current capture engine, retires it before teardown and checks the session ID plus startup/recording phase. Genuine changes still cancel; a new attempt creates a fresh default-input engine. The owner's exact notification source was not traced.

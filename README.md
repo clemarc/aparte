@@ -60,6 +60,8 @@ The installer also refuses to proceed if another Aparté copy is running. A stal
 
 [Local LLM setup on Apple Silicon](docs/LOCAL-LLM-SETUP.md) walks a beginner through LM Studio with Apple's MLX runtime, model selection, a local API test and troubleshooting. This prepares a separate server; Aparté's formatting/summarization integration and LLM picker remain deferred in the [Post-M5 scope](docs/POST-M5-DICTATION.md). The guide does not use Ollama and does not claim live-provider validation.
 
+[Choosing a local LLM](docs/LOCAL-LLM-MODELS.md) adds a compact non-thinking baseline, larger general-use candidates, estimated memory budgets by RAM tier and a performance comparison procedure. LLM timing/quality remains unmeasured on the reference Mac.
+
 ## Logo
 
 The owner selected the voice-to-text mark: three speech bars become two text lines. `Sources/Aparte/Branding.swift` supplies the shared scalable geometry for the workspace, menu template and app icon. `Resources/Aparte-mark.svg` is the vector source for other uses. Regenerate the committed `Resources/Aparte.icns` with `./scripts/generate-brand.sh` on macOS; generated intermediate PNGs stay under ignored `artifacts/brand/`.
