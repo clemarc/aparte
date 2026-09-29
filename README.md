@@ -56,6 +56,10 @@ The installer also refuses to proceed if another Aparté copy is running. A stal
 - **Try your shortcut:** click the box, optionally select text, hold the saved shortcut and release. Keep focus until insertion. The result identifies global or in-app delivery. An in-app pass does not validate another app.
 - **Retention:** leaving Try it or closing the workspace cancels an active local test and clears its editor/results. Explicit clear, five-minute expiry, lock and quit also clear tests. Navigating the workspace does not cancel an external dictation transaction.
 
+## Future optional text handling
+
+[Local LLM setup on Apple Silicon](docs/LOCAL-LLM-SETUP.md) walks a beginner through LM Studio with Apple's MLX runtime, model selection, a local API test and troubleshooting. This prepares a separate server; Aparté's formatting/summarization integration and LLM picker remain deferred in the [Post-M5 scope](docs/POST-M5-DICTATION.md). The guide does not use Ollama and does not claim live-provider validation.
+
 ## Logo
 
 The owner selected the voice-to-text mark: three speech bars become two text lines. `Sources/Aparte/Branding.swift` supplies the shared scalable geometry for the workspace, menu template and app icon. `Resources/Aparte-mark.svg` is the vector source for other uses. Regenerate the committed `Resources/Aparte.icns` with `./scripts/generate-brand.sh` on macOS; generated intermediate PNGs stay under ignored `artifacts/brand/`.

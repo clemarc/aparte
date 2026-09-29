@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Local LLM onboarding documentation — 29 September 2026
+
+Owner requested a beginner macOS setup guide without Ollama and asked about local/remote model selection. D034 adds [LOCAL-LLM-SETUP.md](LOCAL-LLM-SETUP.md): LM Studio with Apple's MLX runtime, memory-based starting examples, manual model loading, loopback server setup, synthetic API checks, future Aparté fields, offline verification and troubleshooting. [POST-M5-DICTATION.md](POST-M5-DICTATION.md) now specifies a separate explicit LLM picker, discovery plus manual API IDs, base-URL semantics, selection persistence and stale-readiness checks. README and PRD link the guide. Official runtime/model sources, sample syntax and local Markdown links were reviewed. This is documentation only; no server installation, weights, live API call, performance result, feature implementation or publication. A clean-Mac walkthrough and combined ASR/LLM live validation remain future checks; existing M4 and beta gates remain pending.
+
 ## Scope documentation — 29 September 2026
 
 Owner asked to update the deferred scope for the new UX. D033 and [POST-M5-DICTATION.md](POST-M5-DICTATION.md) preserve the agreed double-tap mode, voice commands, local/remote providers, per-command prompt enrichment and raw fallback, mapped to Try it / Processing / Shortcuts / Settings and the companion. The PRD now records implemented D031/D032 UX and Dew identity explicitly and links the future scope. Existing model comparison work is the baseline, not a new task. This is documentation only: no feature implementation, provider request, build, beta package or publication. M4 acceptance and fresh-Mac/two-beta permission gates remain pending. Resume the deferred features only when the owner starts that checkpoint after their chosen release work.
