@@ -2,9 +2,9 @@
 ## PRD v2: autonomous implementation through M4
 
 **Date:** 22 September 2026  
-**Status:** Refined build specification; no application has been built or benchmarked by this review.  
+**Status:** Original core specification with owner-approved amendments. M4 implementation is closed with formal acceptance pending; M5A public source/build work is complete. The unified UX is implemented in the development candidate; beta launch/update validation remains pending.
 **Basis:** Supplied seven-page "Local Whisper Push-to-Talk - macOS App PRD".  
-**Authority:** Sections 1-12 are normative for implementation. Appendix A records the adversarial review; Appendix B records sources. This document supersedes conflicting requirements in the original.
+**Authority:** Sections 1-12 and the adopted owner-approved amendments are normative for their implementation checkpoints. Appendix A records the original adversarial review; Appendix B records sources. This document supersedes conflicting requirements in the original. Deferred feature scope is recorded separately in [Post-M5 dictation UX](docs/POST-M5-DICTATION.md); it does not change current acceptance or authorise implementation/publication.
 
 > Build a local, private, native macOS dictation app through M4. M4 produces a locally usable candidate and evidence, with no public repository, hosted CI, Developer ID signing, notarisation or public release. Start M5 only after the owner explicitly authorises the public repository and CI setup. Local compilation and tests begin in M0.
 
@@ -29,6 +29,14 @@ D022 records the owner's request to place a Recovery transcript on the clipboard
 ## Owner-approved model comparison expansion — 24 September 2026
 
 D023 adds an optional, verified large-v3-turbo Core ML choice and an in-app comparison using measured Aparté data. D024 records the owner's explicit follow-up to benchmark multilingual medium and add it as an option, superseding MODEL-01's deferral of medium only. Both new entries must use immutable, complete manifests with matching pinned tokenizers, pass real WhisperKit loading/inference and run the existing fixed benchmark gates, recording any failures rather than hiding them. Keep small as the default unless the same measured evidence warrants a change; no model is downloaded during dictation. Tiny, unverified large-v3 and arbitrary model URLs remain deferred. These requests do not authorize M5 or change the existing privacy/permission boundaries.
+
+## Owner-approved unified UX and development identity — 28 September 2026
+
+D031 adds a retained native workspace with **Try it, Processing, Shortcuts and Settings**, capability-based first-open guidance, a compact menu companion and the selected voice-to-text mark. Explicit open/reopen reveals the workspace; login/service startup stays quiet. Try it uses the real capture/transcription path and an app-owned editor; leaving that section or closing the workspace cancels local diagnostics and clears their transient content. External dictation retains its existing lifecycle. Shortcut capture previews a candidate after release and requires explicit Save; Cancel/navigation preserve the saved binding, and detection-only mode reports delivery without recording. The companion reflects actual coordinator state and opens the workspace for recording diagnostics. These presentation changes do not establish live-device acceptance.
+
+Processing preserves the four pinned models, active-versus-preview selection, language and measured comparisons. Its **Text handling** stage currently stays **Off · original text**: no provider, credentials, LLM inference, transcript transmission or rewriting is implemented. D033 records the owner's deferred double-tap and configurable voice-command scope in [Post-M5 dictation UX](docs/POST-M5-DICTATION.md), mapped to this workspace; it is future work, not a current privacy-contract change.
+
+D032 supersedes local development naming only: default local/CI builds use **Aparte Dew / Aparte Dew.app**, identifier **dev.aparte.Aparte.dew**, install path **~/Applications/Aparte Dew.app**, and separate preferences, login registration and model storage. Beta standard builds retain **Aparté / Aparte.app / dev.aparte.Aparte** and their separate beta signing identity. Reuse the development certificate without migrating data or privacy grants; verify actual permissions independently. M4 acceptance, fresh-Mac beta launch and two-version permission persistence remain outstanding.
 
 ## 1. Agent execution contract
 

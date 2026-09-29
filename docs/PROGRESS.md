@@ -1,5 +1,9 @@
 # Aparté progress — M0–M5 beta tooling
 
+## Scope documentation — 29 September 2026
+
+Owner asked to update the deferred scope for the new UX. D033 and [POST-M5-DICTATION.md](POST-M5-DICTATION.md) preserve the agreed double-tap mode, voice commands, local/remote providers, per-command prompt enrichment and raw fallback, mapped to Try it / Processing / Shortcuts / Settings and the companion. The PRD now records implemented D031/D032 UX and Dew identity explicitly and links the future scope. Existing model comparison work is the baseline, not a new task. This is documentation only: no feature implementation, provider request, build, beta package or publication. M4 acceptance and fresh-Mac/two-beta permission gates remain pending. Resume the deferred features only when the owner starts that checkpoint after their chosen release work.
+
 ## Companion action alignment — 28 September 2026
 
 Owner screenshot showed differently sized, centered action buttons and a truncated microphone-check label. Companion actions now share full-width button labels, leading alignment, fixed icon columns and 8-point spacing; the first label is shortened to “Try dictation…”. Debug/Release builds and stable development signing passed. Idle Dew was quit normally before the Release rebuild and relaunched; native status returned Ready with the existing medium model and access. A native layout-only preview using the actual companion view and synthetic Ready state visually confirmed matching button edges, aligned labels and no truncation. The preview performs no audio/ASR/insertion and does not pass live-device gates. Actual popover capture remains unavailable through the workspace-scoped tool. No beta/install/security changes or private transcript collection occurred.
