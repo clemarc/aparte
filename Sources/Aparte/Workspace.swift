@@ -188,7 +188,7 @@ struct TryItView: View {
                     Text(text).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            WorkspaceCard("Try your shortcut", subtitle: "Click in the box, hold \(model.preferences.shortcut.displayLabel), speak after Recording appears, then release. Keep focus here until it finishes.") {
+            WorkspaceCard("Try your shortcut", subtitle: model.preferences.gesture == .hold ? "Click in the box, hold \(model.preferences.shortcut.displayLabel), speak after Recording appears, then release." : "Click in the box, double-tap \(model.preferences.shortcut.displayLabel), speak after Recording appears, then tap once to stop.") {
                 SetupEditor(model: model).frame(height: 130)
                 Text(model.testStatus).font(.callout).accessibilityLabel("Test status: \(model.testStatus)")
                 HStack {
@@ -210,6 +210,45 @@ struct TryItView: View {
     }
 }
 
+struct SpeechLanguagePicker: View {
+    @ObservedObject var model: Coordinator
+    @State private var showing = false
+    @State private var query = ""
+    private var available: [String] {
+        SpeechLanguages.codes.filter { SpeechLanguages.supports($0, model: model.preferences.model) }
+            .sorted { languageLabel($0).localizedStandardCompare(languageLabel($1)) == .orderedAscending }
+    }
+    private var filtered: [String] {
+        query.isEmpty ? available : available.filter { languageLabel($0).localizedStandardContains(query) || $0.localizedStandardContains(query) }
+    }
+    var body: some View {
+        HStack {
+            Text("Spoken language")
+            Spacer()
+            Button(model.preferences.language == "auto" && model.preferences.model.hasSuffix(".en") ? "Auto · English only" : languageLabel(model.preferences.language)) { query = ""; showing = true }
+                .disabled(model.sessionBusy)
+                .popover(isPresented: $showing) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("Search languages", text: $query).textFieldStyle(.roundedBorder)
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 2) {
+                                choice("auto")
+                                ForEach(filtered, id: \.self) { choice($0) }
+                            }.frame(maxWidth: .infinity, alignment: .leading)
+                        }.frame(height: 260)
+                    }.frame(width: 270).padding()
+                }
+        }
+        Text("Auto detects the language with a multilingual model. Choosing a language gives recognition a fixed prompt; it does not translate or select an accent.").font(.caption).foregroundStyle(.secondary)
+    }
+    private func choice(_ code: String) -> some View {
+        Button { model.preferences.language = code; model.persist(); showing = false } label: {
+            HStack { Text(languageLabel(code)); Spacer(); if code == model.preferences.language { Image(systemName: "checkmark") } }
+                .contentShape(Rectangle())
+        }.buttonStyle(.plain).padding(.vertical, 5).padding(.horizontal, 7)
+    }
+}
+
 struct ProcessingView: View {
     @ObservedObject var model: Coordinator
     @ObservedObject var navigation: WorkspaceNavigation
@@ -224,9 +263,7 @@ struct ProcessingView: View {
                 pipelineStage("3", "Insertion", "Original text field")
             }
             WorkspaceCard("Speech recognition", subtitle: "Active: \(model.preferences.model.capitalized) · \(model.modelStatus)") {
-                Picker("Language", selection: $model.preferences.language) {
-                    Text("Auto").tag("auto"); Text("English").tag("en"); Text("French").tag("fr")
-                }.pickerStyle(.segmented).onChange(of: model.preferences.language) { model.persist() }.disabled(model.sessionBusy)
+                SpeechLanguagePicker(model: model)
                 if let catalog = model.catalog {
                     Picker("Model to compare", selection: $selectedModelID) {
                         ForEach(catalog.models) { entry in Text(entry.displayName + (entry.id == model.preferences.model ? " · Active" : "")).tag(entry.id) }
@@ -249,7 +286,7 @@ struct ProcessingView: View {
                         }
                         HStack {
                             if model.installed(entry.id) {
-                                Button(entry.id == model.preferences.model && model.modelLoaded ? "Prepare again" : "Prepare / Use") { model.prepare(entry.id) }.buttonStyle(.borderedProminent)
+                                Button(!SpeechLanguages.supports(model.preferences.language, model: entry.id) ? "Use with Auto language" : (entry.id == model.preferences.model && model.modelLoaded ? "Prepare again" : "Prepare / Use")) { model.prepare(entry.id) }.buttonStyle(.borderedProminent)
                             } else {
                                 Button("Download \(bytes(entry.installedBytes))") { model.installModel(entry.id) }.buttonStyle(.borderedProminent)
                             }
@@ -275,7 +312,7 @@ struct ProcessingView: View {
                             GridRow { Text(entry.id.capitalized); Text(bytes(entry.installedBytes)); Text(c.prepare); Text(c.warmP95); Text(c.peakMemory) }
                         }
                     }.font(.caption)
-                    Text("Measured on M5 Pro / 48 GB with synthetic English/French audio. File decoding is not microphone-to-insertion latency. Peak RAM is whole-process RSS. Preparation varies with caches; these figures do not predict your accent.").font(.caption).foregroundStyle(.secondary)
+                        Text("Figures were measured on M5 Pro / 48 GB with synthetic audio. English-only Base was evaluated on English clips; it cannot recognize French. File decoding is not microphone-to-insertion latency; these figures do not predict your accent.").font(.caption).foregroundStyle(.secondary)
                 }.padding(.top, 12)
             }
             WorkspaceCard("Text handling", subtitle: "Off · keep the original transcript") {
@@ -305,7 +342,11 @@ struct ShortcutsView: View {
     @State private var preview = "Press modifiers, then a key."
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            WorkspaceCard("Hold to talk", subtitle: "Hold your shortcut to record. Release to transcribe and insert. Escape cancels.") {
+            WorkspaceCard("Recording shortcut", subtitle: "Escape cancels. Choose hold or double-tap, then test your saved shortcut.") {
+                Picker("Recording gesture", selection: $model.preferences.gesture) {
+                    Text("Hold to talk").tag(RecordingGesture.hold)
+                    Text("Double-tap to start · tap to stop").tag(RecordingGesture.doubleTap)
+                }.onChange(of: model.preferences.gesture) { model.persist() }.disabled(model.sessionBusy)
                 Text(model.preferences.shortcut.displayLabel).font(.system(size: 32, weight: .medium, design: .rounded)).padding(.vertical, 6)
                 if !model.recordingBinding {
                     HStack {
@@ -329,22 +370,19 @@ struct ShortcutsView: View {
                     }
                     Button("Cancel change") { cancelChange() }
                 }
-                Text("Use Control, Option or Command with a letter, number, punctuation key or Space. Key labels use US physical positions. Conflicts can vary by app.").font(.caption).foregroundStyle(.secondary)
+                Text("Letters, numbers, punctuation, Space, one modifier alone, or Fn / Globe with a key can be saved. Bare keys take over normal typing while Aparté is ready. Modifier-only keys can conflict with other shortcuts. macOS may handle Globe before Aparté sees it. Test on your keyboard; key labels use US physical positions.").font(.caption).foregroundStyle(.secondary)
             }
             WorkspaceCard("Check detection", subtitle: "Tests the saved shortcut without opening the microphone.") {
                 Toggle("Listen for a press and release", isOn: $model.bindingTest).disabled(model.sessionBusy || model.recordingBinding)
-                Text(model.bindingTest ? "Hold \(model.preferences.shortcut.displayLabel), then release." : model.shortcutStatus).font(.callout)
+                Text(model.bindingTest ? (model.preferences.gesture == .hold ? "Hold \(model.preferences.shortcut.displayLabel), then release." : "Double-tap \(model.preferences.shortcut.displayLabel), then tap to stop.") : model.shortcutStatus).font(.callout)
                 Text(model.testStatus).font(.caption).foregroundStyle(.secondary)
                 Text("The result distinguishes the global listener from in-app delivery. In-app delivery alone does not establish system-wide access or conflict freedom.").font(.caption).foregroundStyle(.secondary)
             }
-            WorkspaceCard("Fn / Globe", subtitle: "Not supported in this version") {
-                Text("Fn alone, Fn combinations and modifier-only bindings need a different capture path and validation on real keyboards. macOS may handle Globe before an app can observe it.").font(.callout).foregroundStyle(.secondary)
-                Text("For now, try ⌃⌥Space. No macOS keyboard settings are changed by Aparté.").font(.caption)
-            }
+            Text("Aparté does not change macOS keyboard settings. Fn / Globe is available only when macOS delivers its modifier event to Aparté; Check detection confirms your saved key on this Mac.").font(.caption).foregroundStyle(.secondary)
             Button("Try dictation with this shortcut →") { navigation.section = .tryIt }.buttonStyle(.link)
         }.onDisappear { cancelChange(); model.bindingTest = false }
     }
-    private func beginRecording() { model.bindingTest = false; candidate = nil; preview = "Press modifiers, then a key."; model.recordingBinding = true; listening = true }
+    private func beginRecording() { model.bindingTest = false; candidate = nil; preview = "Press a key or modifier."; model.recordingBinding = true; listening = true }
     private func cancelChange() { listening = false; candidate = nil; model.recordingBinding = false }
     private func save(_ shortcut: Shortcut) {
         guard shortcut.isValid, !model.sessionBusy else { return }
@@ -436,8 +474,8 @@ struct MenuCompanionView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack { AparteLogo().foregroundStyle(.tint).frame(width: 30, height: 24); Text(AppVersion.displayName).font(.headline); Spacer(); StatusBadge(model: model) }
             Text(model.notice).font(.callout).fixedSize(horizontal: false, vertical: true).lineLimit(4)
-            HStack { Text(model.preferences.shortcut.displayLabel).font(.title3.weight(.semibold)); Spacer(); Text("Hold to talk").font(.caption).foregroundStyle(.secondary) }
-            Text("\(model.preferences.model.capitalized) · \(languageLabel(model.preferences.language)) · On-device").font(.caption).foregroundStyle(.secondary)
+            HStack { Text(model.preferences.shortcut.displayLabel).font(.title3.weight(.semibold)); Spacer(); Text(model.preferences.gesture == .hold ? "Hold to talk" : "Double-tap to start").font(.caption).foregroundStyle(.secondary) }
+            Text("\(model.preferences.model.capitalized) · \(model.preferences.model.hasSuffix(".en") ? "English only" : languageLabel(model.preferences.language)) · On-device").font(.caption).foregroundStyle(.secondary)
             Divider()
             VStack(alignment: .leading, spacing: 8) {
                 action("Try dictation…", icon: "mic") { open(.tryIt) }
@@ -462,7 +500,10 @@ struct MenuCompanionView: View {
     }
 }
 
-func languageLabel(_ language: String) -> String { ["auto": "Auto language", "en": "English", "fr": "French"][language] ?? "Auto language" }
+func languageLabel(_ language: String) -> String {
+    if language == "auto" { return "Auto" }
+    return Locale.current.localizedString(forLanguageCode: language)?.capitalized ?? language.uppercased()
+}
 private func bytes(_ size: Int64) -> String { ByteCountFormatter.string(fromByteCount: size, countStyle: .file) }
 private func openSoundInput() { if let url = URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension?input") { NSWorkspace.shared.open(url) } }
 private struct ModelComparison {
@@ -470,6 +511,7 @@ private struct ModelComparison {
     static func forModel(_ id: String) -> Self {
         switch id {
         case "base": return Self(prepare: "6.2 s", warmP95: "0.218 s", peakMemory: "318 MB", quality: "Fastest, but failed the fixed technical-term gate (50%; gate: 80%).")
+        case "base.en": return Self(prepare: "5.9 s", warmP95: "0.356 s", peakMemory: "313 MB", quality: "English only. Synthetic English WER 2.13%, English technical terms 5/6; French recognition is unsupported. Compare your accent with Small before choosing.")
         case "small": return Self(prepare: "18.3 s", warmP95: "0.533 s", peakMemory: "842 MB", quality: "Recommended default. Passed every fixed synthetic quality gate.")
         case "medium": return Self(prepare: "10.3 s", warmP95: "1.137 s", peakMemory: "2.51 GB", quality: "Passed every fixed synthetic quality gate. English/French WER: 0.43% / 0.85%; technical terms: 91.7%.")
         case "turbo": return Self(prepare: "94 s", warmP95: "0.625 s", peakMemory: "3.24 GB", quality: "Passed every fixed synthetic quality gate. English/French WER: 0.43% / 1.91%.")

@@ -6,12 +6,13 @@ final class SetupTests: XCTestCase {
         XCTAssertNil(Shortcut.standard.validationMessage)
         XCTAssertTrue(Shortcut(key: 49, modifiers: Shortcut.control).validationMessage!.contains("reserved"))
         XCTAssertTrue(Shortcut(key: 12, modifiers: Shortcut.command).validationMessage!.contains("reserved"))
-        XCTAssertTrue(Shortcut(key: 0, modifiers: Shortcut.shift).validationMessage!.contains("Add Control"))
-        XCTAssertTrue(Shortcut(key: 36, modifiers: Shortcut.control).validationMessage!.contains("Function keys"))
-        let fn = Shortcut(key: 49, modifiers: Shortcut.control | Shortcut.option | (1 << 23))
-        XCTAssertFalse(fn.isValid)
-        XCTAssertTrue(fn.validationMessage!.contains("Fn / Globe"))
-        // Extra modifiers must not turn an unsupported Fn chord into the saved chord.
+        XCTAssertTrue(Shortcut(key: 0, modifiers: Shortcut.shift).isValid)
+        XCTAssertTrue(Shortcut(key: 0, modifiers: 0).isValid)
+        XCTAssertTrue(Shortcut(key: Shortcut.modifierOnlyKey, modifiers: Shortcut.function).isValid)
+        XCTAssertFalse(Shortcut(key: Shortcut.modifierOnlyKey, modifiers: Shortcut.control | Shortcut.shift).isValid)
+        XCTAssertTrue(Shortcut(key: 49, modifiers: Shortcut.control | Shortcut.function).isValid)
+        XCTAssertTrue(Shortcut(key: 36, modifiers: Shortcut.control).validationMessage!.contains("Use a letter"))
+        XCTAssertTrue(Shortcut(key: 49, modifiers: Shortcut.function).validationMessage!.contains("reserved"))
         XCTAssertTrue(Shortcut(key: 0, modifiers: Shortcut.control | Shortcut.shift).isValid)
     }
     func testMicrophoneTestDoesNotRequireCrossAppAccess() {
@@ -37,6 +38,32 @@ final class SetupTests: XCTestCase {
         XCTAssertTrue(matcher.ownsGesture)
         XCTAssertEqual(matcher.key(chord.key, down: false, flags: 0, active: false, allowNewBinding: false), .up)
         XCTAssertFalse(matcher.ownsGesture)
+    }
+    func testModifierOnlyAndBareKeyOwnership() {
+        var matcher = GestureMatcher()
+        matcher.binding = Shortcut(key: Shortcut.modifierOnlyKey, modifiers: Shortcut.function)
+        XCTAssertEqual(matcher.flags(Shortcut.function), .down)
+        XCTAssertEqual(matcher.flags(0), .up)
+        XCTAssertEqual(matcher.flags(Shortcut.function), .down)
+        XCTAssertEqual(matcher.key(0, down: true, flags: Shortcut.function, active: false), .up)
+        XCTAssertEqual(matcher.flags(Shortcut.function | Shortcut.shift), .pass)
+        XCTAssertEqual(matcher.flags(Shortcut.function), .pass)
+        XCTAssertEqual(matcher.flags(0), .pass)
+        XCTAssertEqual(matcher.flags(Shortcut.function), .down)
+        XCTAssertEqual(matcher.flags(Shortcut.function | Shortcut.shift), .up)
+        XCTAssertEqual(matcher.flags(Shortcut.function), .pass)
+        XCTAssertEqual(matcher.flags(0), .pass)
+        matcher.binding = Shortcut(key: 0, modifiers: 0)
+        XCTAssertEqual(matcher.key(0, down: true, flags: 0, repeated: true, active: false), .pass)
+        XCTAssertEqual(matcher.key(0, down: true, flags: 0, active: false), .down)
+        XCTAssertEqual(matcher.key(0, down: false, flags: 0, active: true), .up)
+    }
+    func testModelSpecificLanguages() {
+        XCTAssertTrue(SpeechLanguages.supports("yue", model: "turbo"))
+        XCTAssertFalse(SpeechLanguages.supports("yue", model: "small"))
+        XCTAssertTrue(SpeechLanguages.supports("en", model: "base.en"))
+        XCTAssertFalse(SpeechLanguages.supports("fr", model: "base.en"))
+        XCTAssertEqual(SpeechLanguages.codes.count, 100)
     }
     func testTestFieldRejectsChangedContextAndInvalidRanges() {
         let text = "élève 👩🏽‍💻 fin" as NSString

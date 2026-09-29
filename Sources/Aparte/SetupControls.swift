@@ -6,10 +6,10 @@ extension Shortcut {
     var displayLabel: String {
         let modifiers = Self.modifierLabel(self.modifiers)
         let names: [UInt16: String] = [0:"A",1:"S",2:"D",3:"F",4:"H",5:"G",6:"Z",7:"X",8:"C",9:"V",10:"§",11:"B",12:"Q",13:"W",14:"E",15:"R",16:"Y",17:"T",18:"1",19:"2",20:"3",21:"4",22:"6",23:"5",24:"=",25:"9",26:"7",27:"−",28:"8",29:"0",30:"]",31:"O",32:"U",33:"[",34:"I",35:"P",37:"L",38:"J",39:"’",40:"K",41:";",42:"\\",43:",",44:"/",45:"N",46:"M",47:".",49:"Space",50:"`"]
-        return modifiers + (names[key] ?? "Key \(key)")
+        return key == Self.modifierOnlyKey ? modifiers : modifiers + (names[key] ?? "Key \(key)")
     }
     static func modifierLabel(_ flags: UInt64) -> String {
-        [(Self.control,"⌃"),(Self.option,"⌥"),(Self.shift,"⇧"),(Self.command,"⌘")].filter { flags & $0.0 != 0 }.map(\.1).joined()
+        [(Self.control,"⌃"),(Self.option,"⌥"),(Self.shift,"⇧"),(Self.command,"⌘"),(Self.function,"Fn / Globe")].filter { flags & $0.0 != 0 }.map(\.1).joined()
     }
 }
 
@@ -25,6 +25,8 @@ struct ShortcutRecorder: NSViewRepresentable {
     final class CaptureView: NSView {
         private var monitor: Any?
         private var pending: Shortcut?
+        private var pendingModifier: UInt64 = 0
+        private var modifierCombination = false
         var preview: ((String) -> Void)?
         var accept: ((Shortcut?) -> Void)?
         override var acceptsFirstResponder: Bool { true }
@@ -42,28 +44,32 @@ struct ShortcutRecorder: NSViewRepresentable {
                 }
             }
             DispatchQueue.main.async { [weak self] in guard let self, let window = self.window else { return }; window.makeFirstResponder(self) }
-            setAccessibilityElement(true); setAccessibilityLabel("Shortcut recorder. Press modifiers and a key. Escape cancels.")
+            setAccessibilityElement(true); setAccessibilityLabel("Shortcut recorder. Press a key or modifier. Escape cancels.")
         }
         func stop() { if let monitor { NSEvent.removeMonitor(monitor) }; monitor = nil }
         override func draw(_ dirtyRect: NSRect) {
             NSColor.controlBackgroundColor.setFill(); NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1), xRadius: 6, yRadius: 6).fill()
-            ("Press a shortcut here · Esc cancels" as NSString).draw(at: NSPoint(x: 10, y: 12), withAttributes: [.font: NSFont.systemFont(ofSize: 13), .foregroundColor: NSColor.labelColor])
+            ("Press a key or modifier · Esc cancels" as NSString).draw(at: NSPoint(x: 10, y: 12), withAttributes: [.font: NSFont.systemFont(ofSize: 13), .foregroundColor: NSColor.labelColor])
         }
         override func mouseDown(with event: NSEvent) { window?.makeFirstResponder(self) }
         override func flagsChanged(with event: NSEvent) {
             guard pending == nil else { return }
-            if event.modifierFlags.contains(.function) { preview?("Fn / Globe cannot be used by this version. Try Control or Option plus a key."); return }
             let modifiers = UInt64(event.modifierFlags.rawValue) & Shortcut.mask
-            // Keep a rejection readable after the user releases the chord.
-            guard modifiers != 0 else { return }
-            preview?(Shortcut.modifierLabel(modifiers) + " … add a letter, number or Space")
+            if modifiers == 0, pendingModifier != 0 {
+                let chord = Shortcut(key: Shortcut.modifierOnlyKey, modifiers: pendingModifier)
+                pendingModifier = 0
+                if modifierCombination { modifierCombination = false; preview?("Choose one modifier by itself, or add a key to a chord."); return }
+                if chord.isValid { accept?(chord) } else { preview?(chord.validationMessage ?? "Try another shortcut.") }
+                return
+            }
+            pendingModifier = modifiers
+            if modifiers.nonzeroBitCount > 1 { modifierCombination = true }
+            if modifiers != 0 { preview?(Shortcut.modifierLabel(modifiers) + " … release for modifier only, or add a key") }
         }
         override func keyDown(with event: NSEvent) {
             guard !event.isARepeat else { return }
             if event.keyCode == 53 { accept?(nil); return }
-            guard !event.modifierFlags.contains(.function) else {
-                preview?("Fn / Globe cannot be used by this version. Try Control or Option plus a key."); return
-            }
+            pendingModifier = 0; modifierCombination = false
             let chord = Shortcut(key: event.keyCode, modifiers: UInt64(event.modifierFlags.rawValue) & Shortcut.mask)
             if chord.isValid { pending = chord; preview?("\(chord.displayLabel) — release to review") }
             else { preview?(chord.validationMessage ?? "Try another shortcut.") }

@@ -17,7 +17,7 @@ import AVFoundation
                 return
             }
             guard args.count >= 4, args[0] == "transcribe" else {
-                fputs("Usage: aparte-check transcribe CATALOG MODEL_DIRECTORY FIXTURE [base|small] [auto|en|fr]\n", stderr); exit(64)
+                fputs("Usage: aparte-check transcribe CATALOG MODEL_DIRECTORY FIXTURE [model-id] [auto|language-code]\n", stderr); exit(64)
             }
             let catalog = try ModelCatalog.load(URL(fileURLWithPath: args[1]))
             let modelID = args.count > 4 ? args[4] : "base"

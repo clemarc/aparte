@@ -10,6 +10,20 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 - An ad-hoc signed development build artifact from CI. It is not notarised or intended for distribution.
 - A separate persistent self-signed beta identity, verified local ZIP packaging and manual GitHub draft prereleases with accumulated release notes. Beta builds are not Apple-notarised; downloaded launch and permission persistence still need real-Mac validation.
 
+## 0.6.0 — 2026-09-29 (local feature candidate)
+
+### Added
+
+- Optional double-tap shortcut recording: double-tap to start, tap to stop; Hold remains the default.
+- Bare-key, modifier-only and Fn / Globe shortcut candidates, with explicit detection and conflict guidance. Physical macOS/keyboard delivery still needs validation.
+- Searchable speech-language choices for each active model; Auto remains the default.
+- Pinned, optional English-only Base Core ML model. Multilingual Small remains the default.
+
+### Changed
+
+- Explicit model/language compatibility before switching; unsupported decoding choices are rejected before inference.
+- Build 18 identifies this development candidate. No beta package, tag or release is created by this version bump.
+
 ## 0.5.1 — 2026-09-29 (local candidate)
 
 ### Fixed

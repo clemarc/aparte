@@ -1,12 +1,13 @@
 import Foundation
 
 public enum AparteError: String, Error, LocalizedError, Sendable {
-    case invalidAsset, insufficientSpace, unavailableModel, invalidAudio, unavailableDevice, permissions, busy, timeout, cancelled, unsafeTarget, clipboardUnavailable, inference
+    case invalidAsset, insufficientSpace, unavailableModel, unsupportedLanguage, invalidAudio, unavailableDevice, permissions, busy, timeout, cancelled, unsafeTarget, clipboardUnavailable, inference
     public var errorDescription: String? {
         switch self {
         case .invalidAsset: return "Model verification failed. Import a matching model or download again."
         case .insufficientSpace: return "Not enough disk space for a verified model installation."
         case .unavailableModel: return "Install and prepare a model in Settings."
+        case .unsupportedLanguage: return "This model cannot use the selected language. Choose Auto or another supported language."
         case .invalidAudio: return "No usable audio was captured."
         case .unavailableDevice: return "Microphone unavailable or changed. Recheck the default input."
         case .permissions: return "Permission required. Open Settings and recheck access."
@@ -88,8 +89,9 @@ public struct SessionMachine: Sendable {
 public struct Shortcut: Codable, Equatable, Sendable {
     public var key: UInt16
     public var modifiers: UInt64
-    public static let control: UInt64 = 1 << 18, option: UInt64 = 1 << 19, command: UInt64 = 1 << 20, shift: UInt64 = 1 << 17
-    public static let mask = control | option | command | shift
+    public static let control: UInt64 = 1 << 18, option: UInt64 = 1 << 19, command: UInt64 = 1 << 20, shift: UInt64 = 1 << 17, function: UInt64 = 1 << 23
+    public static let mask = control | option | command | shift | function
+    public static let modifierOnlyKey = UInt16.max
     public static let standard = Shortcut(key: 49, modifiers: control | option)
     public init(key: UInt16, modifiers: UInt64) { self.key = key; self.modifiers = modifiers }
     public var isValid: Bool {
@@ -97,15 +99,46 @@ public struct Shortcut: Codable, Equatable, Sendable {
     }
     /// A single policy supplies both persisted-binding validation and recorder guidance.
     public var validationMessage: String? {
-        guard modifiers & ~Self.mask == 0 else { return "Fn / Globe and other extra modifiers are unsupported." }
-        guard modifiers & (Self.control | Self.option | Self.command) != 0 else { return "Add Control, Option or Command. Shift alone and bare keys cannot be used." }
+        guard modifiers & ~Self.mask == 0 else { return "This modifier is unsupported." }
+        if key == Self.modifierOnlyKey { return modifiers != 0 && modifiers.nonzeroBitCount == 1 ? nil : "Choose one modifier by itself." }
         // Explicit keys only: letters, numbers, punctuation, space. No Fn, Return, Escape, Tab, deletion or modifier keys.
         let keys: Set<UInt16> = Set(0...35).union([37,38,39,40,41,42,43,44,45,46,47,49,50])
-        guard keys.contains(key) else { return "Use a letter, number, punctuation key or Space. Function keys and modifier-only shortcuts are unsupported." }
+        guard keys.contains(key) else { return "Use a letter, number, punctuation key or Space." }
         if modifiers == Self.command && [0,6,7,8,9,12,13,35,49].contains(key) { return "That shortcut is reserved for a common app or macOS action. Add Control or Option, or choose another key." }
-        if key == 49 && (modifiers == Self.control || modifiers == Self.command || modifiers == Self.option | Self.command) { return "That Space shortcut is reserved by macOS. Try Control–Option–Space." }
+        if key == 49 && (modifiers == Self.control || modifiers == Self.command || modifiers == Self.option | Self.command || modifiers == Self.function) { return "That Space shortcut is reserved by macOS. Try another key." }
         return nil
     }
+}
+
+public enum RecordingGesture: String, Codable, Sendable, CaseIterable { case hold, doubleTap }
+
+/// Monotonic-time double-tap recognizer. A lone tap never requests microphone capture.
+public struct DoubleTapGesture: Sendable {
+    public enum Event: Equatable { case none, start, stop }
+    private var firstDown: TimeInterval?
+    private var firstUp: TimeInterval?
+    private var recording = false
+    public init() {}
+    public mutating func press(at time: TimeInterval) -> Event {
+        if recording { recording = false; firstDown = nil; firstUp = nil; return .stop }
+        if let firstUp, time >= firstUp, time - firstUp <= 0.35 {
+            self.firstUp = nil; firstDown = nil; recording = true; return .start
+        }
+        firstUp = nil; firstDown = time
+        return .none
+    }
+    public mutating func release(at time: TimeInterval) {
+        guard let firstDown else { return }
+        firstUp = time >= firstDown && time - firstDown <= 0.35 ? time : nil
+        self.firstDown = nil
+    }
+    public mutating func reset() { firstDown = nil; firstUp = nil; recording = false }
+}
+
+/// Codes from WhisperKit 1.1.0 Constants.languages, with aliases removed.
+public enum SpeechLanguages {
+    public static let codes = Set("en zh de es ru ko fr ja pt tr pl ca nl ar sv it id hi fi vi he uk el ms cs ro da hu ta no th ur hr bg lt la mi ml cy sk te fa lv bn sr az sl kn et mk br eu is hy ne mn bs kk sq sw gl mr pa si km sn yo so af oc ka be tg sd gu am yi lo uz fo ht ps tk nn mt sa lb my bo tl mg as tt haw ln ha ba jw su yue".split(separator: " ").map(String.init))
+    public static func supports(_ code: String, model: String) -> Bool { code == "auto" || (codes.contains(code) && (model == "turbo" || code != "yue") && !model.hasSuffix(".en")) || (code == "en" && model.hasSuffix(".en")) }
 }
 
 /// Gesture ownership survives cancellation and rebinding until the original key-up.
@@ -115,6 +148,7 @@ public struct GestureMatcher: Sendable {
     private var ownedKey: UInt16?
     private var ownedModifiers: UInt64 = 0
     private var holding = false
+    private var modifierSuppressedUntilClear = false
     private var escapeOwned = false
     public var ownsGesture: Bool { ownedKey != nil || escapeOwned }
     public init() {}
@@ -129,12 +163,25 @@ public struct GestureMatcher: Sendable {
             if down { return .consume }
             ownedKey = nil; let ended = holding; holding = false; return ended ? .up : .consume
         }
+        if down && holding && binding.key == Shortcut.modifierOnlyKey {
+            holding = false; modifierSuppressedUntilClear = true
+            return .up
+        }
         if allowNewBinding && down && !repeated && key == binding.key && flags & Shortcut.mask == binding.modifiers {
             ownedKey = key; ownedModifiers = binding.modifiers; holding = true; return .down
         }
         return down && active ? .interaction : .pass
     }
     public mutating func flags(_ flags: UInt64) -> Action {
+        if binding.key == Shortcut.modifierOnlyKey {
+            if modifierSuppressedUntilClear {
+                if flags & binding.modifiers == 0 { modifierSuppressedUntilClear = false }
+                return .pass
+            }
+            if holding && flags & Shortcut.mask != binding.modifiers { holding = false; modifierSuppressedUntilClear = flags & binding.modifiers != 0; return .up }
+            if !holding && flags & binding.modifiers != 0 && flags & Shortcut.mask != binding.modifiers { modifierSuppressedUntilClear = true; return .pass }
+            if !holding && flags & Shortcut.mask == binding.modifiers { holding = true; return .down }
+        }
         if holding && flags & ownedModifiers != ownedModifiers { holding = false; return .up }
         return .pass
     }
@@ -145,12 +192,22 @@ public struct Preferences: Codable, Sendable {
     public var shortcut = Shortcut.standard
     public var language = "auto"
     public var model = "small"
+    public var gesture: RecordingGesture = .hold
     public init() {}
+    private enum CodingKeys: String, CodingKey { case schema, shortcut, language, model, gesture }
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        schema = try values.decode(Int.self, forKey: .schema)
+        shortcut = try values.decode(Shortcut.self, forKey: .shortcut)
+        language = try values.decode(String.self, forKey: .language)
+        model = try values.decode(String.self, forKey: .model)
+        gesture = (try? values.decode(RecordingGesture.self, forKey: .gesture)) ?? .hold
+    }
     public static func decode(_ data: Data?) -> Preferences {
         guard let data, var p = try? JSONDecoder().decode(Self.self, from: data), p.schema == 1 else { return .init() }
         if !p.shortcut.isValid { p.shortcut = .standard }
-        if !["auto", "en", "fr"].contains(p.language) { p.language = "auto" }
-        if !["base", "small", "medium", "turbo"].contains(p.model) { p.model = "small" }
+        if !["base", "small", "medium", "turbo", "base.en"].contains(p.model) { p.model = "small" }
+        if !SpeechLanguages.supports(p.language, model: p.model) { p.language = "auto" }
         return p
     }
 }

@@ -25,7 +25,8 @@ private final class LocalWhisperKit: WhisperKit {
     override func loadTokenizerIfNeeded() async throws {
         guard tokenizer == nil else { return }
         guard let folder = tokenizerFolder else { throw AparteError.unavailableModel }
-        textDecoder.isModelMultilingual = true // Catalog contains multilingual models only.
+        guard let logits = textDecoder.logitsSize, [51864, 51865, 51866].contains(logits) else { throw AparteError.invalidAsset }
+        textDecoder.isModelMultilingual = logits != 51864
         tokenizer = try await LocalTokenizer(folder: folder)
     }
 }
@@ -76,7 +77,12 @@ public actor Transcriber {
         guard TranscriptPolicy.hasSpeechEnergy(samples) else { return SpeechResult(text: "", seconds: 0, noSpeech: true) }
         busy = true; defer { busy = false }
         let started = ContinuousClock.now
-        let options = DecodingOptions(verbose: false, task: .transcribe, language: language == "auto" ? nil : language, temperatureFallbackCount: 2, detectLanguage: language == "auto", skipSpecialTokens: true, withoutTimestamps: true, wordTimestamps: false, suppressBlank: true, compressionRatioThreshold: 2.4, logProbThreshold: -1, noSpeechThreshold: 0.6, concurrentWorkerCount: 1)
+        guard let model = selected?.1.id, SpeechLanguages.supports(language, model: model) else { throw AparteError.unsupportedLanguage }
+        let englishOnly = model.hasSuffix(".en")
+        if language != "auto" && !englishOnly {
+            guard let token = engine.tokenizer?.convertTokenToId("<|\(language)|>"), token < (engine.textDecoder.logitsSize ?? 0) else { throw AparteError.unsupportedLanguage }
+        }
+        let options = DecodingOptions(verbose: false, task: .transcribe, language: englishOnly ? "en" : (language == "auto" ? nil : language), temperatureFallbackCount: 2, detectLanguage: !englishOnly && language == "auto", skipSpecialTokens: true, withoutTimestamps: true, wordTimestamps: false, suppressBlank: true, compressionRatioThreshold: 2.4, logProbThreshold: -1, noSpeechThreshold: 0.6, concurrentWorkerCount: 1)
         let results = try await engine.transcribe(audioArray: samples, decodeOptions: options, callback: { _ in
             if Task.isCancelled || started.duration(to: .now) > .seconds(30) { return false }; return nil
         })
