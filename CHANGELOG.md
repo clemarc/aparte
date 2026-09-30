@@ -10,6 +10,17 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 - An ad-hoc signed development build artifact from CI. It is not notarised or intended for distribution.
 - A separate persistent self-signed beta identity, verified local ZIP packaging and manual GitHub draft prereleases with accumulated release notes. Beta builds are not Apple-notarised; downloaded launch and permission persistence still need real-Mac validation.
 
+## 0.6.1 — 2026-09-30 (local shortcut correction)
+
+### Fixed
+
+- Modifier key events no longer clear a Fn / Globe shortcut candidate or interrupt a modifier-only recording gesture.
+- The recording-mode picker now saves Hold or Double-tap directly and shows the saved mode beside the shortcut.
+
+### Changed
+
+- Build 19 identifies the corrected local development candidate. Physical Fn / Globe and double-tap behavior still need keyboard checks; no beta release is created.
+
 ## 0.6.0 — 2026-09-29 (local feature candidate)
 
 ### Added

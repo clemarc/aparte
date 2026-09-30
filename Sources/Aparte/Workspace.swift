@@ -12,9 +12,9 @@ enum WorkspaceSection: String, CaseIterable, Identifiable {
     }
     var subtitle: String {
         switch self {
-        case .tryIt: return "Speak, release, see your words."
+        case .tryIt: return "Speak and see your words."
         case .processing: return "Choose how your voice becomes text."
-        case .shortcuts: return "A comfortable way to hold to talk."
+        case .shortcuts: return "Choose how dictation starts and stops."
         case .settings: return "Access, startup and privacy."
         }
     }
@@ -343,10 +343,11 @@ struct ShortcutsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             WorkspaceCard("Recording shortcut", subtitle: "Escape cancels. Choose hold or double-tap, then test your saved shortcut.") {
-                Picker("Recording gesture", selection: $model.preferences.gesture) {
+                Picker("Recording gesture", selection: Binding(get: { model.preferences.gesture }, set: { model.setRecordingGesture($0) })) {
                     Text("Hold to talk").tag(RecordingGesture.hold)
                     Text("Double-tap to start · tap to stop").tag(RecordingGesture.doubleTap)
-                }.onChange(of: model.preferences.gesture) { model.persist() }.disabled(model.sessionBusy)
+                }.disabled(model.sessionBusy)
+                Text(model.preferences.gesture == .hold ? "Saved mode: Hold to talk" : "Saved mode: Double-tap to start · tap to stop").font(.caption).foregroundStyle(.secondary)
                 Text(model.preferences.shortcut.displayLabel).font(.system(size: 32, weight: .medium, design: .rounded)).padding(.vertical, 6)
                 if !model.recordingBinding {
                     HStack {

@@ -105,6 +105,12 @@ import AparteSpeech
     var sessionBusy: Bool { machine.id != nil || machine.engineBusy || audioDraining || startup != nil || operation != nil || preparation != nil }
     func installed(_ id: String) -> Bool { FileManager.default.fileExists(atPath: modelsRoot.appendingPathComponent(id).appendingPathComponent("tokenizer.json").path) }
     func persist() { tapGesture.reset(); modifierStart?.cancel(); modifierStart = nil; UserDefaults.standard.set(try? JSONEncoder().encode(preferences), forKey: "preferences.v1"); hotkey.binding = preferences.shortcut }
+    func setRecordingGesture(_ gesture: RecordingGesture) {
+        guard !sessionBusy, preferences.gesture != gesture else { return }
+        preferences.gesture = gesture
+        persist()
+        notice = gesture == .hold ? "Hold to talk saved." : "Double-tap to start · tap to stop saved."
+    }
     func recheck(prepareModel: Bool = true) {
         let permissions = PermissionStatus(); permissionSummary = permissions.summary
         if permissions.accessibility {

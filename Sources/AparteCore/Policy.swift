@@ -92,6 +92,8 @@ public struct Shortcut: Codable, Equatable, Sendable {
     public static let control: UInt64 = 1 << 18, option: UInt64 = 1 << 19, command: UInt64 = 1 << 20, shift: UInt64 = 1 << 17, function: UInt64 = 1 << 23
     public static let mask = control | option | command | shift | function
     public static let modifierOnlyKey = UInt16.max
+    /// Carbon virtual key codes 0x36...0x3F are modifier keys, including Fn / Globe.
+    public static func isModifierKeyCode(_ key: UInt16) -> Bool { (54...63).contains(key) }
     public static let standard = Shortcut(key: 49, modifiers: control | option)
     public init(key: UInt16, modifiers: UInt64) { self.key = key; self.modifiers = modifiers }
     public var isValid: Bool {
@@ -154,6 +156,9 @@ public struct GestureMatcher: Sendable {
     public init() {}
     public mutating func key(_ key: UInt16, down: Bool, flags: UInt64, repeated: Bool = false, active: Bool, ownEvent: Bool = false, allowNewBinding: Bool = true) -> Action {
         if ownEvent { return .pass }
+        // Some keyboards deliver a key event as well as flagsChanged for a modifier.
+        // Its own key event must not interrupt a modifier-only gesture.
+        if Shortcut.isModifierKeyCode(key) { return .pass }
         if key == 53 {
             if down && escapeOwned { return .consume }
             if !down && escapeOwned { escapeOwned = false; return .consume }

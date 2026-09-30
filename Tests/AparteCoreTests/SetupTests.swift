@@ -58,6 +58,22 @@ final class SetupTests: XCTestCase {
         XCTAssertEqual(matcher.key(0, down: true, flags: 0, active: false), .down)
         XCTAssertEqual(matcher.key(0, down: false, flags: 0, active: true), .up)
     }
+    func testModifierKeyEventsDoNotInterruptModifierOnlyDoubleTap() {
+        for (key, flag) in [(UInt16(63), Shortcut.function), (UInt16(59), Shortcut.control), (UInt16(62), Shortcut.control)] {
+            XCTAssertTrue(Shortcut.isModifierKeyCode(key))
+            var matcher = GestureMatcher()
+            matcher.binding = Shortcut(key: Shortcut.modifierOnlyKey, modifiers: flag)
+            var taps = DoubleTapGesture()
+            for (downTime, upTime, expected) in [(1.0, 1.08, DoubleTapGesture.Event.none), (1.2, 1.28, .start), (2.0, 2.08, .stop)] {
+                XCTAssertEqual(matcher.flags(flag), .down)
+                XCTAssertEqual(taps.press(at: downTime), expected)
+                XCTAssertEqual(matcher.key(key, down: true, flags: flag, active: expected == .start), .pass)
+                XCTAssertEqual(matcher.key(key, down: false, flags: flag, active: expected == .start), .pass)
+                XCTAssertEqual(matcher.flags(0), .up)
+                taps.release(at: upTime)
+            }
+        }
+    }
     func testModelSpecificLanguages() {
         XCTAssertTrue(SpeechLanguages.supports("yue", model: "turbo"))
         XCTAssertFalse(SpeechLanguages.supports("yue", model: "small"))

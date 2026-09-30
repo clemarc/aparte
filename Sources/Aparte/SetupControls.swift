@@ -68,6 +68,8 @@ struct ShortcutRecorder: NSViewRepresentable {
         }
         override func keyDown(with event: NSEvent) {
             guard !event.isARepeat else { return }
+            // A modifier's own keyDown must leave the flagsChanged candidate intact.
+            if Shortcut.isModifierKeyCode(event.keyCode) { return }
             if event.keyCode == 53 { accept?(nil); return }
             pendingModifier = 0; modifierCombination = false
             let chord = Shortcut(key: event.keyCode, modifiers: UInt64(event.modifierFlags.rawValue) & Shortcut.mask)

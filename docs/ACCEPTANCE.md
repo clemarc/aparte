@@ -400,3 +400,14 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | M4 and beta fresh-Mac/update gates | BLOCKED | D037 does not waive existing acceptance; no beta release or update test |
 
 [English-only benchmark summary](evidence/benchmark-base.en.summary.json) records the scoped measurements without audio/transcripts. Small remains the default.
+
+## D038 — Dew modifier capture and recording-mode correction
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Reported Control double-tap in 0.6.0 | EXPLAINED, not reproduced | Persisted Dew preference was Control-only plus Hold. Hold waits 180 ms for a modifier-only press, so quick taps do not trigger it. No evidence establishes whether the owner had selected Double-tap previously. |
+| Fn / Globe recorder and modifier-only event path | PASS for code/unit | Modifier key codes 54–63 are ignored as duplicate key events; 51 unit tests pass, including Fn and left/right Control events interleaved with modifier flags and double-tap start/stop. No physical keyboard event trace was captured. |
+| Saved Double-tap setting | PASS for local UI/persistence | In Dew 0.6.1 build 19, the picker showed Double-tap and Saved mode; `preferences.v1` encoded `doubleTap` with Control-only, and the installed app showed the choice after restart. No microphone recording was attempted. |
+| Corrected 0.6.1 build 19 and install | PASS for build/install/launch | Native Release and certificate-backed development signature passed; installed executable hash matched the build artifact and the running process resolved to `~/Applications/Aparte Dew.app`. The separate beta app was not replaced. |
+| Physical Fn / Globe selection, Control double-tap and cross-app behavior | BLOCKED | Requires owner-operated keyboard checks. Code/unit and local UI persistence do not establish real event delivery or conflict freedom. |
+| M4 and fresh-Mac/two-version beta gates | BLOCKED | Existing acceptance remains outstanding; no beta package/release or permission-continuity test was performed. |
