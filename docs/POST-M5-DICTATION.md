@@ -1,20 +1,20 @@
 # Post-M5 dictation UX scope
 
-**Updated:** 29 September 2026
+**Updated:** 30 September 2026
 
 **Status:** D037 authorises the shortcut, hands-free, speech-language and optional English-only model work in a pull request. Optional voice-command and LLM text handling below remains deferred. This document does not authorise publishing a release, changing signing identities or passing any outstanding acceptance gate.
 
 ## Current foundation
 
-The 0.5.1 development candidate implements D031's unified workspace and menu companion. D032 isolates **Aparte Dew** from the standard **Aparté** beta. D037 implements the owner-selected recognition and shortcut extension on these surfaces; release/device acceptance remains separate.
+The 0.6.2 development candidate includes D031's unified workspace and menu companion. D032 isolates **Aparte Dew** from the standard **Aparté** beta. D037 implements the owner-selected recognition and shortcut extension, and D039 allows both recording gestures on one shortcut; release/device acceptance remains separate.
 
 | Surface | Implemented foundation | Planned addition |
 | --- | --- | --- |
-| Try it | Real microphone check, app-owned editor, temporary results, no history; selected recording gesture | Exercise future voice commands; compare original and processed text in memory |
+| Try it | Real microphone check, app-owned editor, temporary results, no history; hold and double-tap on one shortcut | Exercise future voice commands; compare original and processed text in memory |
 | Processing | Recognition, pinned models including optional English-only Base, searchable model-specific language choices, Text handling off | Enable voice commands; configure provider, LLM model, command phrases and per-command prompt enrichment |
-| Shortcuts | Candidate and explicit Save/Cancel; hold or double-tap; Fn / Globe, modifier-only and bare-key candidates; detection-only mode | Validate physical keyboards and system conflicts before release |
+| Shortcuts | Candidate and explicit Save/Cancel; hold and double-tap together; Fn / Globe, modifier-only and bare-key candidates; detection-only mode | Validate physical keyboards and system conflicts before release |
 | Settings | Local access, capability recheck, login and diagnostics | Show optional-provider/privacy status; provider readiness must not block ordinary local dictation |
-| Menu companion | Actual state, saved shortcut, active model, workspace and Recovery actions | Mode-specific recording guidance and real Formatting/Summarizing state |
+| Menu companion | Actual state, saved shortcut, both gestures, active model, workspace and Recovery actions | Real Formatting/Summarizing state |
 
 Text handling is a placeholder today. Provider, prompt and voice-command controls below remain planned. Existing M4, UX and beta validation results remain in [ACCEPTANCE](ACCEPTANCE.md).
 
@@ -39,8 +39,8 @@ Text handling is a placeholder today. Provider, prompt and voice-command control
 
 ## Hands-free recording
 
-- Add a recording-mode selector in Shortcuts: **Hold to talk** (existing default) and **Double tap to start / tap to stop**. D037 also allows Fn / Globe, modifier-only and bare-key bindings, with explicit conflict guidance and real-keyboard validation.
-- In the new mode, one completed tap followed by a second press starts capture; one later press stops and transcribes. The maximum gap is 350 ms from first release to second press. A lone first tap expires without opening the microphone; auto-repeat cannot count as another tap.
+- D039 makes **Hold to talk** and **Double tap to start / tap to stop** available on the same saved shortcut, without a mode selector. D037 also allows Fn / Globe, modifier-only and bare-key bindings, with explicit conflict guidance and real-keyboard validation.
+- A press held for 180 ms starts hold recording and release finishes it. Two shorter taps start capture after the second release; one later press stops and transcribes. The maximum gap is 350 ms from first release to second press. A lone first tap expires without opening the microphone; auto-repeat cannot count as another tap. Holding the second press chooses hold recording.
 - Show Starting until live capture begins, then Recording with elapsed time and the correct stop instruction. A stop during startup cancels; no late microphone start is allowed. Preserve matched key-up ownership and modifier-clear checks before insertion.
 - Preserve Escape, 60-second discard, sleep/lock/device/tap-disable cancellation and single-transaction behavior. Busy gestures are ignored; no hidden queue. Detection-only mode exercises the gesture without audio; explicit Start/Stop microphone controls remain available.
 

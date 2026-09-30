@@ -112,29 +112,65 @@ public struct Shortcut: Codable, Equatable, Sendable {
     }
 }
 
-public enum RecordingGesture: String, Codable, Sendable, CaseIterable { case hold, doubleTap }
-
-/// Monotonic-time double-tap recognizer. A lone tap never requests microphone capture.
-public struct DoubleTapGesture: Sendable {
-    public enum Event: Equatable { case none, start, stop }
-    private var firstDown: TimeInterval?
-    private var firstUp: TimeInterval?
-    private var recording = false
+/// One shortcut supports a sustained hold or two quick taps. Neither a lone tap
+/// nor the first half of a double-tap opens the microphone.
+public struct ShortcutGesture: Sendable {
+    public enum Action: Equatable { case none, firstTap, startHold, stopHold, startToggle, stopToggle }
+    public static let holdThreshold: TimeInterval = 0.18
+    public static let doubleTapWindow: TimeInterval = 0.35
+    private enum Mode { case idle, holding, toggled }
+    private var mode: Mode = .idle
+    private var downAt: TimeInterval?
+    private var firstTapUpAt: TimeInterval?
+    private var secondTap = false
+    public var isPressed: Bool { downAt != nil }
+    public var isToggled: Bool { mode == .toggled }
     public init() {}
-    public mutating func press(at time: TimeInterval) -> Event {
-        if recording { recording = false; firstDown = nil; firstUp = nil; return .stop }
-        if let firstUp, time >= firstUp, time - firstUp <= 0.35 {
-            self.firstUp = nil; firstDown = nil; recording = true; return .start
+    public mutating func press(at time: TimeInterval) -> Action {
+        if mode == .toggled {
+            reset()
+            return .stopToggle
         }
-        firstUp = nil; firstDown = time
+        guard mode == .idle, downAt == nil else { return .none }
+        secondTap = firstTapUpAt.map { time >= $0 && time - $0 <= Self.doubleTapWindow } ?? false
+        firstTapUpAt = nil
+        downAt = time
         return .none
     }
-    public mutating func release(at time: TimeInterval) {
-        guard let firstDown else { return }
-        firstUp = time >= firstDown && time - firstDown <= 0.35 ? time : nil
-        self.firstDown = nil
+    public mutating func held(at time: TimeInterval) -> Action {
+        guard mode == .idle, let downAt, time >= downAt,
+              time - downAt >= Self.holdThreshold else { return .none }
+        mode = .holding
+        firstTapUpAt = nil
+        secondTap = false
+        return .startHold
     }
-    public mutating func reset() { firstDown = nil; firstUp = nil; recording = false }
+    public mutating func release(at time: TimeInterval) -> Action {
+        if mode == .holding {
+            reset()
+            return .stopHold
+        }
+        guard mode == .idle, let downAt else { return .none }
+        self.downAt = nil
+        guard time >= downAt, time - downAt < Self.holdThreshold else {
+            firstTapUpAt = nil
+            secondTap = false
+            return .none
+        }
+        if secondTap {
+            mode = .toggled
+            secondTap = false
+            return .startToggle
+        }
+        firstTapUpAt = time
+        return .firstTap
+    }
+    public mutating func reset() {
+        mode = .idle
+        downAt = nil
+        firstTapUpAt = nil
+        secondTap = false
+    }
 }
 
 /// Codes from WhisperKit 1.1.0 Constants.languages, with aliases removed.
@@ -197,16 +233,16 @@ public struct Preferences: Codable, Sendable {
     public var shortcut = Shortcut.standard
     public var language = "auto"
     public var model = "small"
-    public var gesture: RecordingGesture = .hold
     public init() {}
-    private enum CodingKeys: String, CodingKey { case schema, shortcut, language, model, gesture }
+    // Older preferences may contain a gesture choice. Decoding ignores it because
+    // both gestures are now always available for the saved shortcut.
+    private enum CodingKeys: String, CodingKey { case schema, shortcut, language, model }
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         schema = try values.decode(Int.self, forKey: .schema)
         shortcut = try values.decode(Shortcut.self, forKey: .shortcut)
         language = try values.decode(String.self, forKey: .language)
         model = try values.decode(String.self, forKey: .model)
-        gesture = (try? values.decode(RecordingGesture.self, forKey: .gesture)) ?? .hold
     }
     public static func decode(_ data: Data?) -> Preferences {
         guard let data, var p = try? JSONDecoder().decode(Self.self, from: data), p.schema == 1 else { return .init() }

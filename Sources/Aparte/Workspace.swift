@@ -188,7 +188,7 @@ struct TryItView: View {
                     Text(text).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            WorkspaceCard("Try your shortcut", subtitle: model.preferences.gesture == .hold ? "Click in the box, hold \(model.preferences.shortcut.displayLabel), speak after Recording appears, then release." : "Click in the box, double-tap \(model.preferences.shortcut.displayLabel), speak after Recording appears, then tap once to stop.") {
+            WorkspaceCard("Try your shortcut", subtitle: "Click in the box. Hold \(model.preferences.shortcut.displayLabel) to talk and release to finish, or double-tap to start and tap once to stop.") {
                 SetupEditor(model: model).frame(height: 130)
                 Text(model.testStatus).font(.callout).accessibilityLabel("Test status: \(model.testStatus)")
                 HStack {
@@ -342,12 +342,9 @@ struct ShortcutsView: View {
     @State private var preview = "Press modifiers, then a key."
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            WorkspaceCard("Recording shortcut", subtitle: "Escape cancels. Choose hold or double-tap, then test your saved shortcut.") {
-                Picker("Recording gesture", selection: Binding(get: { model.preferences.gesture }, set: { model.setRecordingGesture($0) })) {
-                    Text("Hold to talk").tag(RecordingGesture.hold)
-                    Text("Double-tap to start · tap to stop").tag(RecordingGesture.doubleTap)
-                }.disabled(model.sessionBusy)
-                Text(model.preferences.gesture == .hold ? "Saved mode: Hold to talk" : "Saved mode: Double-tap to start · tap to stop").font(.caption).foregroundStyle(.secondary)
+            WorkspaceCard("Recording shortcut", subtitle: "Both gestures work with the same shortcut. Escape cancels a recording.") {
+                Text("Hold to talk · release to finish").font(.callout)
+                Text("Double-tap to start · tap once to stop").font(.callout)
                 Text(model.preferences.shortcut.displayLabel).font(.system(size: 32, weight: .medium, design: .rounded)).padding(.vertical, 6)
                 if !model.recordingBinding {
                     HStack {
@@ -374,8 +371,8 @@ struct ShortcutsView: View {
                 Text("Letters, numbers, punctuation, Space, one modifier alone, or Fn / Globe with a key can be saved. Bare keys take over normal typing while Aparté is ready. Modifier-only keys can conflict with other shortcuts. macOS may handle Globe before Aparté sees it. Test on your keyboard; key labels use US physical positions.").font(.caption).foregroundStyle(.secondary)
             }
             WorkspaceCard("Check detection", subtitle: "Tests the saved shortcut without opening the microphone.") {
-                Toggle("Listen for a press and release", isOn: $model.bindingTest).disabled(model.sessionBusy || model.recordingBinding)
-                Text(model.bindingTest ? (model.preferences.gesture == .hold ? "Hold \(model.preferences.shortcut.displayLabel), then release." : "Double-tap \(model.preferences.shortcut.displayLabel), then tap to stop.") : model.shortcutStatus).font(.callout)
+                Toggle("Check shortcut detection", isOn: $model.bindingTest).disabled(model.sessionBusy || model.recordingBinding)
+                Text(model.bindingTest ? "Hold \(model.preferences.shortcut.displayLabel) and release, or double-tap it and tap once to stop." : model.shortcutStatus).font(.callout)
                 Text(model.testStatus).font(.caption).foregroundStyle(.secondary)
                 Text("The result distinguishes the global listener from in-app delivery. In-app delivery alone does not establish system-wide access or conflict freedom.").font(.caption).foregroundStyle(.secondary)
             }
@@ -475,7 +472,7 @@ struct MenuCompanionView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack { AparteLogo().foregroundStyle(.tint).frame(width: 30, height: 24); Text(AppVersion.displayName).font(.headline); Spacer(); StatusBadge(model: model) }
             Text(model.notice).font(.callout).fixedSize(horizontal: false, vertical: true).lineLimit(4)
-            HStack { Text(model.preferences.shortcut.displayLabel).font(.title3.weight(.semibold)); Spacer(); Text(model.preferences.gesture == .hold ? "Hold to talk" : "Double-tap to start").font(.caption).foregroundStyle(.secondary) }
+            HStack { Text(model.preferences.shortcut.displayLabel).font(.title3.weight(.semibold)); Spacer(); Text("Hold or double-tap").font(.caption).foregroundStyle(.secondary) }
             Text("\(model.preferences.model.capitalized) · \(model.preferences.model.hasSuffix(".en") ? "English only" : languageLabel(model.preferences.language)) · On-device").font(.caption).foregroundStyle(.secondary)
             Divider()
             VStack(alignment: .leading, spacing: 8) {

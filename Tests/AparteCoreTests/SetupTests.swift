@@ -58,20 +58,30 @@ final class SetupTests: XCTestCase {
         XCTAssertEqual(matcher.key(0, down: true, flags: 0, active: false), .down)
         XCTAssertEqual(matcher.key(0, down: false, flags: 0, active: true), .up)
     }
-    func testModifierKeyEventsDoNotInterruptModifierOnlyDoubleTap() {
+    func testModifierKeyEventsDoNotInterruptEitherGesture() {
         for (key, flag) in [(UInt16(63), Shortcut.function), (UInt16(59), Shortcut.control), (UInt16(62), Shortcut.control)] {
             XCTAssertTrue(Shortcut.isModifierKeyCode(key))
             var matcher = GestureMatcher()
             matcher.binding = Shortcut(key: Shortcut.modifierOnlyKey, modifiers: flag)
-            var taps = DoubleTapGesture()
-            for (downTime, upTime, expected) in [(1.0, 1.08, DoubleTapGesture.Event.none), (1.2, 1.28, .start), (2.0, 2.08, .stop)] {
+            var gesture = ShortcutGesture()
+            for (downTime, upTime, expectedPress, expectedRelease) in [
+                (1.0, 1.08, ShortcutGesture.Action.none, ShortcutGesture.Action.firstTap),
+                (1.2, 1.28, .none, .startToggle),
+                (2.0, 2.08, .stopToggle, .none)
+            ] {
                 XCTAssertEqual(matcher.flags(flag), .down)
-                XCTAssertEqual(taps.press(at: downTime), expected)
-                XCTAssertEqual(matcher.key(key, down: true, flags: flag, active: expected == .start), .pass)
-                XCTAssertEqual(matcher.key(key, down: false, flags: flag, active: expected == .start), .pass)
+                XCTAssertEqual(gesture.press(at: downTime), expectedPress)
+                XCTAssertEqual(matcher.key(key, down: true, flags: flag, active: expectedRelease == .startToggle), .pass)
+                XCTAssertEqual(matcher.key(key, down: false, flags: flag, active: expectedRelease == .startToggle), .pass)
                 XCTAssertEqual(matcher.flags(0), .up)
-                taps.release(at: upTime)
+                XCTAssertEqual(gesture.release(at: upTime), expectedRelease)
             }
+            XCTAssertEqual(matcher.flags(flag), .down)
+            XCTAssertEqual(gesture.press(at: 3), .none)
+            XCTAssertEqual(matcher.key(key, down: true, flags: flag, active: true), .pass)
+            XCTAssertEqual(gesture.held(at: 3.19), .startHold)
+            XCTAssertEqual(matcher.flags(0), .up)
+            XCTAssertEqual(gesture.release(at: 3.5), .stopHold)
         }
     }
     func testModelSpecificLanguages() {

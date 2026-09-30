@@ -40,6 +40,8 @@ D032 supersedes local development naming only: default local/CI builds use **Apa
 
 D036 records the owner's clarified speech-language expansion in [Post-M5 dictation UX](docs/POST-M5-DICTATION.md). D037 authorises implementation now, together with double-tap recording, Fn / Globe, modifier-only and bare-key bindings, plus one pinned smaller English-only model choice. Auto remains the default, and explicit language choices are checked against the active model before decoding. This is recognition UX, not interface translation or a guarantee of equal quality across languages. Optional LLM text handling remains deferred.
 
+D039 records the owner's request to use both hold to talk and double-tap on the same saved shortcut. This replaces D037's either/or recording-mode picker. A sustained press starts hold recording; two short taps start hands-free recording after the second release; a later tap stops it. See [D039](docs/DECISIONS.md) for timing and legacy-preference migration. Physical keyboard behavior remains an acceptance gate.
+
 ## 1. Agent execution contract
 
 ### Owner-approved beta distribution amendment — 28 September 2026
@@ -87,7 +89,7 @@ Hold a shortcut, speak, release, and insert the resulting text into the same eli
 | --- | --- |
 | Platform | macOS 14+, arm64 only; a menu bar app with Swift/AppKit and SwiftUI settings |
 | Engine | Open-source WhisperKit through Swift Package Manager; no Pro SDK, account or cloud inference |
-| Interaction | Hold-to-talk default or double-tap start / tap stop; one recording/transcription/insertion transaction at a time |
+| Interaction | One saved shortcut supports hold-to-talk and double-tap start / tap stop; one recording/transcription/insertion transaction at a time |
 | Default shortcut | Control-Option-Space; configurable chord, Fn / Globe, modifier-only or bare key subject to actual macOS event delivery and user testing |
 | Audio | System default input device; in-memory capture only; maximum 60 seconds |
 | Language | Auto or any verified language supported by the active model; default Auto; transcribe in the spoken language, never translate by default |

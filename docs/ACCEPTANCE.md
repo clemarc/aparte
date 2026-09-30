@@ -411,3 +411,14 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Corrected 0.6.1 build 19 and install | PASS for build/install/launch | Native Release and certificate-backed development signature passed; installed executable hash matched the build artifact and the running process resolved to `~/Applications/Aparte Dew.app`. The separate beta app was not replaced. |
 | Physical Fn / Globe selection, Control double-tap and cross-app behavior | BLOCKED | Requires owner-operated keyboard checks. Code/unit and local UI persistence do not establish real event delivery or conflict freedom. |
 | M4 and fresh-Mac/two-version beta gates | BLOCKED | Existing acceptance remains outstanding; no beta package/release or permission-continuity test was performed. |
+
+## D039 — Both gestures on one shortcut
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Hold, double-tap, lone tap and second-press hold | PASS for code/unit | Shared 180 ms hold threshold and 350 ms tap window; 51 local unit tests pass, including a lone tap without start, double-tap start/tap stop, second press held as hold, expiry and reset. No microphone was opened by these tests. |
+| Modifier-only binding with both gestures | PASS for code/unit | Fn and left/right Control key events interleaved with flags preserve both hold and double-tap actions. Physical OS delivery remains unverified. |
+| Legacy preferences and current shortcut | PASS for code/unit and local UI | A saved `doubleTap` value decodes while preserving Control-only shortcut and language; new encoding omits the obsolete gesture field. Installed Dew showed Control as the saved shortcut. |
+| 0.6.2 build 20 | PASS for local build/install/launch | Native Release and certificate-backed development signing passed. Installed executable matched the build artifact; the running process resolved to `~/Applications/Aparte Dew.app`. Native Shortcuts UI visibly showed both gestures. |
+| Physical timing, microphone capture and cross-app insertion | BLOCKED | Owner-operated keyboard and speech checks remain required; build/unit results are not device acceptance. |
+| M4 and fresh-Mac/two-version beta gates | BLOCKED | No beta release or permission-continuity test; existing acceptance is unchanged. |

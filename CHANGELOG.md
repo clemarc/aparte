@@ -10,6 +10,14 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 - An ad-hoc signed development build artifact from CI. It is not notarised or intended for distribution.
 - A separate persistent self-signed beta identity, verified local ZIP packaging and manual GitHub draft prereleases with accumulated release notes. Beta builds are not Apple-notarised; downloaded launch and permission persistence still need real-Mac validation.
 
+## 0.6.2 — 2026-09-30 (local shortcut candidate)
+
+### Changed
+
+- The same saved shortcut now supports both hold to talk and double-tap start / tap stop, without a mode picker. A press held for 180 ms starts hold recording; two shorter taps within 350 ms start hands-free recording after the second release. A lone tap opens no microphone.
+- Existing Hold and Double-tap preferences migrate to the combined behavior. Shortcut guidance and detection describe both gestures.
+- Build 20 identifies this local candidate. Physical shortcut timing and Fn / Globe delivery still need keyboard checks; no beta release is created.
+
 ## 0.6.1 — 2026-09-30 (local shortcut correction)
 
 ### Fixed
