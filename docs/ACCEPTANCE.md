@@ -395,6 +395,7 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Searchable model-specific language picker and persisted codes | PASS for code/unit | 100 pinned engine codes; Base/Small/Medium exclude Cantonese, Turbo includes it, English-only model accepts Auto/en; corrupt/stale preference tests. No non-English speaker quality result |
 | Optional English-only Base Core ML and tokenizer | PASS for offline English fixture | Complete pinned 149,116,045-byte manifest, real offline English transcription with zero observed outbound requests; synthetic English WER 2.13%, English terms 5/6, silence 10/10; bilingual gate fails as expected because French is unsupported |
 | 0.6.0 build 18 local verification | PASS for build/fixture | Final certificate-backed native Release; 50 unit tests; real offline Base.en fixture; explicit French request rejected before decoding. No installed-app permission or device test inferred |
+| 0.6.0 stable Dew installation and launch | PASS for install/launch | Signed Release executable matches installed hash; running Dew path is `~/Applications/Aparte Dew.app`. No Fn / Globe input or permission continuity was exercised |
 | Real French-accented English, shortcut delivery across apps, bare-key conflicts and Fn keyboards | BLOCKED | Requires owner-operated device checks; automated code/fixture results do not establish these gates |
 | M4 and beta fresh-Mac/update gates | BLOCKED | D037 does not waive existing acceptance; no beta release or update test |
 
