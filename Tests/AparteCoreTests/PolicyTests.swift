@@ -42,6 +42,36 @@ final class PolicyTests: XCTestCase {
         XCTAssertEqual(m.key(8, down: true, flags: Shortcut.command, active: true), .interaction)
         XCTAssertEqual(m.key(9, down: true, flags: Shortcut.command, active: true, ownEvent: true), .pass)
     }
+    func testHoldAndDoubleTapShareOneShortcut() {
+        var gesture = ShortcutGesture()
+        XCTAssertEqual(gesture.press(at: 1), .none)
+        XCTAssertEqual(gesture.held(at: 1.05), .none)
+        XCTAssertEqual(gesture.release(at: 1.08), .firstTap)
+        XCTAssertEqual(gesture.press(at: 1.43), .none) // 350 ms inclusive
+        XCTAssertEqual(gesture.release(at: 1.48), .startToggle)
+        XCTAssertTrue(gesture.isToggled)
+        XCTAssertEqual(gesture.press(at: 5), .stopToggle)
+        XCTAssertEqual(gesture.release(at: 5.05), .none)
+        XCTAssertEqual(gesture.press(at: 6), .none)
+        XCTAssertEqual(gesture.held(at: 6.19), .startHold)
+        XCTAssertEqual(gesture.release(at: 7.1), .stopHold)
+        XCTAssertEqual(gesture.press(at: 7.2), .none)
+        XCTAssertEqual(gesture.release(at: 7.28), .firstTap)
+        XCTAssertEqual(gesture.press(at: 7.4), .none)
+        XCTAssertEqual(gesture.held(at: 7.59), .startHold) // A second press held down is a hold.
+        XCTAssertEqual(gesture.release(at: 8), .stopHold)
+        XCTAssertEqual(gesture.press(at: 9), .none)
+        XCTAssertEqual(gesture.release(at: 9.08), .firstTap)
+        XCTAssertEqual(gesture.press(at: 9.44), .none) // Outside the 350 ms window.
+        XCTAssertEqual(gesture.release(at: 9.5), .firstTap)
+        gesture.reset()
+        XCTAssertEqual(gesture.press(at: 9.6), .none)
+        XCTAssertEqual(gesture.release(at: 9.68), .firstTap)
+        XCTAssertEqual(gesture.press(at: 10), .none)
+        XCTAssertEqual(gesture.release(at: 10.25), .none) // A long press is not a tap.
+        XCTAssertEqual(gesture.press(at: 10.3), .none)
+        XCTAssertEqual(gesture.release(at: 10.38), .firstTap)
+    }
     func testPreferencesFailSafely() {
         XCTAssertEqual(Preferences.decode(Data("bad".utf8)).shortcut, .standard)
         var turbo = Preferences(); turbo.model = "turbo"
@@ -49,8 +79,21 @@ final class PolicyTests: XCTestCase {
         turbo.model = "medium"
         XCTAssertEqual(Preferences.decode(try? JSONEncoder().encode(turbo)).model, "medium")
         XCTAssertFalse(Shortcut(key: 36, modifiers: Shortcut.control).isValid)
-        XCTAssertFalse(Shortcut(key: 0, modifiers: 0).isValid)
+        XCTAssertTrue(Shortcut(key: 0, modifiers: 0).isValid)
         XCTAssertTrue(Shortcut.standard.isValid)
+        turbo.language = "de"; XCTAssertEqual(Preferences.decode(try? JSONEncoder().encode(turbo)).language, "de")
+        turbo.language = "zz"; XCTAssertEqual(Preferences.decode(try? JSONEncoder().encode(turbo)).language, "auto")
+        turbo.model = "base.en"; turbo.language = "fr"
+        let decoded = Preferences.decode(try? JSONEncoder().encode(turbo))
+        XCTAssertEqual(decoded.model, "base.en"); XCTAssertEqual(decoded.language, "auto")
+        for oldMode in ["hold", "doubleTap"] {
+            let legacy = Data("{\"schema\":1,\"shortcut\":{\"key\":65535,\"modifiers\":262144},\"language\":\"en\",\"model\":\"medium\",\"gesture\":\"\(oldMode)\"}".utf8)
+            let migrated = Preferences.decode(legacy)
+            XCTAssertEqual(migrated.shortcut, Shortcut(key: Shortcut.modifierOnlyKey, modifiers: Shortcut.control))
+            XCTAssertEqual(migrated.language, "en")
+            let encoded = try? JSONEncoder().encode(migrated)
+            XCTAssertFalse(String(decoding: encoded ?? Data(), as: UTF8.self).contains("gesture"))
+        }
     }
     func testSampleRateAndStereoConversion() throws {
         for rate in [44100.0, 48000.0] {

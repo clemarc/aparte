@@ -2,7 +2,7 @@ import XCTest
 import CryptoKit
 @testable import AparteCore
 final class ModelStoreTests: XCTestCase {
-    func fixture() throws -> (URL, URL, ModelManifest) {
+    func fixture(id: String = "base") throws -> (URL, URL, ModelManifest) {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         let source = root.appendingPathComponent("source")
         try FileManager.default.createDirectory(at: source, withIntermediateDirectories: true)
@@ -11,7 +11,7 @@ final class ModelStoreTests: XCTestCase {
             let data = Data("synthetic test \(name)".utf8); try data.write(to: url)
             return .init(path: name, url: URL(string: "https://huggingface.co/test/resolve/" + String(repeating: "a", count: 40) + "/" + name)!, bytes: Int64(data.count), sha256: SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined())
         }
-        return (root, source, .init(id: "base", displayName: "Synthetic test", revision: String(repeating: "a", count: 40), tokenizerRevision: String(repeating: "b", count: 40), license: "test", files: files))
+        return (root, source, .init(id: id, displayName: "Synthetic test", revision: String(repeating: "a", count: 40), tokenizerRevision: String(repeating: "b", count: 40), license: "test", files: files))
     }
     func testRealAtomicImportReplacementAndDeletion() async throws {
         let (root, source, manifest) = try fixture(); defer { try? FileManager.default.removeItem(at: root) }
@@ -23,6 +23,16 @@ final class ModelStoreTests: XCTestCase {
         let children = try FileManager.default.contentsOfDirectory(atPath: root.appendingPathComponent("models").path)
         XCTAssertEqual(children, ["base"])
         try await store.delete("base"); XCTAssertFalse(FileManager.default.fileExists(atPath: installed.path))
+    }
+    func testEnglishOnlyModelCanBeDeleted() async throws {
+        let (root, source, manifest) = try fixture(id: "base.en")
+        defer { try? FileManager.default.removeItem(at: root) }
+        let store = ModelStore(root: root.appendingPathComponent("models"))
+        try await store.install(manifest, importing: source) { _ in }
+        let installed = root.appendingPathComponent("models/base.en")
+        try manifest.verify(directory: installed)
+        try await store.delete("base.en")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: installed.path))
     }
     func testCorruptImportPreservesExistingInstallation() async throws {
         let (root, source, manifest) = try fixture(); defer { try? FileManager.default.removeItem(at: root) }

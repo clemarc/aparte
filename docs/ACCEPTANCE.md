@@ -14,7 +14,7 @@ Environment: Apple M5 Pro, 48 GiB, arm64, macOS 26.6 (25G72), Xcode 27.0 (27A266
 | §1.3 source, documentation, evidence bundle | PASS | README and all required docs, frozen fixtures, raw synthetic benchmark evidence |
 | §2 native menu bar, Swift/AppKit/SwiftUI, arm64 macOS14 | PASS | Xcode target/shared scheme; Debug and Release builds; arm64 binary and plist target 14.0 |
 | §2 normal operation no Dock icon | PASS | LSUIElement/accessory policy; visual verification separately BLOCKED |
-| §2 hold-only/default chord/language scope/no deferred features | PASS | Production coordinator, configurable Control–Option–Space, Auto/en/fr; source inspection |
+| §2 original hold-only/default chord/language scope | SUPERSEDED by D037 | Original M4 baseline was inspected; current feature status appears below |
 | §2 stable name/bundle/install path | PASS | Aparte.app, display Aparté, dev.aparte.Aparte; local ~/Applications install/signature verified |
 | §3 pinned OSS WhisperKit only | PASS | Exact revision/lockfiles; WhisperKit/ArgmaxCore only app engine, no Pro SDK |
 | §3 testable modules and reproducible entry points | PASS | build/test/benchmark scripts; generated project committed; clean final-source Debug build and 29 tests, actual small integration and Release runs (evidence/verification.json) |
@@ -372,3 +372,63 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Debug/Release development build and signing | PASS | `artifacts/companion-alignment-{debug,release}.log`; existing certificate-backed identity verified |
 | Updated real app launch | PASS | Idle app quit normally before rebuilding; relaunched Release reports Ready, medium and granted access. No recording/insertion performed |
 | Full live companion behavior | BLOCKED | App-menu invocation still captures the workspace rather than the separate popover; layout fixture does not validate real popover interaction or dictation |
+
+## 0.5.1 — Capture configuration cancellation
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Owner's configuration error observed | PASS | Native 0.5.0 build 16 showed the matching error and 0.0 seconds received; exact notification source was not traced |
+| Engine and capture-phase cancellation | PASS | Three regressions: unrelated/nil/retired engines ignored, current-engine change delivered once, startup/recording accepted, frozen-audio/insertion/stale session callbacks refused. Synthetic events, no recording |
+| Native Release and regression | PASS | 0.5.1 build 17; 47 tests, zero failures; `artifacts/capture-configuration-{release,unit}.log` |
+| Development signing continuity | PASS | Prior Debug Dew and new Release satisfy each other's actual requirements; `artifacts/capture-configuration-signing.log` |
+| Updated launch and owner-operated microphone check | PASS for one smoke attempt | Native 0.5.1 reports captured audio and locally completed transcription after owner interaction. Agent did not start capture; no audio/transcript in evidence |
+| Actual device-route/unplug and repeated capture | BLOCKED | One microphone check does not exercise route changes, cancellation/retry, timing distribution or the full M4 matrix |
+
+`docs/evidence/capture-configuration.json` records scoped evidence. M4 acceptance, fresh-Mac beta launch and two-beta permission persistence remain pending.
+
+## D037 — Recognition and shortcut extension
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Hold/default shortcut remains, optional double-tap timing and stop | PASS for code/unit | Monotonic 350 ms timing reducer and matched key ownership tests; native build. Physical keyboard behavior pending |
+| Bare, modifier-only and Fn / Globe candidate policy | PASS for code/unit | Policy, suppression and recorder paths compile; modifier-only and bare-key ownership tests. macOS Fn delivery and app conflicts unverified |
+| Searchable model-specific language picker and persisted codes | PASS for code/unit | 100 pinned engine codes; Base/Small/Medium exclude Cantonese, Turbo includes it, English-only model accepts Auto/en; corrupt/stale preference tests. No non-English speaker quality result |
+| Optional English-only Base Core ML and tokenizer | PASS for offline English fixture | Complete pinned 149,116,045-byte manifest, real offline English transcription with zero observed outbound requests; synthetic English WER 2.13%, English terms 5/6, silence 10/10; bilingual gate fails as expected because French is unsupported |
+| 0.6.0 build 18 local verification | PASS for build/fixture | Final certificate-backed native Release; 50 unit tests; real offline Base.en fixture; explicit French request rejected before decoding. No installed-app permission or device test inferred |
+| 0.6.0 stable Dew installation and launch | PASS for install/launch | Signed Release executable matches installed hash; running Dew path is `~/Applications/Aparte Dew.app`. No Fn / Globe input or permission continuity was exercised |
+| Real French-accented English, shortcut delivery across apps, bare-key conflicts and Fn keyboards | BLOCKED | Requires owner-operated device checks; automated code/fixture results do not establish these gates |
+| M4 and beta fresh-Mac/update gates | BLOCKED | D037 does not waive existing acceptance; no beta release or update test |
+
+[English-only benchmark summary](evidence/benchmark-base.en.summary.json) records the scoped measurements without audio/transcripts. Small remains the default.
+
+## D038 — Dew modifier capture and recording-mode correction
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Reported Control double-tap in 0.6.0 | EXPLAINED, not reproduced | Persisted Dew preference was Control-only plus Hold. Hold waits 180 ms for a modifier-only press, so quick taps do not trigger it. No evidence establishes whether the owner had selected Double-tap previously. |
+| Fn / Globe recorder and modifier-only event path | PASS for code/unit | Modifier key codes 54–63 are ignored as duplicate key events; 51 unit tests pass, including Fn and left/right Control events interleaved with modifier flags and double-tap start/stop. No physical keyboard event trace was captured. |
+| Saved Double-tap setting | PASS for local UI/persistence | In Dew 0.6.1 build 19, the picker showed Double-tap and Saved mode; `preferences.v1` encoded `doubleTap` with Control-only, and the installed app showed the choice after restart. No microphone recording was attempted. |
+| Corrected 0.6.1 build 19 and install | PASS for build/install/launch | Native Release and certificate-backed development signature passed; installed executable hash matched the build artifact and the running process resolved to `~/Applications/Aparte Dew.app`. The separate beta app was not replaced. |
+| Physical Fn / Globe selection, Control double-tap and cross-app behavior | BLOCKED | Requires owner-operated keyboard checks. Code/unit and local UI persistence do not establish real event delivery or conflict freedom. |
+| M4 and fresh-Mac/two-version beta gates | BLOCKED | Existing acceptance remains outstanding; no beta package/release or permission-continuity test was performed. |
+
+## D039 — Both gestures on one shortcut
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| Hold, double-tap, lone tap and second-press hold | PASS for code/unit | Shared 180 ms hold threshold and 350 ms tap window; 51 local unit tests pass, including a lone tap without start, double-tap start/tap stop, second press held as hold, expiry and reset. No microphone was opened by these tests. |
+| Modifier-only binding with both gestures | PASS for code/unit | Fn and left/right Control key events interleaved with flags preserve both hold and double-tap actions. Physical OS delivery remains unverified. |
+| Legacy preferences and current shortcut | PASS for code/unit and local UI | A saved `doubleTap` value decodes while preserving Control-only shortcut and language; new encoding omits the obsolete gesture field. Installed Dew showed Control as the saved shortcut. |
+| 0.6.2 build 20 | PASS for local build/install/launch | Native Release and certificate-backed development signing passed. Installed executable matched the build artifact; the running process resolved to `~/Applications/Aparte Dew.app`. Native Shortcuts UI visibly showed both gestures. |
+| Owner local shortcut smoke check | PASS for owner report | Owner reports the locally tested 0.6.2 build 20 is working. Exact keyboard/target/timing details were not supplied; this does not pass the full M4 matrix. |
+| Physical timing, microphone capture and cross-app insertion | BLOCKED | Owner-operated keyboard and speech checks remain required; build/unit results are not device acceptance. |
+| M4 and fresh-Mac/two-version beta gates | BLOCKED | No beta release or permission-continuity test; existing acceptance is unchanged. |
+
+## D040 — PR #9 review corrections
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| English-only Base deletion | PASS for code/unit | Synthetic verified `base.en` install then actual temporary-directory deletion; other model IDs remain governed by the explicit allowlist. No owner model directory was touched. |
+| Existing model pinning workflow | PASS for offline catalog check | `scripts/pin-model.py` ordering accepts the complete `base`, `small`, `medium`, `turbo`, `base.en` catalog without downloading assets. A live re-pin was not run. |
+| Detection-only modifier Hold review finding | PASS for code/unit | D039 uses the shared 180 ms gesture path for detection and recording; quick tap reports a first tap, not a Hold success. Physical keyboard validation remains scoped above. |
+| 0.6.2 build 21 local verification | PASS for local build/unit | 52 unit tests, full-catalog order check and certificate-backed native Release passed. Hosted CI and installed build 21 are separate checks. |

@@ -12,6 +12,7 @@ import AparteCore
     private var recentClick: (point: CGPoint, time: Date)?
     var capturingBinding = false
     var allowsLocalTest: (() -> Bool)?
+    var canBegin: (() -> Bool)?
     private(set) var lastDelivery = "Global shortcut"
     var active = false
     var onDown: (() -> Void)?
@@ -74,17 +75,17 @@ import AparteCore
         let action: GestureMatcher.Action
         switch type {
         case .keyDown, .keyUp:
-            action = matcher.key(UInt16(event.getIntegerValueField(.keyboardEventKeycode)), down: type == .keyDown, flags: event.flags.rawValue, repeated: event.getIntegerValueField(.keyboardEventAutorepeat) != 0, active: active, allowNewBinding: !capturingBinding)
-        case .flagsChanged: action = matcher.flags(event.flags.rawValue)
+            action = matcher.key(UInt16(event.getIntegerValueField(.keyboardEventKeycode)), down: type == .keyDown, flags: event.flags.rawValue, repeated: event.getIntegerValueField(.keyboardEventAutorepeat) != 0, active: active, allowNewBinding: !capturingBinding && (binding.modifiers != 0 || canBegin?() == true))
+        case .flagsChanged: action = capturingBinding ? .pass : matcher.flags(event.flags.rawValue)
         default: if active { onInteraction?(nil, type == .leftMouseDown) }; return Unmanaged.passUnretained(event)
         }
         if type == .keyDown && action != .down { recentClick = nil }
         // Dispatch coordinator work after this short callback has returned.
         switch action {
-        case .down: lastDelivery = delivery; DispatchQueue.main.async { self.onDown?() }; return nil
-        case .up: DispatchQueue.main.async { self.onUp?() }; return type == .flagsChanged ? Unmanaged.passUnretained(event) : nil
+        case .down: lastDelivery = delivery; DispatchQueue.main.async { self.onDown?() }; return type == .flagsChanged ? Unmanaged.passUnretained(event) : nil
+        case .up: DispatchQueue.main.async { self.onUp?() }; return type == .flagsChanged || type == .keyDown ? Unmanaged.passUnretained(event) : nil
         case .escape: DispatchQueue.main.async { self.onCancel?() }; return nil
-        case .consume: return nil
+        case .consume: return type == .flagsChanged ? Unmanaged.passUnretained(event) : nil
         case .interaction:
             let switchingApps = type == .keyDown && event.getIntegerValueField(.keyboardEventKeycode) == 48 && event.flags.contains(.maskCommand)
             let rawPID = event.getIntegerValueField(.eventTargetUnixProcessID)

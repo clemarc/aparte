@@ -19,7 +19,7 @@ import AparteSpeech
     @Published var installProgress = 0.0
     @Published var installing = false
     @Published var tapFailed = false
-    @Published var bindingTest = false
+    @Published var bindingTest = false { didSet { resetShortcutGesture() } }
     @Published var recordingBinding = false { didSet { hotkey.capturingBinding = recordingBinding } }
     @Published private(set) var readinessSummary = "Checking setup…"
     @Published private(set) var setupReadiness = SetupReadiness(microphone: false, accessibility: false, model: false, shortcut: false)
@@ -59,6 +59,8 @@ import AparteSpeech
     private var audioDrains = 0
     private var audioDraining: Bool { audioDrains > 0 }
     private var startedAt: Date?
+    private var shortcutGesture = ShortcutGesture()
+    private var holdStart: Task<Void, Never>?
     private var watchdog: Timer?
     private var observers: [NSObjectProtocol] = []
     private var memoryPressure: DispatchSourceMemoryPressure?
@@ -69,13 +71,19 @@ import AparteSpeech
     init() {
         catalog = Bundle.main.url(forResource: "Models", withExtension: "json").flatMap { try? ModelCatalog.load($0) }
         hotkey.binding = preferences.shortcut
-        hotkey.onDown = { [weak self] in self?.begin() }
-        hotkey.onUp = { [weak self] in if self?.destination != .microphoneTest { self?.release() } }
+        hotkey.onDown = { [weak self] in self?.shortcutDown() }
+        hotkey.onUp = { [weak self] in self?.shortcutUp() }
         hotkey.onCancel = { [weak self] in self?.cancel("Cancelled") }
         hotkey.onInteraction = { [weak self] pid, clicked in self?.observeInteraction(targetPID: pid, clicked: clicked) }
         hotkey.onDisabled = { [weak self] in self?.cancel("Shortcut tap interrupted. Recheck permissions.") }
         targetService.onInvalidated = { [weak self] notification in self?.observeTargetChange(notification) }
         hotkey.allowsLocalTest = { [weak self] in self?.testEditor?.isFocused == true || self?.bindingTest == true || self?.destination == .microphoneTest }
+        hotkey.canBegin = { [weak self] in
+            guard let self else { return false }
+            if self.bindingTest { return true }
+            if self.machine.id != nil { return self.machine.state == .startingCapture || self.machine.state == .recording }
+            return !self.sessionBusy && !HotkeyService.secureInput && ((self.testEditor?.isFocused == true && self.setupReadiness.canTestMicrophone) || self.setupReadiness.canDictate)
+        }
         hotkey.installLocalTestHandler()
         watchdog = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.tick() } }
         let workspace = NSWorkspace.shared.notificationCenter
@@ -84,7 +92,6 @@ import AparteSpeech
         }
         observers.append(workspace.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.activatedApplication(); self?.targetService.prepareCurrentApplication() } })
         observers.append(NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { self?.recheck() } })
-        observers.append(NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in MainActor.assumeIsolated { if self?.machine.id != nil { self?.cancel("Microphone configuration changed. Retry with the current default input.") } } })
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(screenLocked), name: NSNotification.Name("com.apple.screenIsLocked"), object: nil)
         memoryPressure = DispatchSource.makeMemoryPressureSource(eventMask: [.warning, .critical], queue: .main)
         memoryPressure?.setEventHandler { [weak self] in Task { @MainActor in self?.unloadIfIdle() } }; memoryPressure?.resume()
@@ -97,7 +104,8 @@ import AparteSpeech
     }
     var sessionBusy: Bool { machine.id != nil || machine.engineBusy || audioDraining || startup != nil || operation != nil || preparation != nil }
     func installed(_ id: String) -> Bool { FileManager.default.fileExists(atPath: modelsRoot.appendingPathComponent(id).appendingPathComponent("tokenizer.json").path) }
-    func persist() { UserDefaults.standard.set(try? JSONEncoder().encode(preferences), forKey: "preferences.v1"); hotkey.binding = preferences.shortcut }
+    private func resetShortcutGesture() { holdStart?.cancel(); holdStart = nil; shortcutGesture.reset() }
+    func persist() { resetShortcutGesture(); UserDefaults.standard.set(try? JSONEncoder().encode(preferences), forKey: "preferences.v1"); hotkey.binding = preferences.shortcut }
     func recheck(prepareModel: Bool = true) {
         let permissions = PermissionStatus(); permissionSummary = permissions.summary
         if permissions.accessibility {
@@ -136,7 +144,10 @@ import AparteSpeech
             do {
                 try await speech.load(directory: modelsRoot.appendingPathComponent(id), manifest: manifest)
                 guard !Task.isCancelled, modelGeneration == generation else { throw AparteError.cancelled }
-                preferences.model = id; persist(); modelLoaded = true; modelStatus = "\(id.capitalized) prepared"; notice = "Hold your shortcut when Ready. Speak after Recording appears."
+                preferences.model = id
+                if !SpeechLanguages.supports(preferences.language, model: id) { preferences.language = "auto"; notice = "This model cannot use the previous language. Language changed to Auto." }
+                else { notice = "Hold your shortcut to talk, or double-tap to start and tap once to stop." }
+                persist(); modelLoaded = true; modelStatus = "\(id.capitalized) prepared"
             } catch {
                 modelStatus = "Model load failed (\(id))."
                 machine.fail()
@@ -150,6 +161,43 @@ import AparteSpeech
     }
     func startMicrophoneTest() { bindingTest = false; begin(manualTest: true) }
     func stopMicrophoneTest() { if destination == .microphoneTest { release() } }
+    private func shortcutDown() {
+        handleShortcutAction(shortcutGesture.press(at: ProcessInfo.processInfo.systemUptime))
+        guard shortcutGesture.isPressed else { return }
+        holdStart?.cancel()
+        holdStart = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(180))
+            guard !Task.isCancelled,
+                  preferences.shortcut.key != Shortcut.modifierOnlyKey || !HotkeyService.modifiersClear(preferences.shortcut) else { return }
+            handleShortcutAction(shortcutGesture.held(at: ProcessInfo.processInfo.systemUptime))
+        }
+    }
+    private func shortcutUp() {
+        holdStart?.cancel(); holdStart = nil
+        handleShortcutAction(shortcutGesture.release(at: ProcessInfo.processInfo.systemUptime))
+    }
+    private func handleShortcutAction(_ action: ShortcutGesture.Action) {
+        if bindingTest {
+            switch action {
+            case .none: return
+            case .firstTap: testStatus = "\(hotkey.lastDelivery): first tap detected. Tap again quickly or hold the shortcut. No audio recorded."
+            case .startHold: testStatus = "\(hotkey.lastDelivery): hold detected. Release to finish detection. No audio recorded."
+            case .stopHold: testStatus = "\(hotkey.lastDelivery): hold and release detected. No audio recorded."
+            case .startToggle: testStatus = "\(hotkey.lastDelivery): double-tap start detected. Tap once to finish detection. No audio recorded."
+            case .stopToggle: testStatus = "\(hotkey.lastDelivery): double-tap start and tap stop detected. No audio recorded."
+            }
+            notice = testStatus; onStatus?()
+            return
+        }
+        switch action {
+        case .startHold, .startToggle:
+            begin()
+            if machine.id == nil { resetShortcutGesture() }
+        case .stopHold: if destination != .microphoneTest { release() }
+        case .stopToggle: release()
+        case .none, .firstTap: break
+        }
+    }
     func invalidateTestTarget() { if destination == .setupField { machine.invalidateTarget() } }
     func closeSetupTests() {
         if destination == .microphoneTest || destination == .setupField { cancel("Setup test closed. Recording cancelled.") }
@@ -215,8 +263,7 @@ import AparteSpeech
     }
     private func begin(manualTest: Bool = false) {
         guard !hotkey.capturingBinding else { return }
-        if bindingTest && !manualTest { notice = "\(hotkey.lastDelivery) detected: \(preferences.shortcut.displayLabel). Release to finish the test."; testStatus = notice; onStatus?(); return }
-        guard !sessionBusy else { notice = "Busy — this hold was ignored."; onStatus?(); return }
+        guard !sessionBusy else { notice = "Shortcut ignored while busy."; onStatus?(); return }
         switchedAwayAt = nil; returnedAt = nil; targetMismatchSince = nil; deferredText = nil; deferredExpires = nil; returnRequested = false
         let localReceipt = manualTest ? nil : testEditor?.receipt()
         let local = manualTest || localReceipt != nil
@@ -238,12 +285,17 @@ import AparteSpeech
         refresh()
         startup = Task {
             do {
-                try await audio.start(ticket: newTicket) { [weak self] in Task { @MainActor in
+                try await audio.start(ticket: newTicket, onConfigurationChange: { [weak self] in
+                    Task { @MainActor in
+                        guard let self, self.machine.isCapturing(id) else { return }
+                        self.cancel("Audio input changed during recording. Try again with the current default microphone.")
+                    }
+                }) { [weak self] in Task { @MainActor in
                     guard let self, self.machine.started(id) else { return }
-                    self.startedAt = Date(); self.notice = self.destination == .microphoneTest ? "Recording — press Stop to transcribe, Escape to cancel." : "Recording — release to transcribe, Escape to cancel."
+                    self.startedAt = Date(); self.notice = self.destination == .microphoneTest ? "Recording — press Stop to transcribe, Escape to cancel." : (self.shortcutGesture.isToggled ? "Recording — tap shortcut to stop, Escape to cancel." : "Recording — release to transcribe, Escape to cancel.")
                     if self.destination != .external { self.testStatus = self.notice }; self.refresh()
                 } }
-            } catch { if machine.id == id { machine.fail(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start (\((error as NSError).domain), \((error as NSError).code)). Check Sound → Input." } }
+            } catch { if machine.id == id { machine.fail(); resetShortcutGesture(); notice = (error as? AparteError)?.localizedDescription ?? "Microphone failed to start (\((error as NSError).domain), \((error as NSError).code)). Check Sound → Input." } }
             if machine.id == nil && destination != .external { testStatus = notice; destination = nil }
             startup = nil; refresh()
         }
@@ -397,6 +449,7 @@ import AparteSpeech
         onStatus?()
     }
     func cancel(_ reason: String = "Cancelled") {
+        resetShortcutGesture()
         if destination == .microphoneTest || destination == .setupField { testStatus = reason }
         let wasDeferring = deferredText != nil
         let wasActive = ticket != nil || machine.engineBusy || startup != nil || audioDraining
