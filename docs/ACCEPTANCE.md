@@ -420,5 +420,15 @@ These checks apply to the new UX candidate and do not close historical M4 or bet
 | Modifier-only binding with both gestures | PASS for code/unit | Fn and left/right Control key events interleaved with flags preserve both hold and double-tap actions. Physical OS delivery remains unverified. |
 | Legacy preferences and current shortcut | PASS for code/unit and local UI | A saved `doubleTap` value decodes while preserving Control-only shortcut and language; new encoding omits the obsolete gesture field. Installed Dew showed Control as the saved shortcut. |
 | 0.6.2 build 20 | PASS for local build/install/launch | Native Release and certificate-backed development signing passed. Installed executable matched the build artifact; the running process resolved to `~/Applications/Aparte Dew.app`. Native Shortcuts UI visibly showed both gestures. |
+| Owner local shortcut smoke check | PASS for owner report | Owner reports the locally tested 0.6.2 build 20 is working. Exact keyboard/target/timing details were not supplied; this does not pass the full M4 matrix. |
 | Physical timing, microphone capture and cross-app insertion | BLOCKED | Owner-operated keyboard and speech checks remain required; build/unit results are not device acceptance. |
 | M4 and fresh-Mac/two-version beta gates | BLOCKED | No beta release or permission-continuity test; existing acceptance is unchanged. |
+
+## D040 — PR #9 review corrections
+
+| Check | Status | Evidence scope |
+|---|---|---|
+| English-only Base deletion | PASS for code/unit | Synthetic verified `base.en` install then actual temporary-directory deletion; other model IDs remain governed by the explicit allowlist. No owner model directory was touched. |
+| Existing model pinning workflow | PASS for offline catalog check | `scripts/pin-model.py` ordering accepts the complete `base`, `small`, `medium`, `turbo`, `base.en` catalog without downloading assets. A live re-pin was not run. |
+| Detection-only modifier Hold review finding | PASS for code/unit | D039 uses the shared 180 ms gesture path for detection and recording; quick tap reports a first tap, not a Hold success. Physical keyboard validation remains scoped above. |
+| 0.6.2 build 21 local verification | PASS for local build/unit | 52 unit tests, full-catalog order check and certificate-backed native Release passed. Hosted CI and installed build 21 are separate checks. |

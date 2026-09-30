@@ -17,6 +17,7 @@ Changes to Aparté are recorded here in [Keep a Changelog](https://keepachangelo
 - The same saved shortcut now supports both hold to talk and double-tap start / tap stop, without a mode picker. A press held for 180 ms starts hold recording; two shorter taps within 350 ms start hands-free recording after the second release. A lone tap opens no microphone.
 - Existing Hold and Double-tap preferences migrate to the combined behavior. Shortcut guidance and detection describe both gestures.
 - Build 20 identifies this local candidate. Physical shortcut timing and Fn / Globe delivery still need keyboard checks; no beta release is created.
+- Build 21 adds review fixes: English-only Base can be deleted, and the model pinning script handles all five catalog entries.
 
 ## 0.6.1 — 2026-09-30 (local shortcut correction)
 

@@ -20,6 +20,7 @@ MODELS = {
     "turbo": ("openai_whisper-large-v3-v20240930_turbo/", "openai/whisper-large-v3-turbo", "41f01f3fe87f28c78e2fbf8b568835947dd65ed9", "Whisper large-v3 turbo · multilingual", "MIT (OpenAI Whisper / Argmax Core ML conversion and OpenAI tokenizer)"),
 }
 CATALOG = ROOT / "Resources/Models.json"
+MODEL_ORDER = {"base": 0, "small": 1, "medium": 2, "turbo": 3, "base.en": 4}
 
 
 def tree(prefix):
@@ -85,8 +86,7 @@ def main():
         "license": license_note,
         "files": files,
     })
-    order = {"base": 0, "small": 1, "medium": 2, "turbo": 3}
-    catalog["models"].sort(key=lambda item: order[item["id"]])
+    catalog["models"].sort(key=lambda item: MODEL_ORDER[item["id"]])
     temporary = CATALOG.with_suffix(".json.partial")
     temporary.write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + "\n")
     temporary.replace(CATALOG)
